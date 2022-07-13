@@ -43,7 +43,7 @@ static const unsigned long crc32b_table[256] =
     0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D,
 };
 
-// fast implementation ------------------------------------------------------------------------------------------------------------------------------
+// fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned long fast_crc32b_array(const unsigned char * data, size_t len)
 {
     unsigned long crc = CRC32INIT;
@@ -61,7 +61,9 @@ unsigned long fast_crc32b_byte(const unsigned long crc, const unsigned char data
     return (crc >> 8) ^ crc32b_table[(crc ^ data) & 0xFF];
 }
 
-// slow implementation ------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+// slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
+//------------------------------------------------------------------------------------------------------------------------------
 unsigned long slow_crc32b_array(const unsigned char * data, size_t len)
 {
     unsigned int crc = CRC32INIT;
@@ -84,4 +86,6 @@ unsigned long slow_crc32b_byte(unsigned long crc, const unsigned char data) // m
     for(int bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x01) ? ((crc >> 1) ^ CRC32POLY) : (crc >> 1);
     }
+
+    return crc;
 }

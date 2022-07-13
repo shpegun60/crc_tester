@@ -53,16 +53,18 @@ Lookup Table:
 */
 
 // CRC-32b -----------------------------------
-#define CRC32INIT 0xFFFFFFFF
+#define CRC32INIT 0xFFFFFFFFUL
 #define CRC32POLY 0xEDB88320UL  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 
-// fast implementation ------------------------------------------------------------------------------------------------------------------------------
+// fast implementation (CRC MSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned long fast_crc32b_array(const unsigned char * data, size_t len);
 unsigned long fast_crc32b_byte(const unsigned long crc, const unsigned char data);
 
-// slow implementation ------------------------------------------------------------------------------------------------------------------------------
-unsigned long slow_crc32b_array(const unsigned char * data, size_t len);
-unsigned long slow_crc32b_byte(unsigned long crc, const unsigned char data);
+//------------------------------------------------------------------------------------------------------------------------------
+// slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
+//------------------------------------------------------------------------------------------------------------------------------
+unsigned long slow_crc32b_array(const unsigned char * data, size_t len);         //must ~crc if last byte
+unsigned long slow_crc32b_byte(unsigned long crc, const unsigned char data);     //must ~crc if last byte
 
 
 #endif

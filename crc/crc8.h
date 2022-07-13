@@ -1,6 +1,7 @@
 #ifndef __CRC8_DALLAS_MAXIM_H__
 #define __CRC8_DALLAS_MAXIM_H__
 
+#include <stddef.h>
 #include <stdint.h>
 
 /*
@@ -37,12 +38,12 @@ Lookup Table:
 
 
 
-// fast implementation ------------------------------------------------------------------------------------------------------------------------------
+// fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned char fast_crc8_maxim_array(unsigned char * data, unsigned int len);
 unsigned char fast_crc8_maxim_byte(const unsigned char crc, const unsigned char data);
 
-// slow implementation ------------------------------------------------------------------------------------------------------------------------------
+// slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned char slow_crc8_maxim_array(unsigned char * data, unsigned int len);
 unsigned char slow_crc8_maxim_byte(unsigned char crc, const unsigned char data);
 
-#endif
+#endif /* __CRC8_DALLAS_MAXIM_H__ */

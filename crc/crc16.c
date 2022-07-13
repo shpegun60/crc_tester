@@ -27,7 +27,7 @@ static const unsigned short crc16_t10dif_table[256] =
     0x1F65, 0x94D2, 0x83BC, 0x080B, 0xAD60, 0x26D7, 0x31B9, 0xBA0E, 0xF0D8, 0x7B6F, 0x6C01, 0xE7B6, 0x42DD, 0xC96A, 0xDE04, 0x55B3,
 };
 
-// fast implementation ------------------------------------------------------------------------------------------------------------------------------
+// fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned short fast_crc16_t10_dif_array(unsigned char * data, unsigned int len)
 {
     unsigned short crc = CRC16INIT;
@@ -44,7 +44,7 @@ unsigned short fast_crc16_t10_dif_byte(const unsigned short crc, const unsigned 
     return (crc << 8) ^ crc16_t10dif_table[((crc >> 8) ^ data) & 0x00FF];
 }
 
-// slow implementation ------------------------------------------------------------------------------------------------------------------------------
+// slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned short slow_crc16_t10_dif_array(unsigned char * data, unsigned int len)
 {
     unsigned short crc = CRC16INIT;
@@ -52,7 +52,7 @@ unsigned short slow_crc16_t10_dif_array(unsigned char * data, unsigned int len)
     while (len--) {
         crc ^= *data++ << 8;
 
-        for (unsigned int i = 0; i < 8; ++i) {
+        for (unsigned int bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x8000) ? ((crc << 1) ^ CRC16POLY) : (crc << 1);
         }
     }
@@ -64,8 +64,9 @@ unsigned short slow_crc16_t10_dif_byte(unsigned short crc, const unsigned char d
 {
     crc ^= data << 8;
 
-    for (unsigned int i = 0; i < 8; ++i) {
+    for (unsigned int bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x8000) ? ((crc << 1) ^ CRC16POLY) : (crc << 1);
     }
+
     return crc;
 }

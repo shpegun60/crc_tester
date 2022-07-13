@@ -6,7 +6,7 @@
 *************************************************************************************************
 */
 
-static const unsigned char crc8MaximTable[256] =
+static const unsigned char crc8_maxim_table[256] =
 {
     0x00, 0x31, 0x62, 0x53, 0xC4, 0xF5, 0xA6, 0x97, 0xB9, 0x88, 0xDB, 0xEA, 0x7D, 0x4C, 0x1F, 0x2E,
     0x43, 0x72, 0x21, 0x10, 0x87, 0xB6, 0xE5, 0xD4, 0xFA, 0xCB, 0x98, 0xA9, 0x3E, 0x0F, 0x5C, 0x6D,
@@ -26,13 +26,13 @@ static const unsigned char crc8MaximTable[256] =
     0x82, 0xB3, 0xE0, 0xD1, 0x46, 0x77, 0x24, 0x15, 0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC,
 };
 
-// fast implementation ------------------------------------------------------------------------------------------------------------------------------
+// fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned char fast_crc8_maxim_array(unsigned char * data, unsigned int len)
 {
     unsigned char crc = CRC8INIT;
 
     while (len--) {
-        crc = crc8MaximTable[crc ^ *data++];
+        crc = crc8_maxim_table[crc ^ *data++];
 	}
 
     return crc;
@@ -40,10 +40,10 @@ unsigned char fast_crc8_maxim_array(unsigned char * data, unsigned int len)
 
 unsigned char fast_crc8_maxim_byte(const unsigned char crc, const unsigned char data)
 {
-    return crc8MaximTable[crc ^ data];
+    return crc8_maxim_table[crc ^ data];
 }
 
-// slow implementation ------------------------------------------------------------------------------------------------------------------------------
+// slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned char slow_crc8_maxim_array(unsigned char * data, unsigned int len)
 {
     unsigned char crc = CRC8INIT;
@@ -51,7 +51,7 @@ unsigned char slow_crc8_maxim_array(unsigned char * data, unsigned int len)
     while (len--) {
         crc ^= *data++;
 
-        for (unsigned int i = 0; i < 8; ++i) {
+        for (unsigned int bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x80) ? ((crc << 1) ^ CRC8POLY) : (crc << 1);
 		}
     }
@@ -63,7 +63,7 @@ unsigned char slow_crc8_maxim_byte(unsigned char crc, const unsigned char data)
 {
     crc ^= data;
 
-	for (unsigned int i = 0; i < 8; ++i) {
+    for (unsigned int bit = 0; bit < 8; ++bit) {
 		crc = (crc & 0x80) ? ((crc << 1) ^ CRC8POLY) : (crc << 1);
 	}
 	

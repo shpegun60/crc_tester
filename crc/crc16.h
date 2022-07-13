@@ -1,11 +1,12 @@
 #ifndef __CRC_16_T10_DIF_H__
 #define __CRC_16_T10_DIF_H__
 
+#include <stddef.h>
 #include <stdint.h>
 
 /*
 **********************************************************************************************************************************
-  Name  : CRC-16
+  Name  : CRC-16-T10-DIF
   Poly  : 0x8BB7    x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
   Init  : 0x0000
   Revert: false
@@ -39,13 +40,13 @@ Lookup Table:
 #define CRC16INIT 0x0000
 #define CRC16POLY 0x8BB7 // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 
-// fast implementation ------------------------------------------------------------------------------------------------------------------------------
+// fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned short fast_crc16_t10_dif_array(unsigned char * data, unsigned int len);
 unsigned short fast_crc16_t10_dif_byte(const unsigned short crc, const unsigned char data);
 
-// slow implementation ------------------------------------------------------------------------------------------------------------------------------
+// slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned short slow_crc16_t10_dif_array(unsigned char * data, unsigned int len);
 unsigned short slow_crc16_t10_dif_byte(unsigned short crc, const unsigned char data);
 
 
-#endif
+#endif /* __CRC_16_T10_DIF_H__ */
