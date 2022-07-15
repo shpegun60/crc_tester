@@ -39,6 +39,7 @@ Lookup Table:
 // CRC-16-T10-DIF -----------------------------------
 #define CRC16INIT 0x0000
 #define CRC16POLY 0x8BB7 // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC16CHECK 0xD0DB
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
 unsigned short fast_crc16_t10_dif_array(unsigned char * data, unsigned int len);

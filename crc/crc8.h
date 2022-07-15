@@ -35,6 +35,7 @@ Lookup Table:
 */
 #define CRC8POLY 0x31 // = x^8 + x^5 + x^4 + 1
 #define CRC8INIT 0xFF
+#define CRC8CHECK 0xF7
 
 
 
