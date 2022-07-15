@@ -12,7 +12,7 @@
   Revert: true
   XorOut: 0xFFFFFFFF
   Check : 0xCBF43926 ("123456789")
-  MaxLen: 268 435 455 Byte (2 147 483 647 Bit) - detection of single, double, burst and all odd errors
+  MaxLen: 268 435 455 byte`s (2 147 483 647 bit`s) - detection of single, double, burst and all odd errors
 
   Ethernet, ZIP STANDARD!!!!
 
@@ -53,8 +53,8 @@ Lookup Table:
 */
 
 // CRC-32b -----------------------------------
-#define CRC32INIT 0xFFFFFFFFUL
-#define CRC32POLY 0xEDB88320UL  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC32INIT  0xFFFFFFFFUL
+#define CRC32POLY  0xEDB88320UL  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 #define CRC32CHECK 0xCBF43926
 
 // fast implementation (CRC MSB)------------------------------------------------------------------------------------------------------------------------------

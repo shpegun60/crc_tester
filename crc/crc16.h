@@ -12,7 +12,7 @@
   Revert: false
   XorOut: 0x0000
   Check : 0xD0DB ("123456789")
-  MaxLen: 4095 byte (32767 bit) - detection of single, double, triple and all odd errors
+  MaxLen: 4095 byte`s (32767 bit`s) - detection of single, double, triple and all odd errors
   
   MILITARY STANDARD!!!!
 
@@ -37,8 +37,8 @@ Lookup Table:
 */
 
 // CRC-16-T10-DIF -----------------------------------
-#define CRC16INIT 0x0000
-#define CRC16POLY 0x8BB7 // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC16INIT  0x0000
+#define CRC16POLY  0x8BB7 // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 #define CRC16CHECK 0xD0DB
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
