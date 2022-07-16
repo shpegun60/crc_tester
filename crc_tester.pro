@@ -8,19 +8,16 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+
+include(smart_assert/smart_assert.pri)
+#include(raw_parser_dma/raw_parser_dma.pri)
+include(crc/crc.pri)
+
 SOURCES += \
-    crc/crc16.c \
-    crc/crc32.c \
-    crc/crc8.c \
-    crc/crc_test.c \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
-    crc/crc16.h \
-    crc/crc32.h \
-    crc/crc8.h \
-    crc/crc_test.h \
     mainwindow.h
 
 FORMS += \

@@ -1,8 +1,9 @@
 #ifndef __CRC_32_B_H__
 #define __CRC_32_B_H__
 
-#include <stddef.h>
-#include <stdint.h>
+#include "my_crc_port.h"
+
+#ifdef _MY_CRC32_ENA
 
 /*
 **********************************************************************************************************************************
@@ -53,19 +54,31 @@ Lookup Table:
 */
 
 // CRC-32b -----------------------------------
-#define CRC32INIT  0xFFFFFFFFUL
-#define CRC32POLY  0xEDB88320UL  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
-#define CRC32CHECK 0xCBF43926
+#define CRC32INIT  ((my_crc32_t)0xFFFFFFFFUL)
+#define CRC32POLY  ((my_crc32_t)0xEDB88320UL)  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC32CHECK ((my_crc32_t)0xCBF43926UL)
+
+#ifdef _MY_CRC32_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB)------------------------------------------------------------------------------------------------------------------------------
-unsigned long fast_crc32b_array(const unsigned char * data, size_t len);
-unsigned long fast_crc32b_byte(const unsigned long crc, const unsigned char data);
+my_crc32_t fast_crc32b_array(const my_crc_byte_t * data, size_t len);
+my_crc32_t fast_crc32b_byte(const my_crc32_t crc, const my_crc_byte_t data);
+
+#endif /* _MY_CRC32_TABLE_CALC_ENA */
+
+
+#ifdef _MY_CRC32_GENERIC_CALC_ENA
 
 //------------------------------------------------------------------------------------------------------------------------------
 // slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
 //------------------------------------------------------------------------------------------------------------------------------
-unsigned long slow_crc32b_array(const unsigned char * data, size_t len);         //must ~crc if last byte
-unsigned long slow_crc32b_byte(unsigned long crc, const unsigned char data);     //must ~crc if last byte
+my_crc32_t slow_crc32b_array(const my_crc_byte_t * data, size_t len);         //must ~crc if last byte
+my_crc32_t slow_crc32b_byte(my_crc32_t crc, const my_crc_byte_t data);     //must ~crc if last byte
+
+#endif /*_MY_CRC32_GENERIC_CALC_ENA */
+
+#endif /* _MY_CRC32_ENA */
 
 
-#endif
+//---------------------------------------------------------------------
+#endif /* __CRC_32_B_H__ */

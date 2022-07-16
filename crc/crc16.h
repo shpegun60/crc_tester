@@ -1,8 +1,9 @@
 #ifndef __CRC_16_T10_DIF_H__
 #define __CRC_16_T10_DIF_H__
 
-#include <stddef.h>
-#include <stdint.h>
+#include "my_crc_port.h"
+
+#ifdef _MY_CRC16_ENA
 
 /*
 **********************************************************************************************************************************
@@ -37,17 +38,29 @@ Lookup Table:
 */
 
 // CRC-16-T10-DIF -----------------------------------
-#define CRC16INIT  0x0000
-#define CRC16POLY  0x8BB7 // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
-#define CRC16CHECK 0xD0DB
+#define CRC16INIT  ((my_crc16_t)0x0000U)
+#define CRC16POLY  ((my_crc16_t)0x8BB7U) // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC16CHECK ((my_crc16_t)0xD0DBU)
+
+#ifdef _MY_CRC16_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-unsigned short fast_crc16_t10_dif_array(unsigned char * data, unsigned int len);
-unsigned short fast_crc16_t10_dif_byte(const unsigned short crc, const unsigned char data);
+my_crc16_t fast_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len);
+my_crc16_t fast_crc16_t10_dif_byte(const my_crc16_t crc, const my_crc_byte_t data);
 
+#endif /* _MY_CRC16_TABLE_CALC_ENA */
+
+
+#ifdef _MY_CRC16_GENERIC_CALC_ENA
 // slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-unsigned short slow_crc16_t10_dif_array(unsigned char * data, unsigned int len);
-unsigned short slow_crc16_t10_dif_byte(unsigned short crc, const unsigned char data);
+my_crc16_t slow_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len);
+my_crc16_t slow_crc16_t10_dif_byte(my_crc16_t crc, const my_crc_byte_t data);
+
+#endif /* _MY_CRC16_GENERIC_CALC_ENA */
+
+#endif /* _MY_CRC16_ENA */
 
 
+
+//---------------------------------------------------------------------
 #endif /* __CRC_16_T10_DIF_H__ */

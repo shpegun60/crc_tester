@@ -1,8 +1,10 @@
 #ifndef __CRC8_DALLAS_MAXIM_H__
 #define __CRC8_DALLAS_MAXIM_H__
 
-#include <stddef.h>
-#include <stdint.h>
+
+#include "my_crc_port.h"
+
+#ifdef _MY_CRC8_ENA
 
 /*
 *************************************************************************************************
@@ -34,18 +36,30 @@ Lookup Table:
 *************************************************************************************************
 */
 
-#define CRC8INIT  0xFF
-#define CRC8POLY  0x31 // = x^8 + x^5 + x^4 + 1
-#define CRC8CHECK 0xF7
+#define CRC8INIT  ((my_crc8_t)0xFFU)
+#define CRC8POLY  ((my_crc8_t)0x31U) // = x^8 + x^5 + x^4 + 1
+#define CRC8CHECK ((my_crc8_t)0xF7U)
 
-
+#ifdef _MY_CRC8_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-unsigned char fast_crc8_maxim_array(unsigned char * data, unsigned int len);
-unsigned char fast_crc8_maxim_byte(const unsigned char crc, const unsigned char data);
+my_crc8_t fast_crc8_maxim_array(my_crc_byte_t * data, unsigned int len);
+my_crc8_t fast_crc8_maxim_byte(const my_crc8_t crc, const my_crc_byte_t data);
+
+#endif /* _MY_CRC8_TABLE_CALC_ENA */
+
+
+#ifdef _MY_CRC8_GENERIC_CALC_ENA
 
 // slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-unsigned char slow_crc8_maxim_array(unsigned char * data, unsigned int len);
-unsigned char slow_crc8_maxim_byte(unsigned char crc, const unsigned char data);
+my_crc8_t slow_crc8_maxim_array(my_crc_byte_t * data, unsigned int len);
+my_crc8_t slow_crc8_maxim_byte(my_crc8_t crc, const my_crc_byte_t data);
 
+#endif /* _MY_CRC8_GENERIC_CALC_ENA */
+
+#endif /* _MY_CRC8_ENA*/
+
+
+
+//---------------------------------------------------------------------
 #endif /* __CRC8_DALLAS_MAXIM_H__ */
