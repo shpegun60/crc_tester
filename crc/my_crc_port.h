@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef unsigned char my_crc_byte_t; // byte type, input to crc functions (error when sizeof != 1)
+typedef uint8_t my_crc_byte_t; // byte type, input to crc functions (error when sizeof != 1)
 /*
  * ******************************************************************************
  * CRC8 SETTINGS (USER OVERWRITE) commit define if do not use future
@@ -17,7 +17,7 @@ typedef unsigned char my_crc_byte_t; // byte type, input to crc functions (error
 
 // type crc8
 #ifdef _MY_CRC8_ENA
-    typedef unsigned char my_crc8_t; // definition CRC8 type (error when sizeof != 1)
+    typedef uint8_t my_crc8_t; // definition CRC8 type (error when sizeof != 1)
 #endif /* _MY_CRC8_ENA */
 
 
@@ -33,7 +33,7 @@ typedef unsigned char my_crc_byte_t; // byte type, input to crc functions (error
 
 // type crc16
 #ifdef _MY_CRC16_ENA
-    typedef unsigned short my_crc16_t; // definition CRC16 type (error when sizeof != 2)
+    typedef uint16_t my_crc16_t; // definition CRC16 type (error when sizeof != 2)
 #endif /* _MY_CRC16_ENA */
 
 
@@ -49,7 +49,7 @@ typedef unsigned char my_crc_byte_t; // byte type, input to crc functions (error
 
 // type crc32
 #ifdef _MY_CRC32_ENA
-    typedef unsigned long my_crc32_t; // definition CRC32 type (error when sizeof != 4)
+    typedef uint32_t my_crc32_t; // definition CRC32 type (error when sizeof != 4)
 #endif /* _MY_CRC32_ENA */
 
 /*
@@ -95,7 +95,7 @@ typedef unsigned char my_crc_byte_t; // byte type, input to crc functions (error
     #endif /* _MY_CRC32_ENA*/
 
     //--------------------------------------------------------------------------------------------------------------
-    #undef C99MY_CRC_STATIC_ASSERTION_CREATE // delete define for static assertion if version C less than C11
+    #undef C99MY_CRC_STATIC_ASSERTION_CREATE
 #endif /* (__STDC_VERSION__ >= 201112L) */
 
 

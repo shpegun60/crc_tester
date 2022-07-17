@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 
 extern "C" {
-#include "crc/crc_test.h"
+#include "crc_test.h"
+#include "byte_order.h"
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     crc_test();
+    endiansTest();
 }
 
 MainWindow::~MainWindow()

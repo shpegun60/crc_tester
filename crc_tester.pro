@@ -10,8 +10,8 @@ CONFIG += c++11
 
 
 include(smart_assert/smart_assert.pri)
-#include(raw_parser_dma/raw_parser_dma.pri)
 include(crc/crc.pri)
+include(byte_order/byte_order.pri)
 
 SOURCES += \
     main.cpp \
