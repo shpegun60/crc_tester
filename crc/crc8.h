@@ -39,6 +39,7 @@ Lookup Table:
 #define CRC8INIT  ((my_crc8_t)0xFFU)
 #define CRC8POLY  ((my_crc8_t)0x31U) // = x^8 + x^5 + x^4 + 1
 #define CRC8CHECK ((my_crc8_t)0xF7U)
+#define CRC8FINAL(crc)
 
 #ifdef _MY_CRC8_TABLE_CALC_ENA
 

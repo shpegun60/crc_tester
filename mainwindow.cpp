@@ -4,6 +4,8 @@
 extern "C" {
 #include "crc_test.h"
 #include "byte_order.h"
+
+#include "rawparser_dma.h"
 }
 
 MainWindow::MainWindow(QWidget *parent)

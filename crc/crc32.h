@@ -57,6 +57,7 @@ Lookup Table:
 #define CRC32INIT  ((my_crc32_t)0xFFFFFFFFUL)
 #define CRC32POLY  ((my_crc32_t)0xEDB88320UL)  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 #define CRC32CHECK ((my_crc32_t)0xCBF43926UL)
+#define CRC32FINAL(crc) (crc) = (~crc)
 
 #ifdef _MY_CRC32_TABLE_CALC_ENA
 

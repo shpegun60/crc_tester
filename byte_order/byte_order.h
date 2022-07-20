@@ -1,7 +1,11 @@
 #ifndef __BYTE_ORDER_H__
 #define __BYTE_ORDER_H__
 
+#include <stddef.h>
 #include <stdint.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmultichar" // disable warning: multi-character character constant [-Wmultichar]
 
 #if defined (__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__) && !defined(MY_BYTE_ORDER_DEFINED)
     #define MY_BYTE_ORDER_DEFINED
@@ -14,8 +18,6 @@
 #elif !defined(MY_BYTE_ORDER_DEFINED) /* if not exists system byte-order macro, define other hack */
     #define MY_BYTE_ORDER_DEFINED
 
-    #pragma GCC diagnostic ignored "-Wmultichar"
-
     #define MY_LITTLE_ENDIAN   0x41424344UL
     #define MY_BIG_ENDIAN      0x44434241UL
     #define MY_PDP_ENDIAN      0x42414443UL
@@ -24,7 +26,7 @@
 #endif /* defined (__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__) && !defined(MY_BYTE_ORDER_DEFINED) */
 
 #define MY_SYSTEM_IS_LITTLE_ENDIAN (*(uint16_t*)"\0\1">>8) // runtime: is little endian system type
-#define MY_SYSTEM_IS_BIG_ENDIAN (*(uint16_t*)"\1\0">>8)    // runtime: is big endian endian system type
+#define MY_SYSTEM_IS_BIG_ENDIAN (*(uint16_t*)"\1\0">>8)    // runtime: is big endian system type
 
 
 //----------------------------------------------------
@@ -311,5 +313,8 @@ inline double BigEndianF64(double value)
 #endif
 }
 
+
+
+#pragma GCC diagnostic pop
 
 #endif /* __BYTE_ORDER_H__ */

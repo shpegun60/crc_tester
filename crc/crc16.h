@@ -41,6 +41,7 @@ Lookup Table:
 #define CRC16INIT  ((my_crc16_t)0x0000U)
 #define CRC16POLY  ((my_crc16_t)0x8BB7U) // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 #define CRC16CHECK ((my_crc16_t)0xD0DBU)
+#define CRC16FINAL(crc)
 
 #ifdef _MY_CRC16_TABLE_CALC_ENA
 

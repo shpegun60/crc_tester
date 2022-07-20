@@ -201,7 +201,8 @@ static int crc32_test(my_crc_byte_t *data, size_t len, my_crc32_t *res)
     for(size_t i = 0; i < len; ++i) {
         crc32[1] = fast_crc32b_byte(crc32[1], data[i]);
     }
-    crc32[1] = ~crc32[1];
+    CRC32FINAL(crc32[1]);
+    //crc32[1] = ~crc32[1];
     printf("\ncrc16 --> fast_crc32b_byte: 0x%x", (unsigned int)crc32[1]);
 
 #endif /* _MY_CRC32_TABLE_CALC_ENA */
@@ -215,7 +216,8 @@ static int crc32_test(my_crc_byte_t *data, size_t len, my_crc32_t *res)
     for(size_t i = 0; i < len; ++i) {
         crc32[3] = slow_crc32b_byte(crc32[3], data[i]);
     }
-    crc32[3] = ~crc32[3];
+    CRC32FINAL(crc32[3]);
+    //crc32[3] = ~crc32[3];
     printf("\ncrc16 --> slow_crc32b_byte: 0x%x", (unsigned int)crc32[3]);
 
 #endif /* _MY_CRC32_GENERIC_CALC_ENA */

@@ -74,6 +74,7 @@ typedef uint8_t my_crc_byte_t; // byte type, input to crc functions (error when 
 
     #ifdef _MY_CRC32_ENA
         static_assert((sizeof(my_crc32_t) == 4), "MY_CRC: size of crc32 type must be equal 4, change --> my_crc_port.h: typedef my_crc32_t ");
+        static_assert((!__builtin_types_compatible_p(my_crc32_t, float)), "MY_CRC: type of crc32 must not be float, change --> my_crc_port.h: typedef my_crc32_t ");
     #endif /* _MY_CRC32_ENA*/
 
 #else // if old version C
