@@ -142,7 +142,7 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
     #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
     //--------------------------------------------------------------------------------------------------------------
-    #undef C99_D_RAW_P__STATIC_ASSERTION_CREATE
+    #undef C99_D_RAW_P_STATIC_ASSERTION_CREATE
 #endif /* (__STDC_VERSION__ >= 201112L) */
 
 
