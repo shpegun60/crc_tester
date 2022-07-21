@@ -347,7 +347,7 @@ inline void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const rawP_
     #define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte((self), (byte))
 #endif /* D_RAW_P_CRC_ENA */
 
-RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, const rawP_data_t * const data, const rawP_size_t len)
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, rawP_data_t * data, rawP_size_t len)
 {
 
 #ifdef D_RAW_P_CRC_ENA
@@ -374,8 +374,8 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, const
     }
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-    for(rawP_size_t i = 0; i < len; ++i) {
-        RawParser_dma_addTxByteCRC(self, data[i]);
+    while(len--) {
+        RawParser_dma_addTxByteCRC(self, *data++);
     }
 
     D_RAW_P_CRC_FINAL(self->m_transmittCalcCRC);

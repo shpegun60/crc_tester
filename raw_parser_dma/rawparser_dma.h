@@ -55,7 +55,7 @@ extern inline void RawParser_dma_addTxByte(RawParser_dma_t * const self, rawP_da
 #endif /* D_RAW_P_CRC_ENA */
 
 
-RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, const rawP_data_t * const data, const rawP_size_t len);
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, rawP_data_t * data, rawP_size_t len);
 
 
 
