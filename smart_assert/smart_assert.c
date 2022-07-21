@@ -48,6 +48,24 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
     //printf("Assert failed:\t %s:\nExpected:\t%s\nSource:\t\t%s, line %d\n", msg, expr_str,file, line);
 }
 
+void __M_Warning_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...)
+{
+    (void)expr;
+
+    va_list args;
+    va_start(args, msg);
+
+    fprintf(stderr, "\nAssert failed:\t");
+    vfprintf(stderr, msg, args);
+    fprintf(stderr, "\n");
+
+    fprintf(stderr, "Expression:\t %s \n", expr_str);
+    fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+
+    va_end(args);
+    fflush(stderr);
+}
+
 
 void __M_valueObserver(const char* msg, ...)
 {

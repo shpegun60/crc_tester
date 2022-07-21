@@ -22,11 +22,13 @@ extern "C" {
 
 //#define NDEBUG
 
+#define M_EMPTY
 
 void __M_Assert(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg);
 void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg);
 void __M_Error_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
 void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg);
+void __M_Warning_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
 void __M_valueObserver(const char* msg, ...);
 
 #ifndef NDEBUG
@@ -82,6 +84,15 @@ void __M_valueObserver(const char* msg, ...);
         }\
     }while(0L)
 
+#   define M_Assert_Warning_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
+    do{\
+        if (Expr) {\
+            beforeExpr;\
+            __M_Warning_variadic((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            afterExpr;\
+        }\
+    }while(0L)
+
 #   define M_Assert_WarningSaveCheck(Expr, Msg, afterExpr)\
     do{\
         if (Expr) {\
@@ -90,6 +101,16 @@ void __M_valueObserver(const char* msg, ...);
         }\
     }while(0L)
 
+#   define M_Assert_WarningSaveCheck_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
+    do{\
+        if (Expr) {\
+            beforeExpr;\
+            __M_Warning_variadic((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            afterExpr;\
+        }\
+    }while(0L)
+
+// functions ------------------------------------------------------------------------------------------------------------------------
 #define M_Assert_SafeFunctionCall(foo, ...)\
     do {\
         if(foo) {\
@@ -113,7 +134,7 @@ void __M_valueObserver(const char* msg, ...);
 
 #else
 #   define M_Assert_Break(Expr, Msg, afterExpr)
-#   define M_Assert_Break_par(Expr, beforeExpr, afterExpr, Msg, arg...)
+#   define M_Assert_Break_var(Expr, beforeExpr, afterExpr, Msg, arg...)
 
 #   define M_Assert_BreakSaveCheck(Expr, Msg, afterExpr)\
     do{\
@@ -123,10 +144,19 @@ void __M_valueObserver(const char* msg, ...);
     }while(0L)
 
 #   define M_Assert_Warning(Expr, Msg)
+#   define M_Assert_Warning_var(Expr, beforeExpr, afterExpr, Msg, arg...)
 
 #   define M_Assert_WarningSaveCheck(Expr, Msg, afterExpr)\
     do{\
         if (Expr) {\
+            afterExpr;\
+        }\
+    }while(0L)
+
+#   define M_Assert_WarningSaveCheck_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
+    do{\
+        if (Expr) {\
+            beforeExpr;\
             afterExpr;\
         }\
     }while(0L)

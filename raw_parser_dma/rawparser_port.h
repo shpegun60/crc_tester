@@ -4,9 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "my_crc_port.h"
+#include "crc8.h"
+#include "crc16.h"
+#include "crc32.h"
 #include "byte_order.h"
-
 
 //--------------------------------TYPES--------------------------------
 typedef uint8_t rawP_start_t; // start byte type, sizeof(rawP_start_t) must be equal 1 else error
@@ -17,8 +18,8 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
     INTERNAL BUFFER SIZE (number of rawP_data_t values)
 ***************************************************************************************************
 */
-#define D_RAW_P_RX_BUF_SIZE 256 // rx buffer must be is power of 2, else error
-#define D_RAW_P_TX_BUF_SIZE 256 // tx buffer must be is power of 2, else error
+#define D_RAW_P_RX_BUF_SIZE 256U // rx buffer must be is power of 2, else error
+#define D_RAW_P_TX_BUF_SIZE 256U // tx buffer must be is power of 2, else error
 
 /*
 ***************************************************************************************************
@@ -34,6 +35,24 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
     typedef uint8_t rawP_size_t;
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    #define RECEIVE_EXTENDED_LEN_CMD (rawP_data_t)(0xFFU)
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+#define D_RAW_P_LEN_SEPARATOR 0xFBU
+
+/*
+***************************************************************************************************
+   frame data structure definition
+***************************************************************************************************
+*/
+
+typedef struct {
+    rawP_data_t *data;
+    rawP_size_t size;
+} RawParser_Frame_t;
+
 /*
 ***************************************************************************************************
     CRC SETTINGS
@@ -48,7 +67,7 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
     //#define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
 
-#endif /* D_RAW_P_CRC8 */
+#endif /* D_RAW_P_CRC_ENA */
 
 
 //CRC TABLE SIZE & TYPE -----------------
@@ -128,6 +147,10 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
         static_assert((sizeof(rawP_size_t) == 1), "MY_RAW_PARSER: size of length type must be equal 1, change --> raw_parser_port.h: typedef rawP_size_t");
     #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
+    #ifdef D_RAW_P_CRC_ENA
+        static_assert((sizeof(rawP_data_t) == sizeof(my_crc_byte_t)), "MY_RAW_PARSER: sizeof CRC my_crc_byte_t  must be equal to raw parser data type rawP_data_t, change --> raw_parser_port.h: typedef rawP_data_t, or my_crc_port.h --> typedef my_crc_byte_t");
+    #endif /* D_RAW_P_CRC_ENA */
+
 #else // if old version C
     #define C99_D_RAW_P_STATIC_ASSERTION_CREATE(COND,MSG) typedef int my_crc_static_assertion_##MSG[(COND)? 1 : -1] // define custom static assertion if version C less than C11
     //--------------------------------------------------------------------------------------------------------------
@@ -140,6 +163,10 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
     #else // use one byte of length
         C99_D_RAW_P_STATIC_ASSERTION_CREATE((sizeof(rawP_size_t) == 1), size_of_length_type_type_must_be_equal_1_change_typedef_rawP_size_t);
     #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+    #ifdef D_RAW_P_CRC_ENA
+        C99_D_RAW_P_STATIC_ASSERTION_CREATE((sizeof(rawP_data_t) == sizeof(my_crc_byte_t)), size_of_crc_type_must_be_equal_to_rawParser_data_type_change_typedef_rawP_size_t_or_my_crc_byte_t);
+    #endif /* D_RAW_P_CRC_ENA */
 
     //--------------------------------------------------------------------------------------------------------------
     #undef C99_D_RAW_P_STATIC_ASSERTION_CREATE
@@ -185,5 +212,13 @@ typedef uint8_t rawP_data_t;  // data type, sizeof(rawP_data_t) must be equal 1 
     #error D_RAW_P_TX_BUF_SIZE must be is power of 2
 #endif //check if power of 2 D_RAW_P_TX_BUF_SIZE
 
+#if ((D_RAW_P_RX_BUF_SIZE > 256) || (D_RAW_P_TX_BUF_SIZE > 256)) && !defined(D_RAW_P_TWO_BYTES_LEN_SUPPORT)
+    #error BUFFER`s must be less than 256 or uncommit D_RAW_P_TWO_BYTES_LEN_SUPPORT
+#endif // two bytes len support buffer check
+
+
+#if ((D_RAW_P_RX_BUF_SIZE > 8192) || (D_RAW_P_TX_BUF_SIZE > 8192))
+    #error BUFFER`s must be less or equal than 8192 bytes per one packet (MTU)
+#endif // two bytes len support buffer check
 
 #endif /* __RAW_PARSER_PORT_H__*/

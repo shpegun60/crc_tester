@@ -6,4 +6,4 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/rawparser_dma.h\
-	$$PWD/rawparser_dma_port.h
+	$$PWD/rawparser_port.h

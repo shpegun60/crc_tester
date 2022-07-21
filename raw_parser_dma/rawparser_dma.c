@@ -1,388 +1,435 @@
 #include "rawparser_dma.h"
-#include "smart_assert.h"
 
-//#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-//    #define RECEIVE_EXTENDED_LEN (rawP_data_t)(0xFF)
-//#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+#include <stdlib.h>
 
 
-//// FSM data fusion -----------------------------
-//#define RECEIVE_LEN_0           0
-
-//#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-//    #define RECEIVE_LEN_LOW     1
-//    #define RECEIVE_LEN_HIGH    2
-//#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-
-//#define RECEIVE_DATA            3
-
-//#ifdef D_RAW_P_CRC_ENA
-//    #define RECEIVE_CRC         4
-//#endif /* D_RAW_P_CRC_ENA */
-
-//#define RECEIVE_ERR             5
-////----------------------------------------------
-
-//RawParser_t* rawParser_new(RawParser_Init_t *init_desc)
-//{
-//    M_Assert_BreakSaveCheck((init_desc == NULL) || (init_desc->maxFrameSize == 0), "rawParser_new: No valid init", return NULL);
-
-//    RawParser_t* self = (RawParser_t *)calloc(1, sizeof(RawParser_t));
-//    M_Assert_BreakSaveCheck(self == NULL, "rawParser_new: No allocation memory", return NULL);
+#ifndef NULL
+#define NULL (void *)0
+#endif /* NULL */
 
 
-//    self->init = *init_desc;
-//    self->m_receivePackLen = (rawP_size_t)0;
+// FSM data fusion -----------------------------
+#define RECEIVE_LEN_0           0x00U
 
-//    #ifdef D_RAW_P_CRC_ENA
-//        self->m_frameCrc = (rawP_crc_t)(0xFFFFFFFFFFFFFFFFULL);
-//    #endif /* D_RAW_P_CRC_ENA */
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+#define RECEIVE_LEN_LOW     0x01U
+#define RECEIVE_LEN_HIGH    0x02U
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+#define RECEIVE_DATA            0x03U
+
+#ifdef D_RAW_P_CRC_ENA
+#define RECEIVE_CRC_0         0x04U
+
+#if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+#define RECEIVE_CRC_1         0x05U
+#endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
+
+#if defined(D_RAW_P_USE_CRC32)
+#define RECEIVE_CRC_2         0x06U
+#define RECEIVE_CRC_3         0x07U
+#endif /* defined(D_RAW_P_USE_CRC32) */
+
+#endif /* D_RAW_P_CRC_ENA */
+
+#define RECEIVE_ERR             0x08U
+#define RECEIVE_OK              0x09U
+//----------------------------------------------
+
+RawParser_dma_t* rawParser_dma_new(rawP_start_t packStart)
+{
+    RawParser_dma_t* self = (RawParser_dma_t *)calloc(1, sizeof(RawParser_dma_t));
+    M_Assert_BreakSaveCheck(self == NULL, "rawParser_dma_new: No allocation memory", return (RawParser_dma_t*)NULL);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    M_Assert_BreakSaveCheck(packStart == RECEIVE_EXTENDED_LEN_CMD, "rawParser_new: start byte must be not equal RECEIVE_EXTENDED_LEN_CMD", return (RawParser_dma_t*)NULL);
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+    self->m_startByte = packStart;
+    self->m_receivePackLen = (rawP_size_t)0;
+
+#ifdef D_RAW_P_CRC_ENA
+    self->m_receiveCalcCRC = D_RAW_P_CRC_INIT;
+    self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;
+
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+        self->m_receiveCRC = D_RAW_P_CRC_INIT;
+    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
+
+#endif /* D_RAW_P_CRC_ENA */
     
-//    self->m_triggerSB = 0;
-//    self->m_receivePos = 0;
-//    self->m_receiveReadPos = 0;
-//    self->m_receiveHandlePos = 0;
-
-//    self-receiveState = RECEIVE_LEN_0;
-
-//    self->TX.data = self->m_sendBuffer;
-//    self->TX.size = (rawP_size_t)0;
-
-//    self->RX.data = self->m_frameBuffer;
-//    self->RX.size = (rawP_size_t)0;
-//}
-
-//int rawParser_delete(RawParser_t** data)
-//{
-//    M_Assert_BreakSaveCheck((data == NULL) || (*data->maxFrameSize == NULL), "rawParser_delete: No valid input", return 0);
-//    free(*data);
-//    *data = NULL;
-//}
-
-
-//void RawParser_receiveByte(RawParser_t *self, rawP_data_t byte)
-//{
-//    M_Assert_Break((self == NULL), "RawParser_PushWord: No valid input", return);
-
-//    self->m_recBuffer[self->m_receivePos++] = byte;
-//}
-
-//void RawParser_receiveByte_ptr(RawParser_t *self, rawP_data_t *byte)
-//{
-//    M_Assert_Break((self == NULL || byte == NULL), "RawParser_PushWord: No valid input", return);
-
-//    self->m_recBuffer[self->m_receivePos++] = *byte;
-//}
-
-
-//RawParser_Frame_t* RawParser_proceed(RawParser_t *self)
-//{
-//    M_Assert_Break((self == NULL), "RawParser_proceed: No valid input", return);
-//    self->RX.size = 0;
-
-//    while (self->m_receivePos != self->m_receiveReadPos) {
-//        rawP_data_t ch = self->m_recBuffer[self->m_receiveReadPos & (D_RAW_P_RX_BUF_SIZE - 1U)];
-//        ++self->m_receiveReadPos;
-
-//        if (self->m_triggerSB) {
-//            if(ch == self->m_startByte) { //{SB}{SB} -> {SB}
-//                _proceedByte(self, ch, 0);
-//            } else { //{SB}{!SB} -> {SB} and newframe
-//                _proceedByte(self, ch, 1);
-//            }
-//            self->m_triggerSB = 0;
-//        } else if (ch == self->m_startByte) { //{!SB}{SB} -> set flag and skip step
-//            self->m_triggerSB = 1;
-//        } else { //{!SB}{!SB} -> {!SB}
-//            _proceedByte(self, ch, 0);
-//        }
-
-//        if(self->RX.size != 0) {
-//            return self->&RX;
-//        }
-//    }
-
-//    return self->&RX;
-//}
-
-
-//static void RawParser_proceedByte(RawParser_t *self, rawP_data_t ch, unsigned char newFrame)
-//{
-//    if (newFrame) {
-
-//#ifdef D_RAW_P_CRC_ENA
-//        self->m_frameCrc = (rawP_crc_t)(0xFFFFFFFFFFFFFFFFULL);
-//#endif /* D_RAW_P_CRC_ENA */
-
-//        self->m_receiveHandlePos = 0;
-//        self-receiveState = RECEIVE_LEN_0;
-//    }
-
-//    switch(self-receiveState) {
-
-//        case RECEIVE_LEN_0:
-
-//#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-//            if(ch == RECEIVE_EXTENDED_LEN) {
-//                self->receiveState = RECEIVE_LEN_LOW;
-//            } else {
-//#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-//                self->m_receivePackLen = ch;
-
-//                if (self->m_receivePackLen > self->m_startByte) {
-//                    self->m_receivePackLen -= 1;
-//                }
-//                self->m_receiveHandlePos = 0;
-//                self->receiveState = RECEIVE_DATA;
-//#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-//            }
-//#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+    self->m_triggerSB = 0;
+    self->m_receivePos = 0;
+    self->m_receiveReadPos = 0;
+    self->m_receiveHandlePos = 0;
 
-//            break;
-//#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-//        case RECEIVE_LEN_LOW:
-//            self->m_receivePackLen = ch;
-//            self->receiveState = RECEIVE_LEN_HIGH;
-//            break;
+    self->m_transmittPos = 0;
+    self->receiveState = RECEIVE_LEN_0;
 
-//        case RECEIVE_LEN_HIGH:
-//            self->m_receivePackLen |= (rawP_size_t)((((rawP_size_t)ch) << 8) & 0xFF00UL);
-//            self->m_receiveHandlePos = 0;
-//            self->receiveState = RECEIVE_DATA;
-//            break;
-//#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+    self->TX.data = self->m_sendBuffer;
+    self->TX.size = (rawP_size_t)0;
 
-//        case RECEIVE_DATA:
-//            M_Assert_WarningSaveCheck((self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE), "RawParser_proceedByte: No valid input length", self->receiveState = RECEIVE_ERR);
+    self->RX.data = self->m_receiveFrameBuffer;
+    self->RX.size = (rawP_size_t)0;
 
-//            self->m_frameBuffer[self->m_receiveHandlePos++] = ch;
+    return self;
+}
 
-//            if (self->m_receiveHandlePos == self->m_receivePackLen) {
 
-//                #ifdef D_RAW_P_CRC_ENA
-//                    self->receiveState = RECEIVE_CRC;
-//                #else
-//                    self->RX.size = self->m_receivePackLen;
-//                #endif /* D_RAW_P_CRC_ENA */
-//            }
-//            break;
+int rawParser_dma_delete(RawParser_dma_t** data)
+{
+    M_Assert_BreakSaveCheck((data == NULL) || (*data == NULL), "rawParser_delete: No valid input", return 0);
+    free(*data);
+    *data = NULL;
 
-// #ifdef D_RAW_P_CRC_ENA
-//        case RECEIVE_CRC:
-//            if(self->m_frameCrc == ch) {
-//                self->RX.size = self->m_receivePackLen;
-//            }
-//            break;
-//#endif /* D_RAW_P_CRC_ENA */
+    return 1;
+}
 
+inline void RawParser_dma_receiveByte(RawParser_dma_t *self, rawP_data_t byte)
+{
+    M_Assert_Break((self == NULL), "RawParser_dma_receiveByte: No valid input", return);
 
-//        case RECEIVE_ERR:
-//            M_Assert_Warning((self->m_receivePackLen > D_RAW_P_BUF_SIZE), "RawParser_proceedByte: No valid input length state changed, need new pack");
-//            break;
-//    }
+    self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
+    ++self->m_receivePos;
+}
 
-//    #ifdef D_RAW_P_CRC_ENA
-//        self->m_frameCrc =  _proceedCrc(m_frameCrc, ch);
-//    #endif /* D_RAW_P_CRC_ENA */
-//}
+inline void RawParser_dma_receiveArray(RawParser_dma_t *self, rawP_data_t *arr, rawP_size_t len)
+{
+    M_Assert_Break((self == NULL || arr == NULL), "RawParser_dma_receiveArray: No valid input", return);
+    M_Assert_Break(((uint32_t)len > D_RAW_P_RX_BUF_SIZE), "RawParser_dma_receiveArray: No valid input length", return);
 
+    while(len--) {
+        self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = *arr++;
+        ++self->m_receivePos;
+    }
+}
 
-//// RawParser_Frame_t *RawParser_ShieldFrame(RawParser_t *self, uint8_t *data, uint8_t dataSize)
-//// {
-////     uint8_t crc = 0xFF;
-////     uint8_t writePos = 0;
 
-////     desc->outputFrameBuff[writePos++] = desc->startByte;
+static void RawParser_dma_proceedByte(RawParser_dma_t * const self, const rawP_data_t ch, const unsigned char newFrame)
+{
+    M_Assert_Break((self == NULL), "RawParser_dma_proceedByte: No valid input", return);
 
-////     if (dataSize >= desc->startByte) {
-////         crc = _RawParser_proceedCrc(crc, (dataSize + 1));
-////         desc->outputFrameBuff[writePos++] = (dataSize + 1);
+    if (newFrame) {
 
-////         if ((dataSize + 1) == desc->startByte)
-////             desc->outputFrameBuff[writePos++] = (dataSize + 1);
+#ifdef D_RAW_P_CRC_ENA
+        self->m_receiveCalcCRC = D_RAW_P_CRC_INIT;
+#endif /* D_RAW_P_CRC_ENA */
 
-////     } else {
-////         crc = _RawParser_proceedCrc(crc, dataSize);
-////         desc->outputFrameBuff[writePos++] = dataSize;
+        self->m_receiveHandlePos = 0U;
+        self->receiveState = RECEIVE_LEN_0;
+    }
 
-////         if (dataSize == desc->startByte)
-////             desc->outputFrameBuff[writePos++] = dataSize;
-////     }
+    switch(self->receiveState) {
 
+    case RECEIVE_LEN_0:
 
-////     for (uint8_t i = 0; i < dataSize; i++) {
-////         crc = _RawParser_proceedCrc(crc, data[i]);
-////         desc->outputFrameBuff[writePos++] = data[i];
+#ifdef D_RAW_P_CRC_ENA
+    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+#endif /* D_RAW_P_CRC_ENA */
 
-////         if (data[i] == desc->startByte)
-////             desc->outputFrameBuff[writePos++] = data[i];
-////     }
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+        if(RECEIVE_EXTENDED_LEN_CMD == ch) {
+            self->receiveState = RECEIVE_LEN_LOW;
+        } else {
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+            if (ch > self->m_startByte) {
+                self->m_receivePackLen = (ch - 1U);
+            } else {
+                self->m_receivePackLen = ch;
+            }
 
+            self->receiveState = RECEIVE_DATA;
+            M_Assert_WarningSaveCheck_var(((uint32_t)self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
+                                              self->receiveState = RECEIVE_ERR;
+                                          }, "RawParser_proceedByte: No valid receive length, rx = %d, max = %d\n", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
 
-////     desc->outputFrameBuff[writePos++] = crc;
-////     if (crc == desc->startByte)
-////         desc->outputFrameBuff[writePos++] = crc;
+            self->m_receiveHandlePos = 0;
 
-////     desc->frameTX.data = desc->outputFrameBuff;
-////     desc->frameTX.size = writePos;
-////     return &desc->frameTX;
-//// }
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+        }
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-    
+        break;
 
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    case RECEIVE_LEN_LOW:
 
+#ifdef D_RAW_P_CRC_ENA
+    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+#endif /* D_RAW_P_CRC_ENA */
 
+        self->m_receivePackLen = (rawP_size_t)(ch & 0x000000FFUL);    // read low byte
+        self->receiveState = RECEIVE_LEN_HIGH;
+        break;
 
+    case RECEIVE_LEN_HIGH:
 
+#ifdef D_RAW_P_CRC_ENA
+    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+#endif /* D_RAW_P_CRC_ENA */
 
+        self->m_receivePackLen |= (rawP_size_t)((((rawP_size_t)ch) << 8U) & 0x0000FF00UL); // read high byte
+        self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen);
 
+        self->receiveState = RECEIVE_DATA;
+        M_Assert_WarningSaveCheck_var((self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
+                                          self->receiveState = RECEIVE_ERR;
+                                      }, "RawParser_proceedByte: No valid receive length, rx = %d, max = %d\n", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
 
+        self->m_receiveHandlePos = 0;
+        break;
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
+    case RECEIVE_DATA:
 
+#ifdef D_RAW_P_CRC_ENA
+    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+#endif /* D_RAW_P_CRC_ENA */
 
+        self->m_receiveFrameBuffer[self->m_receiveHandlePos++] = ch;
 
+        if (self->m_receiveHandlePos == self->m_receivePackLen) {
 
+#ifdef D_RAW_P_CRC_ENA
+            self->receiveState = RECEIVE_CRC_0;
+#else
+            self->RX.size = self->m_receivePackLen;
+            self->receiveState = RECEIVE_OK;
+#endif /* D_RAW_P_CRC_ENA */
+        }
+        break;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//void TcpClient::proceed()
-//{
-//    int len  = m_client.read(m_tmp, 10);
-    
-//    //return;
-//    for (int  i = 0; i < len; ++i) {
-//        auto ch = m_tmp[i];
-
-//        if (m_triggerSB) {
-//            if(ch == m_startByte) { //{SB}{SB} -> {SB}
-//                _proceedByte(ch, false);
-//            } else { //{SB}{!SB} -> {SB} and newframe
-//                _proceedByte(ch, true);
-//            }
-//            m_triggerSB = false;
-//        } else if (ch == m_startByte) { //{!SB}{SB} -> set flag and skip step
-//            m_triggerSB = true;
-//        } else { //{!SB}{!SB} -> {!SB}
-//            _proceedByte(ch, false);
-//        }
-//    }
-//}
-
-
-//#ifdef CLIENT_AUTO
-//int TcpClient::clientAutoProceedNonBlock(unsigned int timeMs, const uint16_t port, const char * host)
-//{
-//    switch (clientAutoState)
-//    {
-//        case 0:
-//            if (connected()) {
-//                proceed();
-//                return CLIENT_OK;
-//            }
-//            ++clientAutoState;
-//            return CLIENT_TRY_CONNECT;
-//            break;
-
-//        case 1:
-//            if (connect(host, port)) {
-//                clientAutoState = 0;
-//                return CLIENT_CONNECTED;
-//            }
-//            ++clientAutoState;
-//            clientAutolastTime = timeMs;
-//            break;
-
-//        case 2:
-//            if((timeMs - clientAutolastTime) > CLIENT_TIMEOUT) {
-//                clientAutoState = 1;
-//                clientAutolastTime = timeMs;
-//                return CLIENT_TRY_CONNECT;
-//            }
-//            break;
-
-//        default:
-//            clientAutoState = 1;
-//            break;
-//    }
-
-//    return CLIENT_ERROR_CONNECTION;
-//}
-
-//#endif /* CLIENT_AUTO */
-
-
-
-
-//void TcpClient::_proceedByte(uint8_t ch, bool newFrame)
-//{
-//    //Serial.print("PROCEED BYTE: "); Serial.print(ch); Serial.print("  ");Serial.print(newFrame); Serial.println("");
-//    if (newFrame) {
-//        m_frameCrc = 0xFF;
-//        m_receivePos = 0;
-//    }
-
-//    if (m_receivePos == 0) {
-//        m_receivePackLen = ch;
-//        if (m_receivePackLen > m_startByte) {
-//            m_receivePackLen -= 1;
-//        }
-//    } else if ((m_receivePos - 1) < m_receivePackLen) {
-//        m_recBuffer[m_receivePos-1] = ch;
-//    } else if ((m_receivePos - 1) == m_receivePackLen && m_frameCrc == ch) {
-//            _proceedPack();
-//    } else {
-//        return;
-//    }
-
-//    m_receivePos++;
-//    m_frameCrc =  _proceedCrc(m_frameCrc, ch);
-//}
-
-//void TcpClient::_proceedPack()
-//{
-//    //Serial.println("PACK received: ");
-    
-//    if (m_receivePackLen > 0) {
-//        auto s = m_handlers.find(m_recBuffer[0]);
-//        if (s != m_handlers.end()) {
-//            s->second(m_receivePackLen - 1, (m_recBuffer+1));
-//        }
-//    }
-//}
-
-//void TcpClient::on(uint8_t cmd, std::function<void(int len, uint8_t*)> foo)
-//{
-//    m_handlers.insert({cmd, foo});
-//}
-
-//void TcpClient::write(int len, unsigned char *ptr)
-//{
-//    char crc = static_cast<char>(0xFF);
-//    m_sendBuffer[0] = m_startByte;
-//    m_sendBuffer[1] = len >= m_startByte ? len + 1 : len;
-
-//    int pos = 2;
-//    auto addByte = [&](uint8_t b) {
-//        crc = _proceedCrc(crc, b);
-//        m_sendBuffer[pos++] = b;
-//        if (b == m_startByte) {
-//            m_sendBuffer[pos++] = b;
-//        }
-//    };
-
-//    for (uint8_t i = 0; i < len; i++) {
-//        addByte(ptr[i]);
-//    }
-//    addByte(crc);
-
-//    m_client.write(m_sendBuffer, pos);
-//}
-
-//uint8_t TcpClient::_proceedCrc(uint8_t crc, uint8_t ch) {
-//    crc ^= ch;
-//    for (int i = 0; i < 8; i++)
-//        crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
-//    return crc;
-//}
-
-
-//#undef CLIENT_AUTO
+
+#ifdef D_RAW_P_CRC_ENA
+
+    case RECEIVE_CRC_0:
+
+    #ifdef D_RAW_P_USE_CRC8
+        D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
+
+        if(self->m_receiveCalcCRC == ch) {
+            self->RX.size = self->m_receivePackLen;
+        }
+        M_Assert_Warning_var((self->m_receiveCalcCRC != ch), M_EMPTY, M_EMPTY, "RawParser_proceedByte: Receive CRC8 error, rx data: %d, crc calc:%d\n", ch, self->m_receiveCalcCRC);
+        self->receiveState = RECEIVE_OK;
+    #elif defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+
+        self->m_receiveCRC = (rawP_crc_t)(ch & 0x000000FFUL); // read 0 byte
+        self->receiveState = RECEIVE_CRC_1;
+
+    #endif /* CRC 0b SWITCH LOGIC */
+
+        break;
+
+
+
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+        case RECEIVE_CRC_1:
+            self->m_receiveCRC |= (rawP_crc_t)((((rawP_crc_t)ch) << 8U) & 0x0000FF00UL); // read 1 byte
+
+        #if defined(D_RAW_P_USE_CRC16)
+            self->m_receiveCRC = LittleEndianU16(self->m_receiveCRC);
+            D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
+
+            if(self->m_receiveCalcCRC == self->m_receiveCRC) {
+                self->RX.size = self->m_receivePackLen;
+            }
+            M_Assert_Warning_var((self->m_receiveCalcCRC != self->m_receiveCRC), M_EMPTY, M_EMPTY, "RawParser_proceedByte: Receive CRC16 error, rx data: %d, crc calc:%d\n", self->m_receiveCRC, self->m_receiveCalcCRC);
+
+            self->receiveState = RECEIVE_OK;
+        #elif defined(D_RAW_P_USE_CRC32)
+            self->receiveState = RECEIVE_CRC_2;
+        #endif /* CRC16 - CRC32 SWITCH */
+            break;
+
+    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
+
+
+
+    #if defined(D_RAW_P_USE_CRC32)
+        case RECEIVE_CRC_2:
+            self->m_receiveCRC |= (rawP_crc_t)((((rawP_crc_t)ch) << 16U) & 0x00FF0000UL); // read 2 byte
+            self->receiveState = RECEIVE_CRC_3;
+            break;
+
+        case RECEIVE_CRC_3:
+            self->m_receiveCRC |= (rawP_crc_t)((((rawP_crc_t)ch) << 24U) & 0xFF000000UL); // read 3 byte
+            self->m_receiveCRC = LittleEndianU32(self->m_receiveCRC);
+            D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
+
+            if(self->m_receiveCalcCRC == self->m_receiveCRC) {
+                self->RX.size = self->m_receivePackLen;
+            }
+            M_Assert_Warning_var((self->m_receiveCalcCRC != self->m_receiveCRC), M_EMPTY, M_EMPTY, "RawParser_proceedByte: Receive CRC32 error, rx data: %d, crc calc:%d\n", self->m_receiveCRC, self->m_receiveCalcCRC);
+            self->receiveState = RECEIVE_OK;
+            break;
+
+    #endif /* defined(D_RAW_P_USE_CRC32) */
+
+#endif /* D_RAW_P_CRC_ENA */
+
+
+    case RECEIVE_ERR:
+        M_Assert_Warning_var(1, M_EMPTY, M_EMPTY, "RawParser_proceedByte: Receive error, byte: %d, rx_len: %d, max_rxlen: %d\n", ch, self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
+        break;
+
+    case RECEIVE_OK:
+        M_Assert_Warning_var(1, M_EMPTY, M_EMPTY, "RawParser_proceedByte: LAST Received OK, byte: %d is not received because no SB", ch);
+        break;
+
+    default:
+        break;
+    }
+}
+
+
+
+RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t * const self)
+{
+    M_Assert_Break((self == NULL), "RawParser_proceed: No valid input", return (RawParser_Frame_t*)NULL);
+    self->RX.size = 0;
+
+    while ((self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)) != (self->m_receiveReadPos & (D_RAW_P_RX_BUF_SIZE - 1U))) {
+
+        rawP_data_t ch = self->m_receiveBuffer[self->m_receiveReadPos & (D_RAW_P_RX_BUF_SIZE - 1U)];
+
+        if (self->m_triggerSB) {
+            if(self->m_startByte == ch) { //{SB}{SB} -> {SB}
+                RawParser_dma_proceedByte(self, ch, 0);
+            } else { //{SB}{!SB} -> {SB} and newframe
+                RawParser_dma_proceedByte(self, ch, 1);
+            }
+            self->m_triggerSB = 0;
+        } else if (self->m_startByte == ch) { //{!SB}{SB} -> set flag and skip step
+            self->m_triggerSB = 1;
+        } else { //{!SB}{!SB} -> {!SB}
+            RawParser_dma_proceedByte(self, ch, 0);
+        }
+
+        ++self->m_receiveReadPos;
+
+        if(self->RX.size != 0) {
+            return &self->RX;
+        }
+    }
+
+    return &self->RX;
+}
+
+
+inline void RawParser_dma_addTxByte(RawParser_dma_t * const self, rawP_data_t byte)
+{
+    M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), "LEN packet more than buffer", M_EMPTY);
+
+    self->m_sendBuffer[self->m_transmittPos++] = byte;
+    if(byte == self->m_startByte) {
+        M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), "LEN packet more than buffer", M_EMPTY);
+
+        self->m_sendBuffer[self->m_transmittPos++] = byte;
+    }
+}
+
+#ifdef D_RAW_P_CRC_ENA
+inline void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const rawP_data_t byte)
+{
+    M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), "LEN packet more than buffer", M_EMPTY);
+
+    self->m_transmittCalcCRC = D_RAW_P_CRC_UPDATE(self->m_transmittCalcCRC, byte);
+
+    self->m_sendBuffer[self->m_transmittPos++] = byte;
+    if(byte == self->m_startByte) {
+        M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), "LEN packet more than buffer", M_EMPTY);
+
+        self->m_sendBuffer[self->m_transmittPos++] = byte;
+    }
+}
+#else
+    #define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte((self), (byte))
+#endif /* D_RAW_P_CRC_ENA */
+
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, const rawP_data_t * const data, const rawP_size_t len)
+{
+
+#ifdef D_RAW_P_CRC_ENA
+    self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;
+#endif /* D_RAW_P_CRC_ENA */
+
+    self->m_transmittPos = 0;
+    self->m_sendBuffer[self->m_transmittPos++] = self->m_startByte;
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    if(len > D_RAW_P_LEN_SEPARATOR) {
+        rawP_size_t tmp_len = LittleEndianU16(len);
+
+        RawParser_dma_addTxByteCRC(self, RECEIVE_EXTENDED_LEN_CMD);
+        RawParser_dma_addTxByteCRC(self, (rawP_data_t)(tmp_len & 0x000000FFU));
+        RawParser_dma_addTxByteCRC(self, (rawP_data_t)((tmp_len >> 8U) & 0x000000FFU));
+
+    } else {
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+        RawParser_dma_addTxByteCRC(self, (rawP_data_t)(((len >= self->m_startByte) ? (len + 1U) : len) & 0x000000FFU));
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    }
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+    for(rawP_size_t i = 0; i < len; ++i) {
+        RawParser_dma_addTxByteCRC(self, data[i]);
+    }
+
+    D_RAW_P_CRC_FINAL(self->m_transmittCalcCRC);
+
+#ifdef D_RAW_P_CRC_ENA
+
+    #ifdef D_RAW_P_USE_CRC8
+        RawParser_dma_addTxByte(self, self->m_transmittCalcCRC);
+    #elif defined(D_RAW_P_USE_CRC16)
+        self->m_transmittCalcCRC = LittleEndianU16(self->m_transmittCalcCRC);
+
+        RawParser_dma_addTxByte(self, (rawP_data_t)((self->m_transmittCalcCRC      ) & 0x000000FFU));
+        RawParser_dma_addTxByte(self, (rawP_data_t)((self->m_transmittCalcCRC >> 8U) & 0x000000FFU));
+    #elif defined(D_RAW_P_USE_CRC32)
+        self->m_transmittCalcCRC = LittleEndianU32(self->m_transmittCalcCRC);
+
+        RawParser_dma_addTxByte(self, (rawP_data_t)((self->m_transmittCalcCRC       ) & 0x000000FFU));
+        RawParser_dma_addTxByte(self, (rawP_data_t)((self->m_transmittCalcCRC >> 8U ) & 0x000000FFU));
+        RawParser_dma_addTxByte(self, (rawP_data_t)((self->m_transmittCalcCRC >> 16U) & 0x000000FFU));
+        RawParser_dma_addTxByte(self, (rawP_data_t)((self->m_transmittCalcCRC >> 24U) & 0x000000FFU));
+    #endif /* CRC SWITCH LOGIC */
+
+#endif /* D_RAW_P_CRC_ENA */
+
+    self->TX.size = (rawP_size_t)self->m_transmittPos;
+    return &self->TX;
+}
+
+
+// FSM data fusion delete -----------------------------
+#undef RECEIVE_LEN_0
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    #undef RECEIVE_LEN_LOW
+    #undef RECEIVE_LEN_HIGH
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+#undef RECEIVE_DATA
+
+#ifdef D_RAW_P_CRC_ENA
+    #undef RECEIVE_CRC_0
+
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+        #undef RECEIVE_CRC_1
+    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
+
+    #if defined(D_RAW_P_USE_CRC32)
+        #undef RECEIVE_CRC_2
+        #undef RECEIVE_CRC_3
+    #endif /* defined(D_RAW_P_USE_CRC32) */
+#else
+    #undef RawParser_dma_addTxByteCRC
+#endif /* D_RAW_P_CRC_ENA */
+
+#undef RECEIVE_ERR
+#undef RECEIVE_OK
+//----------------------------------------------
