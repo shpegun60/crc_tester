@@ -38,24 +38,24 @@ Lookup Table:
 */
 
 // CRC-16-T10-DIF -----------------------------------
-#define CRC16INIT  ((my_crc16_t)0x0000U)
-#define CRC16POLY  ((my_crc16_t)0x8BB7U) // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
-#define CRC16CHECK ((my_crc16_t)0xD0DBU)
-#define CRC16FINAL(crc)
+#define CRC16INIT  ((u16)0x0000U)
+#define CRC16POLY  ((u16)0x8BB7U) // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC16CHECK ((u16)0xD0DBU)
+#define CRC16FINAL(crc) /* ignored expression */
 
 #ifdef _MY_CRC16_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc16_t fast_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len);
-my_crc16_t fast_crc16_t10_dif_byte(const my_crc16_t crc, const my_crc_byte_t data);
+u16 fast_crc16_t10_dif_array(u8 * data, unsigned int len);
+u16 fast_crc16_t10_dif_byte(const u16 crc, const u8 data);
 
 #endif /* _MY_CRC16_TABLE_CALC_ENA */
 
 
 #ifdef _MY_CRC16_GENERIC_CALC_ENA
 // slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc16_t slow_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len);
-my_crc16_t slow_crc16_t10_dif_byte(my_crc16_t crc, const my_crc_byte_t data);
+u16 slow_crc16_t10_dif_array(u8 * data, unsigned int len);
+u16 slow_crc16_t10_dif_byte(u16 crc, const u8 data);
 
 #endif /* _MY_CRC16_GENERIC_CALC_ENA */
 

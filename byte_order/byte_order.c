@@ -2,84 +2,25 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-// strict type control (PRECOMPILE)------------------------------------------------
-#if (__STDC_VERSION__ >= 201112L) // if C version equal or more than C11
-#include "assert.h"
-
-static_assert((sizeof(uint64_t) == 8), "MY_ENDIAN: size of data type uint64_t do not supported");
-static_assert((sizeof(int64_t) == 8), "MY_ENDIAN: size of data type int64_t do not supported");
-static_assert((sizeof(int64_t) == sizeof(uint64_t)), "MY_ENDIAN: some type`s do not supported");
-static_assert((sizeof(double) == sizeof(uint64_t)), "MY_ENDIAN: some type`s do not supported");
-static_assert((sizeof(double) == 8), "MY_ENDIAN: size of data type double do not supported");
-
-static_assert((sizeof(uint32_t) == 4), "MY_ENDIAN: size of data type uint32_t do not supported");
-static_assert((sizeof(int32_t) == 4), "MY_ENDIAN: size of data type int32_t do not supported");
-static_assert((sizeof(int32_t) == sizeof(uint32_t)), "MY_ENDIAN: some type`s do not supported");
-static_assert((sizeof(float) == sizeof(uint32_t)), "MY_ENDIAN: some type`s do not supported");
-static_assert((sizeof(float) == 4), "MY_ENDIAN: size of data type float do not supported");
-
-static_assert((sizeof(uint16_t) == 2), "MY_ENDIAN: size of data type uint16_t do not supported");
-static_assert((sizeof(int16_t) == 2), "MY_ENDIAN: size of data type int16_t do not supported");
-static_assert((sizeof(int16_t) == sizeof(uint16_t)), "MY_ENDIAN: some type`s do not supported");
-
-static_assert((sizeof(uint8_t) == 1), "MY_ENDIAN: size of data type int8_t do not supported");
-
-#else // if old version C
-#define C99MY_ENDIAN_STATIC_ASSERTION_CREATE(COND,MSG) typedef int my_crc_static_assertion_##MSG[(COND)? 1 : -1] // define custom static assertion if version C less than C11
-//--------------------------------------------------------------------------------------------------------------
-
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(uint64_t) == 8), not_support_endian_data_type_uint64_t);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(int64_t) == 8), not_support_endian_data_type_int64_t);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(int64_t) == sizeof(uint64_t)), some_types_not_supported);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(double) == sizeof(uint64_t)), some_types_not_supported);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(double) == 8), not_support_endian_data_type_double);
-
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(uint32_t) == 4), not_support_endian_data_type_uint32_t);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(int32_t) == 4), not_support_endian_data_type_int32_t);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(int32_t) == sizeof(uint32_t)), some_types_not_supported);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(float) == sizeof(uint32_t)), some_types_not_supported);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(float) == 4), not_support_endian_data_type_float);
-
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(uint16_t) == 2), not_support_endian_data_type_uint16_t);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(int16_t) == 2), not_support_endian_data_type_int16_t);
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(int16_t) == sizeof(uint16_t)), some_types_not_supported);
-
-C99MY_ENDIAN_STATIC_ASSERTION_CREATE((sizeof(uint8_t) == 1), not_support_endian_data_type_uint8_t);
-
-//--------------------------------------------------------------------------------------------------------------
-#undef C99MY_ENDIAN_STATIC_ASSERTION_CREATE
-#endif /* (__STDC_VERSION__ >= 201112L) */
-
-
-//    #if MY_ENDIAN_ORDER==MY_LITTLE_ENDIAN
-//        #error "machine is little endian"
-//    #elif MY_ENDIAN_ORDER==MY_BIG_ENDIAN
-//        #error "machine is big endian"
-//    #elif MY_ENDIAN_ORDER==MY_PDP_ENDIAN
-//        #error "jeez, machine is PDP!"
-//    #else
-//        #error "What kind of hardware is this?!"
-//    #endif
-
 ///*
 // * ********************************************************
 // * main reverse function
 // * ********************************************************
 // */
 
-extern inline uint16_t Reverse16(const uint16_t value);
-extern inline uint32_t Reverse32(const uint32_t value);
-extern inline uint64_t Reverse64(const uint64_t value);
+extern inline u16 Reverse16(const u16 value);
+extern inline u32 Reverse32(const u32 value);
+extern inline u64 Reverse64(const u64 value);
 
-// pointrs input ----------------------------------------------
-extern inline uint16_t Reverse16_ptr(const uint16_t * const value);
-extern inline uint32_t Reverse32_ptr(const uint32_t * const value);
-extern inline uint64_t Reverse64_ptr(const uint64_t * const value);
+// pointers input ----------------------------------------------
+extern inline u16 Reverse16_ptr(const u16 * const value);
+extern inline u32 Reverse32_ptr(const u32 * const value);
+extern inline u64 Reverse64_ptr(const u64 * const value);
 
-extern inline uint16_t LittleEndianU16(uint16_t value);
-extern inline int16_t LittleEndianI16(int16_t value);
-extern inline uint16_t BigEndianU16(uint16_t value);
-extern inline int16_t BigEndianI16(int16_t value);
+extern inline u16 LittleEndianU16(u16 value);
+extern inline i16 LittleEndianI16(i16 value);
+extern inline u16 BigEndianU16(u16 value);
+extern inline i16 BigEndianI16(i16 value);
 
 /*
 * ********************************************************
@@ -87,10 +28,10 @@ extern inline int16_t BigEndianI16(int16_t value);
 * ********************************************************
 */
 
-extern inline uint32_t LittleEndianU32(uint32_t value);
-extern inline int32_t LittleEndianI32(int32_t value);
-extern inline uint32_t BigEndianU32(uint32_t value);
-extern inline int32_t BigEndianI32(int32_t value);
+extern inline u32 LittleEndianU32(u32 value);
+extern inline i32 LittleEndianI32(i32 value);
+extern inline u32 BigEndianU32(u32 value);
+extern inline i32 BigEndianI32(i32 value);
 
 /*
 * ********************************************************
@@ -98,33 +39,33 @@ extern inline int32_t BigEndianI32(int32_t value);
 * ********************************************************
 */
 
-extern inline uint64_t LittleEndianU64(uint64_t value);
-extern inline int64_t LittleEndianI64(int64_t value);
-extern inline uint64_t BigEndianU64(uint64_t value);
-extern inline int64_t BigEndianI64(int64_t value);
+extern inline u64 LittleEndianU64(u64 value);
+extern inline i64 LittleEndianI64(i64 value);
+extern inline u64 BigEndianU64(u64 value);
+extern inline i64 BigEndianI64(i64 value);
 
 /*
  * ********************************************************
- * float 32 bit variable reverse function
+ * f32 32 bit variable reverse function
  * ********************************************************
  */
 
-extern inline float LittleEndianF32(float value);
-extern inline float BigEndianF32(float value);
+extern inline f32 LittleEndianF32(f32 value);
+extern inline f32 BigEndianF32(f32 value);
 
 /*
  * ********************************************************
- * double 64 bit variable reverse function
+ * f64 64 bit variable reverse function
  * ********************************************************
  */
 
-extern inline double LittleEndianF64(double value);
-extern inline double BigEndianF64(double value);
+extern inline f64 LittleEndianF64(f64 value);
+extern inline f64 BigEndianF64(f64 value);
 
 __attribute__((unused)) static int byteOrderCheck(void * source, void * destination, int len)
 {
-    uint8_t * src = source;
-    uint8_t * dst = destination;
+    u8 * src = source;
+    u8 * dst = destination;
 
     while(len--) {
         if(*src++ != *(dst + len)) {
@@ -137,26 +78,26 @@ __attribute__((unused)) static int byteOrderCheck(void * source, void * destinat
 int endiansTest()
 {
     // dataset for test toyr system -------------------------------------------------------
-    const uint16_t dataU16 = 12345U;
-    const int16_t dataI16 = -1000L;
-    const uint32_t dataU32 = 1565465464;
-    const int32_t dataI32 = -1005500099L;
-    const uint64_t dataU64 = 2147483647786453ULL;
-    const int64_t dataI64 = -412123456442352LL;
-    const float  dataF32 = 123.321;
-    const double dataF64 = 987654321.123456789;
+    const u16 dataU16 = 12345U;
+    const i16 dataI16 = -1000L;
+    const u32 dataU32 = 1565465464;
+    const i32 dataI32 = -1005500099L;
+    const u64 dataU64 = 2147483647786453ULL;
+    const i64 dataI64 = -412123456442352LL;
+    const f32  dataF32 = 123.321;
+    const f64 dataF64 = 987654321.123456789;
     // ------------------------------------------------------------------------------------
 
 
     // check values ----------
-    uint16_t U16Check;
-    int16_t I16Check;
-    uint32_t U32Check;
-    int32_t I32Check;
-    uint64_t U64Check;
-    int64_t I64Check;
-    float floatCheck;
-    double doubleCheck;
+    u16 U16Check;
+    i16 I16Check;
+    u32 U32Check;
+    i32 I32Check;
+    u64 U64Check;
+    i64 I64Check;
+    f32 f32Check;
+    f64 f64Check;
     //------------------------
 
 
@@ -232,23 +173,23 @@ int endiansTest()
     if(I64Check != dataI64) {
         ++counter_notlittleEndian;
     }
-    // float -----------------------------------------------------------------------------
-    /* LittleEndianFloat */
-    printf("\nLittleEndianFloat\ndata: %f\n", dataF32);
-    floatCheck = LittleEndianF32(dataF32);
-    printf("result: %f\nmatched: %d\n", floatCheck, floatCheck == dataF32);
+    // f32 -----------------------------------------------------------------------------
+    /* LittleEndianf32 */
+    printf("\nLittleEndianf32\ndata: %f\n", dataF32);
+    f32Check = LittleEndianF32(dataF32);
+    printf("result: %f\nmatched: %d\n", f32Check, f32Check == dataF32);
 
-    if(floatCheck != dataF32) {
+    if(f32Check != dataF32) {
         ++counter_notlittleEndian;
     }
 
-    // double -----------------------------------------------------------------------------
-    /* LittleEndianDouble */
-    printf("\nLittleEndianDouble\ndata: %f\n", dataF64);
-    doubleCheck = LittleEndianF64(dataF64);
-    printf("result: %f\nmatched: %d\n", doubleCheck, doubleCheck == dataF64);
+    // f64 -----------------------------------------------------------------------------
+    /* LittleEndianf64 */
+    printf("\nLittleEndianf64\ndata: %f\n", dataF64);
+    f64Check = LittleEndianF64(dataF64);
+    printf("result: %f\nmatched: %d\n", f64Check, f64Check == dataF64);
 
-    if(doubleCheck != dataF64) {
+    if(f64Check != dataF64) {
         ++counter_notlittleEndian;
     }
 
@@ -271,7 +212,7 @@ int endiansTest()
     printf("\nBigEndianU16\ndata: %d\n", dataU16);
     U16Check = BigEndianU16(dataU16);
 
-    if(byteOrderCheck((uint8_t*)&dataU16, &U16Check, sizeof(dataU16))) {
+    if(byteOrderCheck((u8*)&dataU16, &U16Check, sizeof(dataU16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -290,7 +231,7 @@ int endiansTest()
     printf("\nBigEndianI16\ndata: %d\n", dataI16);
     I16Check = BigEndianI16(dataI16);
 
-    if(byteOrderCheck((uint8_t*)&dataI16, &I16Check, sizeof(dataI16))) {
+    if(byteOrderCheck((u8*)&dataI16, &I16Check, sizeof(dataI16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -309,7 +250,7 @@ int endiansTest()
     printf("\nBigEndianU32\ndata: %d\n", dataU32);
     U32Check = BigEndianU32(dataU32);
 
-    if(byteOrderCheck((uint8_t*)&dataU32, &U32Check, sizeof(dataU32))) {
+    if(byteOrderCheck((u8*)&dataU32, &U32Check, sizeof(dataU32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -328,7 +269,7 @@ int endiansTest()
     printf("\nBigEndianI32\ndata: %d\n", dataI32);
     I32Check = BigEndianI32(dataI32);
 
-    if(byteOrderCheck((uint8_t*)&dataI32, &I32Check, sizeof(dataI32))) {
+    if(byteOrderCheck((u8*)&dataI32, &I32Check, sizeof(dataI32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -347,7 +288,7 @@ int endiansTest()
     printf("\nBigEndianU64\ndata: %" PRId64 "\n", dataU64);
     U64Check = BigEndianU64(dataU64);
 
-    if(byteOrderCheck((uint8_t*)&dataU64, &U64Check, sizeof(dataU64))) {
+    if(byteOrderCheck((u8*)&dataU64, &U64Check, sizeof(dataU64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -366,7 +307,7 @@ int endiansTest()
     printf("\nBigEndianI64\ndata: %" SCNd64 "\n", dataI64);
     I64Check = BigEndianI64(dataI64);
 
-    if(byteOrderCheck((uint8_t*)&dataI64, &I64Check, sizeof(dataI64))) {
+    if(byteOrderCheck((u8*)&dataI64, &I64Check, sizeof(dataI64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -381,41 +322,41 @@ int endiansTest()
     }
 
 
-    // float -----------------------------------------------------------------------------
-    /* BigEndianFloat */
-    printf("\nBigEndianFloat\ndata: %f\n", dataF32);
-    floatCheck = BigEndianF32(dataF32);
+    // f32 -----------------------------------------------------------------------------
+    /* BigEndianf32 */
+    printf("\nBigEndianf32\ndata: %f\n", dataF32);
+    f32Check = BigEndianF32(dataF32);
 
-    if(byteOrderCheck((uint8_t*)&dataF32, &floatCheck, sizeof(dataF32))) {
+    if(byteOrderCheck((u8*)&dataF32, &f32Check, sizeof(dataF32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
         printf("bytes order check error: 0\n");
     }
 
-    floatCheck = BigEndianF32(floatCheck);
-    printf("result: %f\nmatched: %d\n", floatCheck, floatCheck == dataF32);
+    f32Check = BigEndianF32(f32Check);
+    printf("result: %f\nmatched: %d\n", f32Check, f32Check == dataF32);
 
-    if(floatCheck != dataF32) {
+    if(f32Check != dataF32) {
         ++counter_notBigEndian;
     }
 
-    // double -----------------------------------------------------------------------------
-    /* BigEndianDouble */
-    printf("\nBigEndianDouble\ndata: %f\n", dataF64);
-    doubleCheck = BigEndianF64(dataF64);
+    // f64 -----------------------------------------------------------------------------
+    /* BigEndianf64 */
+    printf("\nBigEndianf64\ndata: %f\n", dataF64);
+    f64Check = BigEndianF64(dataF64);
 
-    if(byteOrderCheck((uint8_t*)&dataF64, &doubleCheck, sizeof(dataF64))) {
+    if(byteOrderCheck((u8*)&dataF64, &f64Check, sizeof(dataF64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
         printf("bytes order check error: 0\n");
     }
 
-    doubleCheck = BigEndianF64(doubleCheck);
-    printf("result: %f\nmatched: %d\n", doubleCheck, doubleCheck == dataF64);
+    f64Check = BigEndianF64(f64Check);
+    printf("result: %f\nmatched: %d\n", f64Check, f64Check == dataF64);
 
-    if(doubleCheck != dataF64) {
+    if(f64Check != dataF64) {
         ++counter_notBigEndian;
     }
 
@@ -438,7 +379,7 @@ int endiansTest()
     printf("\nLittleEndianU16\ndata: %d\n", dataU16);
     U16Check = LittleEndianU16(dataU16);
 
-    if(byteOrderCheck((uint8_t*)&dataU16, &U16Check, sizeof(dataU16))) {
+    if(byteOrderCheck((u8*)&dataU16, &U16Check, sizeof(dataU16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -457,7 +398,7 @@ int endiansTest()
     printf("\nLittleEndianI16\ndata: %d\n", dataI16);
     I16Check = LittleEndianI16(dataI16);
 
-    if(byteOrderCheck((uint8_t*)&dataI16, &I16Check, sizeof(dataI16))) {
+    if(byteOrderCheck((u8*)&dataI16, &I16Check, sizeof(dataI16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -476,7 +417,7 @@ int endiansTest()
     printf("\nLittleEndianU32\ndata: %d\n", dataU32);
     U32Check = LittleEndianU32(dataU32);
 
-    if(byteOrderCheck((uint8_t*)&dataU32, &U32Check, sizeof(dataU32))) {
+    if(byteOrderCheck((u8*)&dataU32, &U32Check, sizeof(dataU32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -495,7 +436,7 @@ int endiansTest()
     printf("\nLittleEndianI32\ndata: %d\n", dataI32);
     I32Check = LittleEndianI32(dataI32);
 
-    if(byteOrderCheck((uint8_t*)&dataI32, &I32Check, sizeof(dataI32))) {
+    if(byteOrderCheck((u8*)&dataI32, &I32Check, sizeof(dataI32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -514,7 +455,7 @@ int endiansTest()
     printf("\nLittleEndianU64\ndata: %" PRId64 "\n", dataU64);
     U64Check = LittleEndianU64(dataU64);
 
-    if(byteOrderCheck((uint8_t*)&dataU64, &U64Check, sizeof(dataU64))) {
+    if(byteOrderCheck((u8*)&dataU64, &U64Check, sizeof(dataU64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -533,7 +474,7 @@ int endiansTest()
     printf("\nLittleEndianI64\ndata: %" SCNd64 "\n", dataI64);
     I64Check = LittleEndianI64(dataI64);
 
-    if(byteOrderCheck((uint8_t*)&dataI64, &I64Check, sizeof(dataI64))) {
+    if(byteOrderCheck((u8*)&dataI64, &I64Check, sizeof(dataI64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -546,41 +487,41 @@ int endiansTest()
     if(I64Check != dataI64) {
         ++counter_notlittleEndian;
     }
-    // float -----------------------------------------------------------------------------
-    /* LittleEndianFloat */
-    printf("\nLittleEndianFloat\ndata: %f\n", dataF32);
-    floatCheck = LittleEndianF32(dataF32);
+    // f32 -----------------------------------------------------------------------------
+    /* LittleEndianf32 */
+    printf("\nLittleEndianf32\ndata: %f\n", dataF32);
+    f32Check = LittleEndianF32(dataF32);
 
-    if(byteOrderCheck((uint8_t*)&dataF32, &floatCheck, sizeof(dataF32))) {
+    if(byteOrderCheck((u8*)&dataF32, &f32Check, sizeof(dataF32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
         printf("bytes order check error: 0\n");
     }
 
-    floatCheck = LittleEndianF32(floatCheck);
-    printf("result: %f\nmatched: %d\n", floatCheck, floatCheck == dataF32);
+    f32Check = LittleEndianF32(f32Check);
+    printf("result: %f\nmatched: %d\n", f32Check, f32Check == dataF32);
 
-    if(floatCheck != dataF32) {
+    if(f32Check != dataF32) {
         ++counter_notlittleEndian;
     }
 
-    // double -----------------------------------------------------------------------------
-    /* LittleEndianDouble */
-    printf("\nLittleEndianDouble\ndata: %f\n", dataF64);
-    doubleCheck = LittleEndianF64(dataF64);
+    // f64 -----------------------------------------------------------------------------
+    /* LittleEndianf64 */
+    printf("\nLittleEndianf64\ndata: %f\n", dataF64);
+    f64Check = LittleEndianF64(dataF64);
 
-    if(byteOrderCheck((uint8_t*)&dataF64, &doubleCheck, sizeof(dataF64))) {
+    if(byteOrderCheck((u8*)&dataF64, &f64Check, sizeof(dataF64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
         printf("bytes order check error: 0\n");
     }
 
-    doubleCheck = LittleEndianF64(doubleCheck);
-    printf("result: %f\nmatched: %d\n", doubleCheck, doubleCheck == dataF64);
+    f64Check = LittleEndianF64(f64Check);
+    printf("result: %f\nmatched: %d\n", f64Check, f64Check == dataF64);
 
-    if(doubleCheck != dataF64) {
+    if(f64Check != dataF64) {
         ++counter_notlittleEndian;
     }
 
@@ -658,23 +599,23 @@ int endiansTest()
     }
 
 
-    // float -----------------------------------------------------------------------------
-    /* BigEndianFloat */
-    printf("\nBigEndianFloat\ndata: %f\n", dataF32);
-    floatCheck = BigEndianF32(dataF32);
-    printf("result: %f\nmatched: %d\n", floatCheck, floatCheck == dataF32);
+    // f32 -----------------------------------------------------------------------------
+    /* BigEndianf32 */
+    printf("\nBigEndianf32\ndata: %f\n", dataF32);
+    f32Check = BigEndianF32(dataF32);
+    printf("result: %f\nmatched: %d\n", f32Check, f32Check == dataF32);
 
-    if(floatCheck != dataF32) {
+    if(f32Check != dataF32) {
         ++counter_notBigEndian;
     }
 
-    // double -----------------------------------------------------------------------------
-    /* BigEndianDouble */
-    printf("\nBigEndianDouble\ndata: %f\n", dataF64);
-    doubleCheck = BigEndianF64(dataF64);
-    printf("result: %f\nmatched: %d\n", doubleCheck, doubleCheck == dataF64);
+    // f64 -----------------------------------------------------------------------------
+    /* BigEndianf64 */
+    printf("\nBigEndianf64\ndata: %f\n", dataF64);
+    f64Check = BigEndianF64(dataF64);
+    printf("result: %f\nmatched: %d\n", f64Check, f64Check == dataF64);
 
-    if(doubleCheck != dataF64) {
+    if(f64Check != dataF64) {
         ++counter_notBigEndian;
     }
 
@@ -701,8 +642,8 @@ int endiansTest()
     (void)I32Check;
     (void)U64Check;
     (void)I64Check;
-    (void)floatCheck;
-    (void)doubleCheck;
+    (void)f32Check;
+    (void)f64Check;
     //------------------------
 
     printf("\n----------> ENDIAN RESULT <---------------------------\n");

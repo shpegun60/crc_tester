@@ -1,81 +1,67 @@
+#ifndef NDEBUG
+
 #include "smart_assert.h"
 #include <stdio.h>
 #include <stdarg.h>
 
-void __M_Assert(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg)
-{
-    if (expr) {
-        fprintf(stderr, "Assert failed:\t %s \nExpression:\t%s\nSource:\t\t%s, line %d\n", msg, expr_str,file, line);
-        fflush(stderr);
-        //printf("Assert failed:\t %s:\nExpected:\t%s\nSource:\t\t%s, line %d\n", msg, expr_str,file, line);
-        abort();
-    }
-}
 
-void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg)
-{
-    (void)expr;
-    fprintf(stderr, "Assert failed:\t %s \nExpression:\t%s\nSource:\t\t%s, line %d\n", msg, expr_str,file, line);
-    fflush(stderr);
-    //printf("Assert failed:\t %s:\nExpected:\t%s\nSource:\t\t%s, line %d\n", msg, expr_str,file, line);
-    abort();
-}
-
-void __M_Error_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...)
-{
-    (void)expr;
-
-    va_list args;
-    va_start(args, msg);
-
-    fprintf(stderr, "\nAssert failed:\t");
-    vfprintf(stderr, msg, args);
-    fprintf(stderr, "\n");
-
-    fprintf(stderr, "Expression:\t %s \n", expr_str);
-    fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
-
-    va_end(args);
-    fflush(stderr);
-    abort();
-}
-
-void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg)
-{
-    (void)expr;
-    fprintf(stderr, "Assert failed:\t %s \nExpression:\t%s\nSource:\t\t%s, line %d\n\n", msg, expr_str,file, line);
-    fflush(stderr);
-    //printf("Assert failed:\t %s:\nExpected:\t%s\nSource:\t\t%s, line %d\n", msg, expr_str,file, line);
-}
-
-void __M_Warning_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...)
-{
-    (void)expr;
-
-    va_list args;
-    va_start(args, msg);
-
-    fprintf(stderr, "\nAssert failed:\t");
-    vfprintf(stderr, msg, args);
-    fprintf(stderr, "\n");
-
-    fprintf(stderr, "Expression:\t %s \n", expr_str);
-    fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
-
-    va_end(args);
-    fflush(stderr);
-}
-
-
-void __M_valueObserver(const char* msg, ...)
+void __M_SEND_DEBUG_INFO(const char* const msg, ...)
 {
     va_list args;
     va_start(args, msg);
-    fprintf(stdout, "\n-----------valueObserver:-----------> \n");
     vfprintf(stdout, msg, args);
-    fprintf(stdout, "\n-----------end valueObserver----------- \n");
+    fprintf(stdout, "\n");
     fflush(stdout);
     va_end(args);
 }
 
+static inline void __M_SEND_MSG(const char* const header, const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, const va_list args)
+{
+    (void)expr;
+    fprintf(stderr, "\n%s\n", header);
+    fprintf(stderr, "Assert failed:\t");
+    vfprintf(stderr, msg, args);
+    fprintf(stderr, "\n");
 
+    fprintf(stderr, "Expression:\t %s \n", expr_str);
+    fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+    fflush(stderr);
+}
+
+void __M_Error(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    __M_SEND_MSG("PROGRAMM EXIT WITH ERROR!!!", expr_str, expr, file, line, msg, args);
+    va_end(args);
+    abort(); // exit programm
+}
+
+void __M_Warning(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...)
+{
+    (void)expr;
+
+    va_list args;
+    va_start(args, msg);
+    __M_SEND_MSG("WARNING!!!", expr_str, expr, file, line, msg, args);
+    va_end(args);
+}
+
+void __M_assert_test()
+{
+    int i = 1;
+    //M_Assert_Break(1, M_EMPTY, M_EMPTY, "RUNTIME ERROR Assert test: M_Assert_Break without parameters");
+    //M_Assert_Break(1, M_EMPTY, M_EMPTY, "RUNTIME ERROR Assert test: M_Assert_Break with parameter: %d", 123);
+    //M_Assert_Break(1, M_EMPTY, M_EMPTY, "RUNTIME ERROR Assert test:" "M_Assert_Break with two parameter: %d, %d", 123, 456);
+
+
+    M_Assert_Warning(1, M_EMPTY, M_EMPTY, "RUNTIME WARNING Assert test: M_Assert_Break without parameters");
+    M_Assert_Warning(1, ++i, M_EMPTY, "RUNTIME WARNING Assert test: M_Assert_Break with parameter: %d", i);
+    M_Assert_Warning(1, M_EMPTY, ++i, "RUNTIME WARNING Assert test: M_Assert_Break with two parameter: %d, %d", i, 456);
+    M_Assert_Warning(1, M_EMPTY, M_EMPTY, "RUNTIME WARNING Assert test:" "M_Assert_Break with two parameter: %d, %d", i, 456);
+    M_Assert_Break(1, ++i, M_EMPTY, "RUNTIME ERROR Assert test: M_Assert_Break with two parameter: %d, %d", i, 456);
+
+    (void)i;
+}
+
+#endif /* NDEBUG */

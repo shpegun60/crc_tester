@@ -16,11 +16,15 @@ include(raw_parser_dma/raw_parser_dma.pri)
 
 
 SOURCES += \
+    convert/convert.c \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    my_ctypes.cpp
 
 HEADERS += \
-    mainwindow.h
+    convert/convert.h \
+    mainwindow.h \
+    my_ctypes.h
 
 FORMS += \
     mainwindow.ui

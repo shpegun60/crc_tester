@@ -10,7 +10,7 @@
 
 #ifdef _MY_CRC16_TABLE_CALC_ENA
 
-static const my_crc16_t crc16_t10dif_table[256] =
+static const u16 crc16_t10dif_table[256] =
 {
     0x0000U, 0x8BB7U, 0x9CD9U, 0x176EU, 0xB205U, 0x39B2U, 0x2EDCU, 0xA56BU, 0xEFBDU, 0x640AU, 0x7364U, 0xF8D3U, 0x5DB8U, 0xD60FU, 0xC161U, 0x4AD6U,
     0x54CDU, 0xDF7AU, 0xC814U, 0x43A3U, 0xE6C8U, 0x6D7FU, 0x7A11U, 0xF1A6U, 0xBB70U, 0x30C7U, 0x27A9U, 0xAC1EU, 0x0975U, 0x82C2U, 0x95ACU, 0x1E1BU,
@@ -31,9 +31,9 @@ static const my_crc16_t crc16_t10dif_table[256] =
 };
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc16_t fast_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len)
+u16 fast_crc16_t10_dif_array(u8 * data, unsigned int len)
 {
-    my_crc16_t crc = CRC16INIT;
+    u16 crc = CRC16INIT;
 
     while (len--) {
         crc = (crc << 8U) ^ crc16_t10dif_table[((crc >> 8U) ^ *data++) & 0x00FFU];
@@ -42,7 +42,7 @@ my_crc16_t fast_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len)
     return crc;
 }
 
-my_crc16_t fast_crc16_t10_dif_byte(const my_crc16_t crc, const my_crc_byte_t data)
+u16 fast_crc16_t10_dif_byte(const u16 crc, const u8 data)
 {
     return (crc << 8U) ^ crc16_t10dif_table[((crc >> 8U) ^ data) & 0x00FFU];
 }
@@ -53,9 +53,9 @@ my_crc16_t fast_crc16_t10_dif_byte(const my_crc16_t crc, const my_crc_byte_t dat
 #ifdef _MY_CRC16_GENERIC_CALC_ENA
 
 // slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc16_t slow_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len)
+u16 slow_crc16_t10_dif_array(u8 * data, unsigned int len)
 {
-    my_crc16_t crc = CRC16INIT;
+    u16 crc = CRC16INIT;
 
     while (len--) {
         crc ^= *data++ << 8U;
@@ -68,7 +68,7 @@ my_crc16_t slow_crc16_t10_dif_array(my_crc_byte_t * data, unsigned int len)
     return crc;
 }
 
-my_crc16_t slow_crc16_t10_dif_byte(my_crc16_t crc, const my_crc_byte_t data)
+u16 slow_crc16_t10_dif_byte(u16 crc, const u8 data)
 {
     crc ^= data << 8U;
 

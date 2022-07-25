@@ -8,7 +8,7 @@
 */
 
 #ifdef _MY_CRC8_TABLE_CALC_ENA
-static const my_crc8_t crc8_maxim_table[256] =
+static const u8 crc8_maxim_table[256] =
 {
     0x00U, 0x31U, 0x62U, 0x53U, 0xC4U, 0xF5U, 0xA6U, 0x97U, 0xB9U, 0x88U, 0xDBU, 0xEAU, 0x7DU, 0x4CU, 0x1FU, 0x2EU,
     0x43U, 0x72U, 0x21U, 0x10U, 0x87U, 0xB6U, 0xE5U, 0xD4U, 0xFAU, 0xCBU, 0x98U, 0xA9U, 0x3EU, 0x0FU, 0x5CU, 0x6DU,
@@ -29,9 +29,9 @@ static const my_crc8_t crc8_maxim_table[256] =
 };
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc8_t fast_crc8_maxim_array(my_crc_byte_t * data, unsigned int len)
+u8 fast_crc8_maxim_array(u8 * data, unsigned int len)
 {
-    my_crc8_t crc = CRC8INIT;
+    u8 crc = CRC8INIT;
 
     while (len--) {
         crc = crc8_maxim_table[crc ^ *data++];
@@ -40,7 +40,7 @@ my_crc8_t fast_crc8_maxim_array(my_crc_byte_t * data, unsigned int len)
     return crc;
 }
 
-my_crc8_t fast_crc8_maxim_byte(const my_crc8_t crc, const my_crc_byte_t data)
+u8 fast_crc8_maxim_byte(const u8 crc, const u8 data)
 {
     return crc8_maxim_table[crc ^ data];
 }
@@ -50,9 +50,9 @@ my_crc8_t fast_crc8_maxim_byte(const my_crc8_t crc, const my_crc_byte_t data)
 #ifdef _MY_CRC8_GENERIC_CALC_ENA
 
 // slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc8_t slow_crc8_maxim_array(my_crc_byte_t * data, unsigned int len)
+u8 slow_crc8_maxim_array(u8 * data, unsigned int len)
 {
-    my_crc8_t crc = CRC8INIT;
+    u8 crc = CRC8INIT;
 
     while (len--) {
         crc ^= *data++;
@@ -65,7 +65,7 @@ my_crc8_t slow_crc8_maxim_array(my_crc_byte_t * data, unsigned int len)
     return crc;
 }
 
-my_crc8_t slow_crc8_maxim_byte(my_crc8_t crc, const my_crc_byte_t data)
+u8 slow_crc8_maxim_byte(u8 crc, const u8 data)
 {
     crc ^= data;
 

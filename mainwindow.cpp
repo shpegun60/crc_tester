@@ -8,6 +8,8 @@ extern "C" {
 #include "rawparser_dma.h"
 }
 
+#include "smart_assert.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -16,6 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     crc_test();
     endiansTest();
+    //__M_assert_test();
+    M_Assert_disableExpr({
+                             __M_SEND_DEBUG_INFO("debug: %d", 123);
+                         });
 }
 
 MainWindow::~MainWindow()

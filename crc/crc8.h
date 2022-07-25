@@ -36,16 +36,16 @@ Lookup Table:
 *************************************************************************************************
 */
 
-#define CRC8INIT  ((my_crc8_t)0xFFU)
-#define CRC8POLY  ((my_crc8_t)0x31U) // = x^8 + x^5 + x^4 + 1
-#define CRC8CHECK ((my_crc8_t)0xF7U)
-#define CRC8FINAL(crc)
+#define CRC8INIT  ((u8)0xFFU)
+#define CRC8POLY  ((u8)0x31U) // = x^8 + x^5 + x^4 + 1
+#define CRC8CHECK ((u8)0xF7U)
+#define CRC8FINAL(crc) /* ignored expression */
 
 #ifdef _MY_CRC8_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc8_t fast_crc8_maxim_array(my_crc_byte_t * data, unsigned int len);
-my_crc8_t fast_crc8_maxim_byte(const my_crc8_t crc, const my_crc_byte_t data);
+u8 fast_crc8_maxim_array(u8 * data, unsigned int len);
+u8 fast_crc8_maxim_byte(const u8 crc, const u8 data);
 
 #endif /* _MY_CRC8_TABLE_CALC_ENA */
 
@@ -53,8 +53,8 @@ my_crc8_t fast_crc8_maxim_byte(const my_crc8_t crc, const my_crc_byte_t data);
 #ifdef _MY_CRC8_GENERIC_CALC_ENA
 
 // slow implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc8_t slow_crc8_maxim_array(my_crc_byte_t * data, unsigned int len);
-my_crc8_t slow_crc8_maxim_byte(my_crc8_t crc, const my_crc_byte_t data);
+u8 slow_crc8_maxim_array(u8 * data, unsigned int len);
+u8 slow_crc8_maxim_byte(u8 crc, const u8 data);
 
 #endif /* _MY_CRC8_GENERIC_CALC_ENA */
 

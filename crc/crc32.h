@@ -54,16 +54,16 @@ Lookup Table:
 */
 
 // CRC-32b -----------------------------------
-#define CRC32INIT  ((my_crc32_t)0xFFFFFFFFUL)
-#define CRC32POLY  ((my_crc32_t)0xEDB88320UL)  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
-#define CRC32CHECK ((my_crc32_t)0xCBF43926UL)
+#define CRC32INIT  ((u32)0xFFFFFFFFUL)
+#define CRC32POLY  ((u32)0xEDB88320UL)  // (revert is 0x04C11DB7UL) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC32CHECK ((u32)0xCBF43926UL)
 #define CRC32FINAL(crc) (crc) = (~crc)
 
 #ifdef _MY_CRC32_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc32_t fast_crc32b_array(const my_crc_byte_t * data, size_t len);
-my_crc32_t fast_crc32b_byte(const my_crc32_t crc, const my_crc_byte_t data);
+u32 fast_crc32b_array(const u8 * data, size_t len);
+u32 fast_crc32b_byte(const u32 crc, const u8 data);
 
 #endif /* _MY_CRC32_TABLE_CALC_ENA */
 
@@ -73,8 +73,8 @@ my_crc32_t fast_crc32b_byte(const my_crc32_t crc, const my_crc_byte_t data);
 //------------------------------------------------------------------------------------------------------------------------------
 // slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
 //------------------------------------------------------------------------------------------------------------------------------
-my_crc32_t slow_crc32b_array(const my_crc_byte_t * data, size_t len);         //must ~crc if last byte
-my_crc32_t slow_crc32b_byte(my_crc32_t crc, const my_crc_byte_t data);     //must ~crc if last byte
+u32 slow_crc32b_array(const u8 * data, size_t len);         //must ~crc if last byte
+u32 slow_crc32b_byte(u32 crc, const u8 data);               //must ~crc if last byte
 
 #endif /*_MY_CRC32_GENERIC_CALC_ENA */
 

@@ -1,11 +1,7 @@
 #ifndef __BYTE_ORDER_H__
 #define __BYTE_ORDER_H__
 
-#include <stddef.h>
-#include <stdint.h>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmultichar" // disable warning: multi-character character constant [-Wmultichar]
+#include "my_ctypes.h"
 
 #if defined (__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__) && !defined(MY_BYTE_ORDER_DEFINED)
     #define MY_BYTE_ORDER_DEFINED
@@ -16,6 +12,11 @@
     #define MY_ENDIAN_ORDER    __BYTE_ORDER__
 
 #elif !defined(MY_BYTE_ORDER_DEFINED) /* if not exists system byte-order macro, define other hack */
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wmultichar" // disable warning: multi-character character constant [-Wmultichar]
+
+
     #define MY_BYTE_ORDER_DEFINED
 
     #define MY_LITTLE_ENDIAN   0x41424344UL
@@ -25,8 +26,8 @@
 
 #endif /* defined (__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__) && !defined(MY_BYTE_ORDER_DEFINED) */
 
-#define MY_SYSTEM_IS_LITTLE_ENDIAN (*(uint16_t*)"\0\1">>8) // runtime: is little endian system type
-#define MY_SYSTEM_IS_BIG_ENDIAN (*(uint16_t*)"\1\0">>8)    // runtime: is big endian system type
+#define MY_SYSTEM_IS_LITTLE_ENDIAN (*(u16*)"\0\1">>8) // runtime: is little endian system type
+#define MY_SYSTEM_IS_BIG_ENDIAN (*(u16*)"\1\0">>8)    // runtime: is big endian system type
 
 
 //----------------------------------------------------
@@ -37,25 +38,25 @@ int endiansTest();
  * ********************************************************
  */
 
-inline uint16_t Reverse16(const uint16_t value)
+inline u16 Reverse16(const u16 value)
 {
-    return (uint16_t)( 0
+    return (u16)( 0
                        | ((value & 0x00ffU) << 8U)
                        | ((value & 0xff00U) >> 8U) );
 }
 
-inline uint32_t Reverse32(const uint32_t value)
+inline u32 Reverse32(const u32 value)
 {
-    return (uint32_t)( 0
+    return (u32)( 0
                        | ((value & 0x000000ffUL) << 24U)
                        | ((value & 0x0000ff00UL) << 8U)
                        | ((value & 0x00ff0000UL) >> 8U)
                        | ((value & 0xff000000UL) >> 24U) );
 }
 
-inline uint64_t Reverse64(const uint64_t value)
+inline u64 Reverse64(const u64 value)
 {
-    return (uint64_t)( 0
+    return (u64)( 0
                        | ((value & 0x00000000000000ffULL) << 56U)
                        | ((value & 0x000000000000ff00ULL) << 40U)
                        | ((value & 0x0000000000ff0000ULL) << 24U)
@@ -67,25 +68,25 @@ inline uint64_t Reverse64(const uint64_t value)
 }
 
 // pointrs input ----------------------------------------------
-inline uint16_t Reverse16_ptr(const uint16_t * const value)
+inline u16 Reverse16_ptr(const u16 * const value)
 {
-    return (uint16_t)( 0
+    return (u16)( 0
                        | (((*value) & 0x00ff) << 8U)
                        | (((*value) & 0xff00) >> 8U) );
 }
 
-inline uint32_t Reverse32_ptr(const uint32_t * const value)
+inline u32 Reverse32_ptr(const u32 * const value)
 {
-    return (uint32_t)( 0
+    return (u32)( 0
                        | (((*value) & 0x000000ffUL) << 24U)
                        | (((*value) & 0x0000ff00UL) << 8U)
                        | (((*value) & 0x00ff0000UL) >> 8U)
                        | (((*value) & 0xff000000UL) >> 24U) );
 }
 
-inline uint64_t Reverse64_ptr(const uint64_t * const value)
+inline u64 Reverse64_ptr(const u64 * const value)
 {
-    return (uint64_t)( 0
+    return (u64)( 0
                        | (((*value) & 0x00000000000000ffULL) << 56U)
                        | (((*value) & 0x000000000000ff00ULL) << 40U)
                        | (((*value) & 0x0000000000ff0000ULL) << 24U)
@@ -102,7 +103,7 @@ inline uint64_t Reverse64_ptr(const uint64_t * const value)
  * ********************************************************
  */
 
-inline uint16_t LittleEndianU16(uint16_t value)
+inline u16 LittleEndianU16(u16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -113,19 +114,19 @@ inline uint16_t LittleEndianU16(uint16_t value)
 #endif
 }
 
-inline int16_t LittleEndianI16(int16_t value)
+inline i16 LittleEndianI16(i16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    uint16_t data = Reverse16_ptr((uint16_t *) &value);
-    return *((int16_t *)(&data));
+    u16 data = Reverse16_ptr((u16 *) &value);
+    return *((i16 *)(&data));
 #else
 #    error unsupported endianness
 #endif
 }
 
-inline uint16_t BigEndianU16(uint16_t value)
+inline u16 BigEndianU16(u16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse16(value);
@@ -136,11 +137,11 @@ inline uint16_t BigEndianU16(uint16_t value)
 #endif
 }
 
-inline int16_t BigEndianI16(int16_t value)
+inline i16 BigEndianI16(i16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    uint16_t data = Reverse16_ptr((uint16_t *) &value);
-    return *((int16_t *)(&data));
+    u16 data = Reverse16_ptr((u16 *) &value);
+    return *((i16 *)(&data));
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
     return value;
 #else
@@ -154,7 +155,7 @@ inline int16_t BigEndianI16(int16_t value)
  * ********************************************************
  */
 
-inline uint32_t LittleEndianU32(uint32_t value)
+inline u32 LittleEndianU32(u32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -165,19 +166,19 @@ inline uint32_t LittleEndianU32(uint32_t value)
 #endif
 }
 
-inline int32_t LittleEndianI32(int32_t value)
+inline i32 LittleEndianI32(i32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    uint32_t data = Reverse32_ptr((uint32_t *) &value);
-    return *((int32_t *)(&data));
+    u32 data = Reverse32_ptr((u32 *) &value);
+    return *((i32 *)(&data));
 #else
 #    error unsupported endianness
 #endif
 }
 
-inline uint32_t BigEndianU32(uint32_t value)
+inline u32 BigEndianU32(u32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse32(value);
@@ -188,11 +189,11 @@ inline uint32_t BigEndianU32(uint32_t value)
 #endif
 }
 
-inline int32_t BigEndianI32(int32_t value)
+inline i32 BigEndianI32(i32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    uint32_t data = Reverse32_ptr((uint32_t *) &value);
-    return *((int32_t *)(&data));
+    u32 data = Reverse32_ptr((u32 *) &value);
+    return *((i32 *)(&data));
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
     return value;
 #else
@@ -207,7 +208,7 @@ inline int32_t BigEndianI32(int32_t value)
  * ********************************************************
  */
 
-inline uint64_t LittleEndianU64(uint64_t value)
+inline u64 LittleEndianU64(u64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -218,19 +219,19 @@ inline uint64_t LittleEndianU64(uint64_t value)
 #endif
 }
 
-inline int64_t LittleEndianI64(int64_t value)
+inline i64 LittleEndianI64(i64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    uint64_t data = Reverse64_ptr((uint64_t *) &value);
-    return *((int64_t *)(&data));
+    u64 data = Reverse64_ptr((u64 *) &value);
+    return *((i64 *)(&data));
 #else
 #    error unsupported endianness
 #endif
 }
 
-inline uint64_t BigEndianU64(uint64_t value)
+inline u64 BigEndianU64(u64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse64(value);
@@ -241,11 +242,11 @@ inline uint64_t BigEndianU64(uint64_t value)
 #endif
 }
 
-inline int64_t BigEndianI64(int64_t value)
+inline i64 BigEndianI64(i64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    uint64_t data = Reverse64_ptr((uint64_t *) &value);
-    return *((int64_t *)(&data));
+    u64 data = Reverse64_ptr((u64 *) &value);
+    return *((i64 *)(&data));
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
     return value;
 #else
@@ -255,27 +256,27 @@ inline int64_t BigEndianI64(int64_t value)
 
 /*
  * ********************************************************
- * float 32 bit variable reverse function
+ * f32 32 bit variable reverse function
  * ********************************************************
  */
 
-inline float LittleEndianF32(float value)
+inline f32 LittleEndianF32(f32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    uint32_t data = Reverse32_ptr((uint32_t *) &value);
-    return *((float *)(&data));
+    u32 data = Reverse32_ptr((u32 *) &value);
+    return *((f32 *)(&data));
 #else
 #    error unsupported endianness
 #endif
 }
 
-inline float BigEndianF32(float value)
+inline f32 BigEndianF32(f32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    uint32_t data = Reverse32_ptr((uint32_t *) &value);
-    return *((float *)(&data));
+    u32 data = Reverse32_ptr((u32 *) &value);
+    return *((f32 *)(&data));
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
     return value;
 #else
@@ -285,27 +286,27 @@ inline float BigEndianF32(float value)
 
 /*
  * ********************************************************
- * double 64 bit variable reverse function
+ * f64 64 bit variable reverse function
  * ********************************************************
  */
 
-inline double LittleEndianF64(double value)
+inline f64 LittleEndianF64(f64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    uint64_t data = Reverse64_ptr((uint64_t *) &value);
-    return *((double *)(&data));
+    u64 data = Reverse64_ptr((u64 *) &value);
+    return *((f64 *)(&data));
 #else
 #    error unsupported endianness
 #endif
 }
 
-inline double BigEndianF64(double value)
+inline f64 BigEndianF64(f64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    uint64_t data = Reverse64_ptr((uint64_t *) &value);
-    return *((double *)(&data));
+    u64 data = Reverse64_ptr((u64 *) &value);
+    return *((f64 *)(&data));
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
     return value;
 #else
@@ -314,7 +315,9 @@ inline double BigEndianF64(double value)
 }
 
 
-
+#if !defined (__BYTE_ORDER__) && !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__) && !defined(__ORDER_PDP_ENDIAN__)
 #pragma GCC diagnostic pop
+#endif /* !defined (__BYTE_ORDER__) && !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__) && !defined(__ORDER_PDP_ENDIAN__) */
+
 
 #endif /* __BYTE_ORDER_H__ */

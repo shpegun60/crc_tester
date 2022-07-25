@@ -3,7 +3,6 @@
  * @brief   This library for check expressions and send message if expressions is true on RUNTIME and on DEBUG version.
  *          If NDEBUG is not defined some expressions has change to empty define. (programmer must uncommit NDEBUG if code version released)
  *
- *
  * @date
  */
 
@@ -22,51 +21,110 @@ extern "C" {
 
 //#define NDEBUG
 
-#define M_EMPTY
+#define M_EMPTY /* ignored expression */
+#define M_ALWAYS 1 /* always proceed expression */
 
-void __M_Assert(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg);
-void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg);
-void __M_Error_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
-void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg);
-void __M_Warning_variadic(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
-void __M_valueObserver(const char* msg, ...);
+
+void __M_SEND_DEBUG_INFO(const char* const msg, ...);
+void __M_assert_test();
 
 #ifndef NDEBUG
 
+void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
+void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
+
 /*
  * ***********************************************************************************************************************************************
- *  defines for break program and dont save checking when NDEBUG
+ *  defines simple if NDEBUG disable expr
  * ***********************************************************************************************************************************************
  */
 
-#   define M_Assert_Break(Expr, Msg, afterExpr)\
-    do{\
-        if (Expr) {\
-            __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg));\
-            afterExpr;\
-        }\
-    }while(0L)
+#define M_Assert_disableExpr(...) __VA_ARGS__
 
+/*
+ * ***********************************************************************************************************************************************
+ *  defines for break program
+ * ***********************************************************************************************************************************************
+ */
 
-#   define M_Assert_Break_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
+#   define M_Assert_Break(Expr, beforeExpr, afterExpr, Msg, arg...)\
     do{\
         if (Expr) {\
             beforeExpr;\
-            __M_Error_variadic((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
-            afterExpr;\
+            __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            afterExpr;/* ignored if NDEBUG because programm is break, but compiler not known it*/\
+        }\
+    }while(0L)
+
+#   define M_Assert_BreakSaveCheck(Expr, beforeExpr, afterExpr, Msg, arg...)\
+    do{\
+        if (Expr) {\
+            beforeExpr;\
+            __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            afterExpr;/* ignored if NDEBUG because programm is break, but compiler not known it*/\
         }\
     }while(0L)
 
 /*
  * ***********************************************************************************************************************************************
- *  defines for break program and save checking when NDEBUG (WARNING!!! only after breakExpr saving)
+ *  defines no break program
  * ***********************************************************************************************************************************************
  */
 
-#   define M_Assert_BreakSaveCheck(Expr, Msg, afterExpr)\
+#   define M_Assert_Warning(Expr, beforeExpr, afterExpr, Msg, arg...)\
     do{\
         if (Expr) {\
-            __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg));\
+            beforeExpr;\
+            __M_Warning((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            afterExpr;\
+        }\
+    }while(0L)
+
+#   define M_Assert_WarningSaveCheck(Expr, beforeExpr, afterExpr, Msg, arg...)\
+    do{\
+        if (Expr) {\
+            beforeExpr;\
+            __M_Warning((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            afterExpr;\
+        }\
+    }while(0L)
+
+
+/*
+ * ***********************************************************************************************************************************************
+ *  functions
+ * ***********************************************************************************************************************************************
+ */
+
+#   define M_Assert_SafeFunctionCall(foo, true_expression)\
+    do{\
+        if(foo) {\
+            true_expression;\
+        } else {\
+            __M_Warning((#foo), (0), (__FILE__), (__LINE__), ("NO exists function"));\
+        }\
+    }while(0L);
+
+#else
+/*
+ * ***********************************************************************************************************************************************
+ *  defines simple if NDEBUG disable expr
+ * ***********************************************************************************************************************************************
+ */
+
+#define M_Assert_disableExpr(...)
+/*
+ * ***********************************************************************************************************************************************
+ *  defines for break program
+ * ***********************************************************************************************************************************************
+ */
+
+#   define M_Assert_Break(Expr, beforeExpr, afterExpr, Msg, arg...)
+
+#   define M_Assert_BreakSaveCheck(Expr, beforeExpr, afterExpr, Msg, arg...)\
+    do{\
+        if (Expr) {\
+            beforeExpr;\
             afterExpr;\
         }\
     }while(0L)
@@ -77,83 +135,9 @@ void __M_valueObserver(const char* msg, ...);
  * ***********************************************************************************************************************************************
  */
 
-#   define M_Assert_Warning(Expr, Msg)\
-    do{\
-        if (Expr) {\
-            __M_Warning((#Expr), (Expr), (__FILE__), (__LINE__), (Msg));\
-        }\
-    }while(0L)
+#   define M_Assert_Warning(Expr, beforeExpr, afterExpr, Msg, arg...)
 
-#   define M_Assert_Warning_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
-    do{\
-        if (Expr) {\
-            beforeExpr;\
-            __M_Warning_variadic((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
-            afterExpr;\
-        }\
-    }while(0L)
-
-#   define M_Assert_WarningSaveCheck(Expr, Msg, afterExpr)\
-    do{\
-        if (Expr) {\
-            __M_Warning((#Expr), (Expr), (__FILE__), (__LINE__), (Msg));\
-            afterExpr;\
-        }\
-    }while(0L)
-
-#   define M_Assert_WarningSaveCheck_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
-    do{\
-        if (Expr) {\
-            beforeExpr;\
-            __M_Warning_variadic((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
-            afterExpr;\
-        }\
-    }while(0L)
-
-// functions ------------------------------------------------------------------------------------------------------------------------
-#define M_Assert_SafeFunctionCall(foo, ...)\
-    do {\
-        if(foo) {\
-            foo(__VA_ARGS__);\
-        } else {\
-            __M_Warning((#foo), (0), (__FILE__), (__LINE__), ("NO valid function"));\
-        }\
-    } while(0L);
-
-
-#define M_Assert_SafeFunctionCallExpression(foo, expression)\
-    do {\
-        if(foo) {\
-            expression;\
-        } else {\
-            __M_Warning((#foo), (0), (__FILE__), (__LINE__), ("NO valid function"));\
-        }\
-    } while(0L);
-
-
-
-#else
-#   define M_Assert_Break(Expr, Msg, afterExpr)
-#   define M_Assert_Break_var(Expr, beforeExpr, afterExpr, Msg, arg...)
-
-#   define M_Assert_BreakSaveCheck(Expr, Msg, afterExpr)\
-    do{\
-        if (Expr) {\
-            afterExpr;\
-        }\
-    }while(0L)
-
-#   define M_Assert_Warning(Expr, Msg)
-#   define M_Assert_Warning_var(Expr, beforeExpr, afterExpr, Msg, arg...)
-
-#   define M_Assert_WarningSaveCheck(Expr, Msg, afterExpr)\
-    do{\
-        if (Expr) {\
-            afterExpr;\
-        }\
-    }while(0L)
-
-#   define M_Assert_WarningSaveCheck_var(Expr, beforeExpr, afterExpr, Msg, arg...)\
+#   define M_Assert_WarningSaveCheck(Expr, beforeExpr, afterExpr, Msg, arg...)\
     do{\
         if (Expr) {\
             beforeExpr;\
@@ -161,15 +145,23 @@ void __M_valueObserver(const char* msg, ...);
         }\
     }while(0L)
 
-#define M_Assert_SafeFunctionCall(foo, ...)\
-    do {\
+
+/*
+ * ***********************************************************************************************************************************************
+ *  functions
+ * ***********************************************************************************************************************************************
+ */
+
+#   define M_Assert_SafeFunctionCall(foo, true_expression)\
+    do{\
         if(foo) {\
-            foo(__VA_ARGS__);\
+            true_expression;\
         }\
-    } while(0L);
-#endif
+    }while(0L);
 
 
+
+#endif /* NDEBUG */
 
 
 

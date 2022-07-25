@@ -10,7 +10,7 @@
 
 #ifdef _MY_CRC32_TABLE_CALC_ENA
 
-static const my_crc32_t crc32b_table[256] =
+static const u32 crc32b_table[256] =
 {
     0x00000000UL, 0x77073096UL, 0xEE0E612CUL, 0x990951BAUL, 0x076DC419UL, 0x706AF48FUL, 0xE963A535UL, 0x9E6495A3UL,
     0x0EDB8832UL, 0x79DCB8A4UL, 0xE0D5E91EUL, 0x97D2D988UL, 0x09B64C2BUL, 0x7EB17CBDUL, 0xE7B82D07UL, 0x90BF1D91UL,
@@ -47,9 +47,9 @@ static const my_crc32_t crc32b_table[256] =
 };
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-my_crc32_t fast_crc32b_array(const my_crc_byte_t * data, size_t len)
+u32 fast_crc32b_array(const u8 * data, size_t len)
 {
-    my_crc32_t crc = CRC32INIT;
+    u32 crc = CRC32INIT;
 
     while (len--) {
         crc = (crc >> 8UL) ^ crc32b_table[(crc ^ *data++) & 0xFFUL];
@@ -59,7 +59,7 @@ my_crc32_t fast_crc32b_array(const my_crc_byte_t * data, size_t len)
 }
 
 
-my_crc32_t fast_crc32b_byte(const my_crc32_t crc, const my_crc_byte_t data) // must ~crc if last byte
+u32 fast_crc32b_byte(const u32 crc, const u8 data) // must ~crc if last byte
 {
     return (crc >> 8UL) ^ crc32b_table[(crc ^ data) & 0xFFUL];
 }
@@ -72,7 +72,7 @@ my_crc32_t fast_crc32b_byte(const my_crc32_t crc, const my_crc_byte_t data) // m
 //------------------------------------------------------------------------------------------------------------------------------
 // slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
 //------------------------------------------------------------------------------------------------------------------------------
-my_crc32_t slow_crc32b_array(const my_crc_byte_t * data, size_t len)
+u32 slow_crc32b_array(const u8 * data, size_t len)
 {
     unsigned int crc = CRC32INIT;
 
@@ -87,7 +87,7 @@ my_crc32_t slow_crc32b_array(const my_crc_byte_t * data, size_t len)
 }
 
 
-my_crc32_t slow_crc32b_byte(my_crc32_t crc, const my_crc_byte_t data) // must ~crc if last byte
+u32 slow_crc32b_byte(u32 crc, const u8 data) // must ~crc if last byte
 {
     crc = crc ^ data;
 

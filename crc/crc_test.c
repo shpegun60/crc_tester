@@ -29,9 +29,9 @@ __attribute__((unused)) static uint8_t _proceedCrc_OLD(uint8_t crc, uint8_t ch) 
 }
 
 #ifdef _MY_CRC8_ENA
-static int crc8_test(my_crc_byte_t *data, size_t len, my_crc8_t * res)
+static int crc8_test(u8 *data, size_t len, u8 * res)
 {
-    my_crc8_t crc8[5] = {CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT};
+    u8 crc8[5] = {CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT};
     
     printf("\n\n------> crc 8 test <-------------------------------------------\n");
     printf("data: 0x");
@@ -117,9 +117,9 @@ static int crc8_test(my_crc_byte_t *data, size_t len, my_crc8_t * res)
 
 #ifdef _MY_CRC16_ENA
 
-static int crc16_test(my_crc_byte_t *data, size_t len, my_crc16_t * res)
+static int crc16_test(u8 *data, size_t len, u16 * res)
 {
-    my_crc16_t crc16[4] = {CRC16INIT, CRC16INIT, CRC16INIT, CRC16INIT};
+    u16 crc16[4] = {CRC16INIT, CRC16INIT, CRC16INIT, CRC16INIT};
 
     printf("\n\n----> crc16 test <-------------------------------------------\n");
     printf("sizeof buffer: %d\n\n", (int)len);
@@ -186,9 +186,9 @@ static int crc16_test(my_crc_byte_t *data, size_t len, my_crc16_t * res)
 
 #ifdef _MY_CRC32_ENA
 
-static int crc32_test(my_crc_byte_t *data, size_t len, my_crc32_t *res)
+static int crc32_test(u8 *data, size_t len, u32 *res)
 {
-    my_crc32_t crc32[4] = {CRC32INIT, CRC32INIT, CRC32INIT, CRC32INIT};
+    u32 crc32[4] = {CRC32INIT, CRC32INIT, CRC32INIT, CRC32INIT};
 
     printf("\n\n--------> crc32 test <-------------------------------------------\n");
     printf("sizeof buffer: %d\n\n", (int)len);
@@ -261,22 +261,22 @@ static int crc32_test(my_crc_byte_t *data, size_t len, my_crc32_t *res)
 
 int crc_test()
 {
-    my_crc_byte_t data[] = "123456789";
+    u8 data[] = "123456789";
 
     int not_passed8 = 0;
     int not_passed16 = 0;
     int not_passed32 = 0;
 
-    uint8_t crc8_matched_with_test = 1;
-    uint8_t crc16_matched_with_test = 1;
-    uint8_t crc32_matched_with_test = 1;
+    u8 crc8_matched_with_test = 1;
+    u8 crc16_matched_with_test = 1;
+    u8 crc32_matched_with_test = 1;
 
     printf("\n-------------------------------\nMATCH TEST");
     printf("\n-------------------------------\n");
 
 
 #ifdef _MY_CRC8_ENA
-    my_crc8_t resCrc8 = CRC8INIT;
+    u8 resCrc8 = CRC8INIT;
 
     not_passed8 = crc8_test(data, (sizeof (data) - 1), &resCrc8);
     printf("\ncheck test CRC8 exit with error: %d", not_passed8);
@@ -294,7 +294,7 @@ int crc_test()
     printf("\n-------------------------------\n");
 
 #ifdef _MY_CRC16_ENA
-    my_crc16_t resCrc16 = CRC16INIT;
+    u16 resCrc16 = CRC16INIT;
 
     not_passed16 = crc16_test(data, (sizeof (data) - 1), &resCrc16);
     printf("\ncheck test CRC16 exit with error: %d", not_passed16);
@@ -312,7 +312,7 @@ int crc_test()
     printf("\n-------------------------------\n");
 
 #ifdef _MY_CRC32_ENA
-    my_crc32_t resCrc32 = CRC32INIT;
+    u32 resCrc32 = CRC32INIT;
 
     not_passed32 = crc32_test(data, (sizeof (data) - 1), &resCrc32);
     printf("\ncheck test CRC32 exit with error: %d", not_passed32);
@@ -343,7 +343,7 @@ int crc_test()
     printf("\n\n-------------------------------\nRANDOM TEST");
     printf("\n-------------------------------\n");
 
-    my_crc_byte_t randomData[4096*2];
+    u8 randomData[4096*2];
     srand(time(NULL)); // use current time as seed for random generator
 
 #ifdef _MY_CRC8_ENA
