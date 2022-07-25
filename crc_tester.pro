@@ -19,7 +19,7 @@ SOURCES += \
     convert/convert.c \
     main.cpp \
     mainwindow.cpp \
-    my_ctypes.cpp
+    my_ctypes.c
 
 HEADERS += \
     convert/convert.h \
