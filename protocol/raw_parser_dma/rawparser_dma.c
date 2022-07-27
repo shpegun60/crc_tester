@@ -1,5 +1,6 @@
+
+#define INLINE
 #include "rawparser_dma.h"
-#include "smart_assert.h"
 #include <stdlib.h>
 
 
@@ -83,25 +84,6 @@ int rawParser_dma_delete(RawParser_dma_t** data)
     *data = NULL;
 
     return 1;
-}
-
-inline void RawParser_dma_receiveByte(RawParser_dma_t *self, u8 byte)
-{
-    M_Assert_Break((self == NULL), M_EMPTY, return, "RawParser_dma_receiveByte: No valid input");
-
-    self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
-    ++self->m_receivePos;
-}
-
-inline void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP_size_t len)
-{
-    M_Assert_Break((self == NULL || arr == NULL), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input");
-    M_Assert_Break(((u32)len > (D_RAW_P_RX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, (D_RAW_P_RX_BUF_SIZE - 1));
-
-    while(len--) {
-        self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = *arr++;
-        ++self->m_receivePos;
-    }
 }
 
 
@@ -461,3 +443,5 @@ inline void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const u8 by
 #undef RECEIVE_ERR
 #undef RECEIVE_OK
 //----------------------------------------------
+
+#undef INLINE

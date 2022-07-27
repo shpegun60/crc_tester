@@ -1,8 +1,7 @@
-#ifndef NDEBUG
-
 #include "smart_assert.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <assert.h>
 
 
 void __M_SEND_DEBUG_INFO(const char* const msg, ...)
@@ -15,6 +14,7 @@ void __M_SEND_DEBUG_INFO(const char* const msg, ...)
     va_end(args);
 }
 
+#ifndef NDEBUG
 static inline void __M_SEND_MSG(const char* const header, const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, const va_list args)
 {
     (void)expr;
@@ -47,6 +47,8 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
     va_end(args);
 }
 
+#endif /* NDEBUG */
+
 void __M_assert_test()
 {
     int i = 1;
@@ -64,4 +66,4 @@ void __M_assert_test()
     (void)i;
 }
 
-#endif /* NDEBUG */
+

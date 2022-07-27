@@ -2,6 +2,7 @@
 #define __RAW_PARSER_DMA_FUSION_H__
 
 #include "rawparser_port.h"
+#include "smart_assert.h"
 
 /**
   * @brief RawParser_DescriptorTypeDef structure definition
@@ -27,12 +28,12 @@ typedef struct {
 #endif /* D_RAW_P_CRC_ENA */
     // ----------------------------------------------------
 
-    u8         m_triggerSB;            // trigger for read start byte
-    u32        m_receivePos;           // receive raw position
-    u32        m_receiveReadPos;       // receive read position
+    u8              m_triggerSB;            // trigger for read start byte
+    u32             m_receivePos;           // receive raw position
+    u32             m_receiveReadPos;       // receive read position
     rawP_size_t     m_receiveHandlePos;     // receive handler position
 
-    u32        m_transmittPos;           // transmitt raw position
+    u32             m_transmittPos;           // transmitt raw position
 
     u8 receiveState;
 
@@ -44,9 +45,36 @@ typedef struct {
 RawParser_dma_t* rawParser_dma_new(u8 packStart);
 int rawParser_dma_delete(RawParser_dma_t** data);
 
+#ifndef INLINE
+    # if __GNUC__ && !__GNUC_STDC_INLINE__
+        #define INLINE extern inline
+    # else
+        #define INLINE inline
+    # endif
+#endif /* INLINE */
+
 // receive functions-----------------------------------------------------------------------------------------
-extern inline void RawParser_dma_receiveByte(RawParser_dma_t *self, u8 byte);
-extern inline void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP_size_t len);
+INLINE void RawParser_dma_receiveByte(RawParser_dma_t *self, u8 byte)
+{
+    M_Assert_Break((self == NULL), M_EMPTY, return, "RawParser_dma_receiveByte: No valid input");
+
+    self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
+    ++self->m_receivePos;
+}
+
+INLINE void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP_size_t len)
+{
+    M_Assert_Break((self == NULL || arr == NULL), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input");
+    M_Assert_Break(((u32)len > (D_RAW_P_RX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, (D_RAW_P_RX_BUF_SIZE - 1));
+
+    while(len--) {
+        self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = *arr++;
+        ++self->m_receivePos;
+    }
+}
+
+#undef INLINE
+
 RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t * const self);
 
 // slow shield functions (slow & more copy)-----------------------------------------------------------------------------------------

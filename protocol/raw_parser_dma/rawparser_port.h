@@ -22,7 +22,7 @@
 ***************************************************************************************************
 */
 
-#define D_RAW_P_TWO_BYTES_LEN_SUPPORT
+//#define D_RAW_P_TWO_BYTES_LEN_SUPPORT
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     typedef u16 rawP_size_t;

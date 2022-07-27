@@ -8,23 +8,14 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
-include(smart_assert/smart_assert.pri)
-include(crc/crc.pri)
-include(byte_order/byte_order.pri)
-include(raw_parser_dma/raw_parser_dma.pri)
-
+include(protocol/protocol.pri)
 
 SOURCES += \
-    convert/convert.c \
     main.cpp \
     mainwindow.cpp \
-    my_ctypes.c
 
 HEADERS += \
-    convert/convert.h \
-    mainwindow.h \
-    my_ctypes.h
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui

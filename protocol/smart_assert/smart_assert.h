@@ -9,7 +9,6 @@
 #ifndef __SMART_ASSERT_H_
 #define __SMART_ASSERT_H_
 
-#include <assert.h>
 
 // this library must include only .c file!!!!!!!!!!!!!!!!
 
@@ -28,7 +27,7 @@ extern "C" {
 void __M_SEND_DEBUG_INFO(const char* const msg, ...);
 void __M_assert_test();
 
-#ifndef NDEBUG
+#ifndef NDEBUG /* --------------------------------------------------------------------------------------------------------- */
 
 void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
 void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
@@ -175,7 +174,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
     }while(0L)
 
 
-#define TO_TXT(a) #a
+//#define TO_TXT(a) #a
 
 #ifdef __cplusplus
 }

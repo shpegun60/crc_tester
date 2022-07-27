@@ -1,66 +1,62 @@
 #include "byte_order.h"
+
 #include <stdio.h>
 #include <inttypes.h>
 
-///*
-// * ********************************************************
-// * main reverse function
-// * ********************************************************
-// */
-
-extern inline u16 Reverse16(const u16 value);
-extern inline u32 Reverse32(const u32 value);
-extern inline u64 Reverse64(const u64 value);
-
-// pointers input ----------------------------------------------
-extern inline u16 Reverse16_ptr(const u16 * const value);
-extern inline u32 Reverse32_ptr(const u32 * const value);
-extern inline u64 Reverse64_ptr(const u64 * const value);
-
-extern inline u16 LittleEndianU16(u16 value);
-extern inline i16 LittleEndianI16(i16 value);
-extern inline u16 BigEndianU16(u16 value);
-extern inline i16 BigEndianI16(i16 value);
-
 /*
-* ********************************************************
-* 32 bit variable reverse function
-* ********************************************************
-*/
-
-extern inline u32 LittleEndianU32(u32 value);
-extern inline i32 LittleEndianI32(i32 value);
-extern inline u32 BigEndianU32(u32 value);
-extern inline i32 BigEndianI32(i32 value);
-
+ * ********************************************************
+ * main reverse function, inline extern ONLY C99!!!
+ * ********************************************************
+ */
+C_INLINE u16 Reverse16(const u16 value);
+C_INLINE u32 Reverse32(const u32 value);
+C_INLINE u64 Reverse64(const u64 value);
+// pointrs input ----------------------------------------------
+C_INLINE void Reverse16_ptr(const u16 * const value, u16 * const to);
+C_INLINE void Reverse32_ptr(const u32 * const value, u32 * const to);
+C_INLINE void Reverse64_ptr(const u64 * const value, u64 * const to);
 /*
-* ********************************************************
-* 64 bit variable reverse function
-* ********************************************************
-*/
-
-extern inline u64 LittleEndianU64(u64 value);
-extern inline i64 LittleEndianI64(i64 value);
-extern inline u64 BigEndianU64(u64 value);
-extern inline i64 BigEndianI64(i64 value);
-
+ * ********************************************************
+ * 16 bit variable reverse function
+ * ********************************************************
+ */
+C_INLINE u16 LittleEndianU16(u16 value);
+C_INLINE i16 LittleEndianI16(i16 value);
+C_INLINE u16 BigEndianU16(u16 value);
+C_INLINE i16 BigEndianI16(i16 value);
+/*
+ * ********************************************************
+ * 32 bit variable reverse function
+ * ********************************************************
+ */
+C_INLINE u32 LittleEndianU32(u32 value);
+C_INLINE i32 LittleEndianI32(i32 value);
+C_INLINE u32 BigEndianU32(u32 value);
+C_INLINE i32 BigEndianI32(i32 value);
+/*
+ * ********************************************************
+ * 64 bit variable reverse function
+ * ********************************************************
+ */
+C_INLINE u64 LittleEndianU64(u64 value);
+C_INLINE i64 LittleEndianI64(i64 value);
+C_INLINE u64 BigEndianU64(u64 value);
+C_INLINE i64 BigEndianI64(i64 value);
 /*
  * ********************************************************
  * f32 32 bit variable reverse function
  * ********************************************************
  */
-
-extern inline f32 LittleEndianF32(f32 value);
-extern inline f32 BigEndianF32(f32 value);
-
+C_INLINE f32 LittleEndianF32(f32 value);
+C_INLINE f32 BigEndianF32(f32 value);
 /*
  * ********************************************************
  * f64 64 bit variable reverse function
  * ********************************************************
  */
-
-extern inline f64 LittleEndianF64(f64 value);
-extern inline f64 BigEndianF64(f64 value);
+C_INLINE f64 LittleEndianF64(f64 value);
+C_INLINE f64 BigEndianF64(f64 value);
+//---------------------------------------------------------
 
 __attribute__((unused)) static int byteOrderCheck(void * source, void * destination, int len)
 {
