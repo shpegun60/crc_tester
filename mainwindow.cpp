@@ -19,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+	
+    quint8 data[100];
+    quint16 pos = 0;
 
     crc_test();
     endiansTest();
@@ -29,8 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     templatetest();
 
-    u8 data[100];
-    u16 pos = 0;
+
 
     TEMPLATE(convertWriteMSB, f32)(data, &pos, 123.456);
     TEMPLATE(convertWriteMSB, u16)(data, &pos, 853);
@@ -44,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << tmp16;
     qDebug() << tmp64;
     qDebug() << pos;
+    qDebug() << "long double "<<sizeof(long double);
 }
 
 MainWindow::~MainWindow()
