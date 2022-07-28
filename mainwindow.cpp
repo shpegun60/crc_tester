@@ -8,6 +8,7 @@ extern "C" {
 
 #include "rawparser_dma.h"
 
+//#define CONVERT_TEST_DISABLE
 #include "convert.h"
 }
 
@@ -24,13 +25,13 @@ MainWindow::MainWindow(QWidget *parent)
     quint16 pos = 0;
 
     crc_test();
-    endiansTest();
+    //endiansTest();
     //__M_assert_test();
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
-    templatetest();
+    //templatetest();
 
 
 
@@ -47,6 +48,9 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << tmp64;
     qDebug() << pos;
     qDebug() << "long double "<<sizeof(long double);
+
+
+    qDebug() << "test: "<< convertTest();
 }
 
 MainWindow::~MainWindow()

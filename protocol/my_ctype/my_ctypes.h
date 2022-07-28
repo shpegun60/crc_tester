@@ -166,7 +166,7 @@ static_assert((sizeof(i64) == 8),   "MY_CTYPES: size of int64    type must be eq
 // floating point
 static_assert((sizeof(f32) == 4),   "MY_CTYPES: size of float         type must be equal 4, change --> my_types.h: typedef f32 ");
 static_assert((sizeof(f64) == 8),   "MY_CTYPES: size of double        type must be equal 8, change --> my_types.h: typedef f64 ");
-//static_assert((sizeof(f128) == 16), "MY_CTYPES: size of long double   type must be equal 16, change --> my_types.h: typedef f128 ");
+//static_assert((sizeof(f128) == 16), "MY_CTYPES: size of long double   type must be equal 16, change --> my_types.h: typedef f128 "); // platform depend
 
 #else // if old version C
 #define C99MY_CTYPES_STATIC_ASSERTION_CREATE(COND,MSG) typedef int my_ctype_static_assertion_##MSG[(COND)? 1 : -1] // define custom static assertion if version C less than C11
@@ -190,7 +190,7 @@ C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(i64) == 8), size_of_int64_type_must
 // floating point
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f32) == 4), size_of_float_type_must_be_equal_4_change_typedef_f32);
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f64) == 8), size_of_double_type_must_be_equal_8_change_typedef_f64);
-//C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f128) == 16), size_of_long_double_type_must_be_equal_16_change_typedef_f128);
+//C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f128) == 16), size_of_long_double_type_must_be_equal_16_change_typedef_f128); // platform depend
 
 // other type
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(b) == 1), size_of_long_bool_type_must_be_equal_1_change_typedef_b);

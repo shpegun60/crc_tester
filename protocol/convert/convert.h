@@ -7,6 +7,10 @@
 
 #include "my_ctypes.h"
 
+#ifndef CONVERT_TEST_DISABLE
+    //#define CONVERT_TEST_DISABLE
+#endif /* CONVERT_TEST_DISABLE */
+
 
 #define T u8
 #include "convert_template.h"
@@ -49,6 +53,9 @@
 #include "convert_template.h"
 
 
+#ifndef CONVERT_TEST_DISABLE
+int convertTest();
+#endif /* CONVERT_TEST_DISABLE */
 
 
 #endif /* __CONVERT_H__ */

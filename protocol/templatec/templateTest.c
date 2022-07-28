@@ -1,4 +1,5 @@
 #include "templateTest.h"
+#include "preprocessor_map.h"
 #include "all_possible_sums.h"
 
 #include <stdio.h>
@@ -45,7 +46,7 @@ void templatetest()
 
     printf("%s\n", TO_TXT2(MAP_LIST_UD_I(f, x, a, b, c)));
 
-    MAP_UD(PRINT_STREAM, stdout, 1, 2, 3, 4, 5)
+    MAP_UD(PRINT_STREAM, stdout, 1, 2, 3, 4, 5);
 
     fflush(stdout);
     fflush(stderr);

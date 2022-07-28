@@ -6,8 +6,6 @@ Write your code in this editor and press "Run" button to compile and execute it.
 
 *******************************************************************************/
 
-
-#include <time.h>
 #include <stdlib.h>
 
 #include "crc_test.h"
@@ -344,7 +342,7 @@ int crc_test()
     printf("\n-------------------------------\n");
 
     u8 randomData[4096*2];
-    srand(time(NULL)); // use current time as seed for random generator
+    srand(100); // use current time as seed for random generator
 
 #ifdef _MY_CRC8_ENA
 
@@ -375,7 +373,7 @@ int crc_test()
         size_t len = 0;
 
         while(len == 0) {
-            len = rand() % 4096*2; // crc 16 maximum 4095 bytes
+            len = rand() % 4096; // crc 16 maximum 4095 bytes
         }
 
         for(size_t j = 0; j < len; ++j) {
