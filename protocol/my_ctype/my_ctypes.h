@@ -71,14 +71,14 @@ typedef ptrdiff_t   sreg;   // platform depend type
  * Define user copy
  * *************************************************
  */
-forceinline void MY_CTYPE_USER_DATA_MEMCPY(u8 n, u8* from, u8* to)
+forceinline void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to)
 {
     while((n)--) {
         *(to)++ = *(from)++;
     }
 }
 
-forceinline void MY_CTYPE_USER_DATA_REVCPY(u8 n, u8* from, u8* to)
+forceinline void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
 {
     while((n)--) {
         *(to)++ = *((from) + (n));

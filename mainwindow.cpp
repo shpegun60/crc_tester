@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 	
     quint8 data[100];
-    quint16 pos = 0;
+    reg pos = 0;
 
     //crc_test();
     //endiansTest();

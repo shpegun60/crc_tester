@@ -5,8 +5,8 @@
  * Define user copy
  * *************************************************
  */
-C_INLINE void MY_CTYPE_USER_DATA_MEMCPY(u8 n, u8* from, u8* to);
-C_INLINE void  MY_CTYPE_USER_DATA_REVCPY(u8 n, u8* from, u8* to);
+C_INLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to);
+C_INLINE void  MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to);
 C_INLINE void MY_CTYPE_USER_DATA_COPY_REGISTER(u8* from, u8* to);
 
 C_INLINE const u8* myCTypeGetTablePointer();
