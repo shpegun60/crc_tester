@@ -24,28 +24,35 @@ MainWindow::MainWindow(QWidget *parent)
     quint8 data[100];
     quint16 pos = 0;
 
-    crc_test();
+    //crc_test();
     //endiansTest();
     //__M_assert_test();
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
-    //templatetest();
+    templatetest();
+
+    TEMPLATE(convertWrite_MSB, f32)(data, &pos, 123.456);
+    TEMPLATE(convertWrite_MSB, u16)(data, &pos, 853);
+    TEMPLATE(CAT_SYSTEM(convertWrite), u64)(data, &pos, 1122334455);
+
+    u64 tmpuni = 1234567890ULL;
+    TEMPLATE(CAT_SYSTEM(convertWrite), uni)(sizeof(u64), data, &pos, (u8*)&tmpuni);
 
 
-
-    TEMPLATE(convertWriteMSB, f32)(data, &pos, 123.456);
-    TEMPLATE(convertWriteMSB, u16)(data, &pos, 853);
-    TEMPLATE(convertWriteLSB, u64)(data, &pos, 1122334455);
     pos = 0;
-    f32 tmp = TEMPLATE(convertReadMSB, f32)(data, &pos);
-    u16 tmp16 = TEMPLATE(convertReadMSB, u16)(data, &pos);
-    u64 tmp64 = TEMPLATE(convertReadLSB, u64)(data, &pos);
+    f32 tmp = TEMPLATE(convertRead_MSB, f32)(data, &pos);
+    u16 tmp16 = TEMPLATE(convertRead_MSB, u16)(data, &pos);
+    u64 tmp64 = TEMPLATE(CAT_SYSTEM(convertRead), u64)(data, &pos);
+
+    u64 tmpunitest;
+    TEMPLATE(CAT_SYSTEM(convertRead), uni)(sizeof(u64), data, &pos, (u8*)&tmpunitest);
 
     qDebug() << tmp;
     qDebug() << tmp16;
     qDebug() << tmp64;
+    qDebug() << tmpunitest;
     qDebug() << pos;
     qDebug() << "long double "<<sizeof(long double);
 

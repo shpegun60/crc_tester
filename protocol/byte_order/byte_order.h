@@ -2,6 +2,7 @@
 #define __BYTE_ORDER_H__
 
 #include "my_ctypes.h"
+#include "preprocessor_base.h"
 
 
 #if defined (__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__) && !defined(MY_BYTE_ORDER_DEFINED)
@@ -31,8 +32,25 @@
 #define MY_SYSTEM_IS_BIG_ENDIAN (*(u16*)"\1\0">>8)    // runtime: is big endian system type
 
 
+#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+    #define CAT_SYSTEM(name) CAT(name, _LSB)
+#elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
+    #define CAT_SYSTEM(name) CAT(name, _MSB)
+#else
+    #define CAT_SYSTEM(name) CAT(name, _)
+    #error unsupported endianness
+#endif
+
+
+
 //------------------------------------------------------------------------
 
+/*
+ * ****************************************
+ * dataset read/write test for bytes order
+ *  * return 1 if test compleated, 0 - not compleated
+ * ****************************************
+ */
 int endiansTest();
 
 /*

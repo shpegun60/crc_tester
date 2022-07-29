@@ -73,7 +73,7 @@ __attribute__((unused)) static int byteOrderCheck(void * source, void * destinat
 
 int endiansTest()
 {
-    // dataset for test toyr system -------------------------------------------------------
+    // dataset for test your system -------------------------------------------------------
     const u16 dataU16 = 12345U;
     const i16 dataI16 = -1000L;
     const u32 dataU32 = 1565465464;

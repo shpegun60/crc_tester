@@ -9,7 +9,7 @@
 
 // all types. Commit this if types defines upper--------------------------
 
-typedef void            u0; // do not check this type because void type is not exist, error type
+typedef void            uni; // do not check this type because void type is not exist, error type
 typedef uint8_t         u8;
 typedef uint16_t        u16;
 typedef uint32_t        u24;

@@ -14,7 +14,7 @@
  * LSB - first
  * ******************************************
  */
-T TEMPLATE(convertReadLSB, T) (u8 *data, u16 *pos)
+T TEMPLATE(convertRead_LSB, T) (u8 *data, u16 *pos)
 {
     T value;
     MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + *pos), (u8 *)(&value));
@@ -22,21 +22,21 @@ T TEMPLATE(convertReadLSB, T) (u8 *data, u16 *pos)
     return value;
 }
 
-void TEMPLATE(convertWriteLSB, T) (u8 *data, u16 *pos, T value)
+void TEMPLATE(convertWrite_LSB, T) (u8 *data, u16 *pos, T value)
 {
     MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + *pos));
     *pos += sizeof(T);
 }
 
 // position not a pointer
-T TEMPLATE(convertReadLSB_cpos, T) (u8 *data, u16 pos)
+T TEMPLATE(convertRead_cpos_LSB, T) (u8 *data, u16 pos)
 {
     T value;
     MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + pos), (u8 *)(&value));
     return value;
 }
 
-void TEMPLATE(convertWriteLSB_cpos, T) (u8 *data, u16 pos, T value)
+void TEMPLATE(convertWrite_cpos_LSB, T) (u8 *data, u16 pos, T value)
 {
     MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + pos));
 }
@@ -48,7 +48,7 @@ void TEMPLATE(convertWriteLSB_cpos, T) (u8 *data, u16 pos, T value)
  * ******************************************
  */
 
-T TEMPLATE(convertReadMSB, T) (u8 *data, u16 *pos)
+T TEMPLATE(convertRead_MSB, T) (u8 *data, u16 *pos)
 {
     T value;
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + *pos), (u8 *)(&value));
@@ -56,21 +56,21 @@ T TEMPLATE(convertReadMSB, T) (u8 *data, u16 *pos)
     return value;
 }
 
-void TEMPLATE(convertWriteMSB, T) (u8 *data, u16 *pos, T value)
+void TEMPLATE(convertWrite_MSB, T) (u8 *data, u16 *pos, T value)
 {
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(&value), (u8*)(data + *pos));
     *pos += sizeof(T);
 }
 
 // position not a pointer
-T TEMPLATE(convertReadMSB_cpos, T) (u8 *data, u16 pos)
+T TEMPLATE(convertRead_cpos_MSB, T) (u8 *data, u16 pos)
 {
     T value;
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + pos), (u8 *)(&value));
     return value;
 }
 
-void TEMPLATE(convertWriteMSB_cpos, T) (u8 *data, u16 pos, T value)
+void TEMPLATE(convertWrite_cpos_MSB, T) (u8 *data, u16 pos, T value)
 {
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(&value), (u8*)(data + pos));
 }
@@ -91,28 +91,28 @@ int TEMPLATE(convertTest, T) (int testN)
     u16 pos = 0;
 
     T value = (T)(sizeof(T));
-    T valueLast = value;
+    T valueLast = 0;
     T value_check = 0;
 
 
     int testCounter = 0;
     while(testN--) {
         // lsb--------------------------------------------------------
-        TEMPLATE(convertWriteLSB, T) (buff, &pos, value);
+        TEMPLATE(convertWrite_LSB, T) (buff, &pos, value);
         if(pos != sizeof(T)) {
             ++testCounter;
         }
         pos = 0;
-        value_check = TEMPLATE(convertReadLSB, T) (buff, &pos);
+        value_check = TEMPLATE(convertRead_LSB, T) (buff, &pos);
         if(value_check != value) {
             ++testCounter;
         }
         pos = 0;
 
         // cpos
-        TEMPLATE(convertWriteLSB_cpos, T) (buff, pos, value);
+        TEMPLATE(convertWrite_cpos_LSB, T) (buff, pos, value);
         pos = 0;
-        value_check = TEMPLATE(convertReadLSB_cpos, T) (buff, pos);
+        value_check = TEMPLATE(convertRead_cpos_LSB, T) (buff, pos);
         if(value_check != value) {
             ++testCounter;
         }
@@ -121,21 +121,21 @@ int TEMPLATE(convertTest, T) (int testN)
 
 
         // msb---------------------------------------------------------
-        TEMPLATE(convertWriteMSB, T) (buff, &pos, value);
+        TEMPLATE(convertWrite_MSB, T) (buff, &pos, value);
         if(pos != sizeof(T)) {
             ++testCounter;
         }
         pos = 0;
-        value_check = TEMPLATE(convertReadMSB, T) (buff, &pos);
+        value_check = TEMPLATE(convertRead_MSB, T) (buff, &pos);
         if(value_check != value) {
             ++testCounter;
         }
         pos = 0;
 
         // cpos
-        TEMPLATE(convertWriteMSB_cpos, T) (buff, pos, value);
+        TEMPLATE(convertWrite_cpos_MSB, T) (buff, pos, value);
         pos = 0;
-        value_check = TEMPLATE(convertReadMSB_cpos, T) (buff, pos);
+        value_check = TEMPLATE(convertRead_cpos_MSB, T) (buff, pos);
         if(value_check != value) {
             ++testCounter;
         }

@@ -10,24 +10,24 @@
  * LSB - first
  * ******************************************
  */
-T TEMPLATE(convertReadLSB, T) (u8 *data, u16 *pos);
-void TEMPLATE(convertWriteLSB, T) (u8 *data, u16 *pos, T value);
+T TEMPLATE(convertRead_LSB, T) (u8 *data, u16 *pos);
+void TEMPLATE(convertWrite_LSB, T) (u8 *data, u16 *pos, T value);
 
 // position not a pointer
-T TEMPLATE(convertReadLSB_cpos, T) (u8 *data, u16 pos);
-void TEMPLATE(convertWriteLSB_cpos, T) (u8 *data, u16 pos, T value);
+T TEMPLATE(convertRead_cpos_LSB, T) (u8 *data, u16 pos);
+void TEMPLATE(convertWrite_cpos_LSB, T) (u8 *data, u16 pos, T value);
 
 /*
  * ******************************************
  * MSB - first
  * ******************************************
  */
-T TEMPLATE(convertReadMSB, T) (u8 *data, u16 *pos);
-void TEMPLATE(convertWriteMSB, T) (u8 *data, u16 *pos, T value);
+T TEMPLATE(convertRead_MSB, T) (u8 *data, u16 *pos);
+void TEMPLATE(convertWrite_MSB, T) (u8 *data, u16 *pos, T value);
 
 // position not a pointer
-T TEMPLATE(convertReadMSB_cpos, T) (u8 *data, u16 pos);
-void TEMPLATE(convertWriteMSB_cpos, T) (u8 *data, u16 pos, T value);
+T TEMPLATE(convertRead_cpos_MSB, T) (u8 *data, u16 pos);
+void TEMPLATE(convertWrite_cpos_MSB, T) (u8 *data, u16 pos, T value);
 
 
 #ifndef CONVERT_TEST_DISABLE

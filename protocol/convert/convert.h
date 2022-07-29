@@ -11,7 +11,7 @@
     //#define CONVERT_TEST_DISABLE
 #endif /* CONVERT_TEST_DISABLE */
 
-
+// MAIN TEMPLATE FUNCTIOINS--------------------------------------------
 #define T u8
 #include "convert_template.h"
 #define T u16
@@ -52,8 +52,44 @@
 #define T sreg
 #include "convert_template.h"
 
+/*
+ * ******************************************
+ * LSB - first univarsal
+ * ******************************************
+ */
+
+void TEMPLATE(convertRead_LSB, uni)(u8 n, u8* data, u16* pos, u8* value);
+void TEMPLATE(convertWrite_LSB, uni)(u8 n, u8* data, u16* pos, u8* value);
+
+// position not a pointer
+void TEMPLATE(convertWrite_cpos_LSB, uni)(u8 n, u8* data, u16 pos, u8* value);
+void TEMPLATE(convertRead_cpos_LSB, uni)(u8 n, u8* data, u16 pos, u8* value);
+
+/*
+ * ******************************************
+ * MSB - first univarsal
+ * ******************************************
+ */
+
+void TEMPLATE(convertRead_MSB, uni)(u8 n, u8* data, u16* pos, u8* value);
+void TEMPLATE(convertWrite_MSB, uni)(u8 n, u8* data, u16* pos, u8* value);
+
+// position not a pointer
+void TEMPLATE(convertRead_cpos_MSB, uni)(u8 n, u8* data, u16 pos, u8* value);
+void TEMPLATE(convertWrite_cpos_MSB, uni)(u8 n, u8* data, u16 pos, u8* value);
+
+
+// TEST--------------------------------------------
+
 
 #ifndef CONVERT_TEST_DISABLE
+/*
+ * ****************************************
+ * Random Write/Read test for convert
+ *  * return 0 if test compleated, else - not compleated
+ * ****************************************
+ */
+
 int convertTest();
 #endif /* CONVERT_TEST_DISABLE */
 

@@ -19,6 +19,9 @@
 
 #define PRINT_STREAM(x, stream) fprintf (stream, "%d\n", x);
 
+
+#define TRANSLATE(name) CAT(name, MSB)
+
 void templatetest()
 {
     int ai[3] = {1,2,3};
@@ -47,6 +50,12 @@ void templatetest()
     printf("%s\n", TO_TXT2(MAP_LIST_UD_I(f, x, a, b, c)));
 
     MAP_UD(PRINT_STREAM, stdout, 1, 2, 3, 4, 5);
+
+    printf("%s\n", TO_TXT2(TEMPLATE(sum, bla1, bla2, bla3, bla4)));
+
+    printf("%s\n", TO_TXT2(TEMPLATE(TRANSLATE(convertWrite), sum)));
+
+
 
     fflush(stdout);
     fflush(stderr);
