@@ -27,7 +27,11 @@ typedef float           f32;
 typedef double          f64;
 typedef long double     f128; // platform depend type
 
+// bool type -------------------------
 typedef unsigned char   b;
+
+#define CTYPE_FALSE (b)(0!=0)
+#define CTYPE_TRUE  (b)(0==0)
 
 // bus types defining (platform depend) ----------------------------------------------
 typedef size_t      reg;    // platform depend type
@@ -168,6 +172,13 @@ static_assert((sizeof(f32) == 4),   "MY_CTYPES: size of float         type must 
 static_assert((sizeof(f64) == 8),   "MY_CTYPES: size of double        type must be equal 8, change --> my_types.h: typedef f64 ");
 //static_assert((sizeof(f128) == 16), "MY_CTYPES: size of long double   type must be equal 16, change --> my_types.h: typedef f128 "); // platform depend
 
+// bool type
+static_assert((sizeof(b) == 1),    "MY_CTYPES: size of bool     type must be equal 1, change --> my_types.h: typedef b ");
+
+// reg types
+static_assert((sizeof(reg) == sizeof(uni*)),   "MY_CTYPES: size of reg            type must be equal pointer size, change --> my_types.h: typedef reg ");
+static_assert((sizeof(sreg) == sizeof(uni*)),   "MY_CTYPES: size of sreg            type must be equal pointer size, change --> my_types.h: typedef sreg ");
+
 #else // if old version C
 #define C99MY_CTYPES_STATIC_ASSERTION_CREATE(COND,MSG) typedef int my_ctype_static_assertion_##MSG[(COND)? 1 : -1] // define custom static assertion if version C less than C11
 //--------------------------------------------------------------------------------------------------------------
@@ -192,8 +203,12 @@ C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f32) == 4), size_of_float_type_must
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f64) == 8), size_of_double_type_must_be_equal_8_change_typedef_f64);
 //C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f128) == 16), size_of_long_double_type_must_be_equal_16_change_typedef_f128); // platform depend
 
-// other type
-C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(b) == 1), size_of_long_bool_type_must_be_equal_1_change_typedef_b);
+// bool type
+C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(b) == 1), size_of_bool_type_must_be_equal_1_change_typedef_b);
+
+// reg types
+C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(reg) == sizeof(uni*)), size_of_reg_type_must_be_equal_pointer_size_change_typedef_reg);
+C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(sreg) == sizeof(uni*)), size_of_sreg_type_must_be_equal_pointer_size_change_typedef_sreg);
 
 
 //--------------------------------------------------------------------------------------------------------------
