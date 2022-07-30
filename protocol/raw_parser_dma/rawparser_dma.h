@@ -65,7 +65,7 @@ INLINE void RawParser_dma_receiveByte(RawParser_dma_t *self, u8 byte)
 INLINE void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP_size_t len)
 {
     M_Assert_Break((self == NULL || arr == NULL), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input");
-    M_Assert_Break(((u32)len > (D_RAW_P_RX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, (D_RAW_P_RX_BUF_SIZE - 1));
+    M_Assert_Break( ((u32)(len) + 1) > (D_RAW_P_RX_BUF_SIZE + 1), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, (D_RAW_P_RX_BUF_SIZE - 1));
 
     while(len--) {
         self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = *arr++;

@@ -1,6 +1,9 @@
 #ifndef __MY_CRC_TEST_H__
 #define __MY_CRC_TEST_H__
 
+#include "my_crc_port.h"
+
+#ifndef _MY_CRC_TEST_DISABLE
 /*
  * ****************************************
  * two stage test:
@@ -12,6 +15,9 @@
  */
 
 int crc_test(); // this is a test for your platform to check the performance CRC8/16/32
+
+
+#endif /* _MY_CRC_TEST_DISABLE */
 
 #endif /* __MY_CRC_TEST_H__*/
 

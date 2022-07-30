@@ -6,13 +6,17 @@ Write your code in this editor and press "Run" button to compile and execute it.
 
 *******************************************************************************/
 
-#include <stdlib.h>
+
 
 #include "crc_test.h"
+
+#ifndef _MY_CRC_TEST_DISABLE
+
+#include <stdlib.h>
+
+
 #include <stdio.h>
 
-
-#include "my_crc_port.h"
 #include "crc8.h"
 #include "crc16.h"
 #include "crc32.h"
@@ -446,4 +450,9 @@ int crc_test()
 }
 
 #undef CRC_RANDOM_TEST_NUM
+
+
+
+
+#endif /* _MY_CRC_TEST_DISABLE */
 

@@ -4,6 +4,10 @@
 #include "my_ctypes.h"
 #include "preprocessor_base.h"
 
+#ifndef BYTE_ORDER_TEST_DISABLE
+    //#define BYTE_ORDER_TEST_DISABLE
+#endif /* BYTE_ORDER_TEST_DISABLE */
+
 
 #if defined (__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__) && !defined(MY_BYTE_ORDER_DEFINED)
     #define MY_BYTE_ORDER_DEFINED
@@ -39,11 +43,13 @@
 #else
     #define CAT_SYSTEM(name) CAT(name, _)
     #error unsupported endianness
-#endif
+#endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
 
 
 
 //------------------------------------------------------------------------
+
+#ifndef BYTE_ORDER_TEST_DISABLE
 
 /*
  * ****************************************
@@ -52,6 +58,8 @@
  * ****************************************
  */
 int endiansTest();
+
+#endif /* BYTE_ORDER_TEST_DISABLE */
 
 /*
  * ********************************************************

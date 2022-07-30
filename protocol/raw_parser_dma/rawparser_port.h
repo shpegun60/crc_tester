@@ -3,11 +3,6 @@
 
 #include "my_ctypes.h"
 
-#include "crc8.h"
-#include "crc16.h"
-#include "crc32.h"
-#include "byte_order.h"
-
 /*
 ***************************************************************************************************
     INTERNAL BUFFER SIZE (number of rawP_data_t values)
@@ -33,9 +28,10 @@
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     #define RECEIVE_EXTENDED_LEN_CMD (u8)(0xFFU)
+    #define D_RAW_P_LEN_SEPARATOR 0xFBU
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-#define D_RAW_P_LEN_SEPARATOR 0xFBU
+
 
 /*
 ***************************************************************************************************
@@ -58,8 +54,8 @@ typedef struct {
 
 #ifdef D_RAW_P_CRC_ENA
 
-    #define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
-    //#define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
+    //#define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
+    #define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
 
 #endif /* D_RAW_P_CRC_ENA */
@@ -67,6 +63,13 @@ typedef struct {
 
 //CRC TABLE SIZE & TYPE -----------------
 #ifdef D_RAW_P_CRC_ENA
+    #if defined(D_RAW_P_USE_CRC8)
+        #include "crc8.h"
+    #elif defined(D_RAW_P_USE_CRC16)
+        #include "crc16.h"
+    #elif defined(D_RAW_P_USE_CRC32)
+        #include "crc32.h"
+    #endif
 
     #if defined(D_RAW_P_USE_CRC8) && defined(_MY_CRC8_ENA)
         typedef u8 rawP_crc_t;

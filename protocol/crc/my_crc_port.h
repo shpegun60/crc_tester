@@ -3,6 +3,10 @@
 
 #include "my_ctypes.h"
 
+#ifndef _MY_CRC_TEST_DISABLE
+    //#define _MY_CRC_TEST_DISABLE
+#endif /* _MY_CRC_TEST_DISABLE */
+
 /*
  * ******************************************************************************
  * CRC8 SETTINGS (USER OVERWRITE) commit define if do not use future

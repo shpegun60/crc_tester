@@ -58,7 +58,9 @@ C_INLINE f64 LittleEndianF64(f64 value);
 C_INLINE f64 BigEndianF64(f64 value);
 //---------------------------------------------------------
 
-__attribute__((unused)) static int byteOrderCheck(void * source, void * destination, int len)
+#ifndef BYTE_ORDER_TEST_DISABLE
+
+__attribute__((unused)) static int byteOrderRevCheck(void * source, void * destination, int len)
 {
     u8 * src = source;
     u8 * dst = destination;
@@ -70,6 +72,7 @@ __attribute__((unused)) static int byteOrderCheck(void * source, void * destinat
     }
     return 0;
 }
+
 
 int endiansTest()
 {
@@ -208,7 +211,7 @@ int endiansTest()
     printf("\nBigEndianU16\ndata: %d\n", dataU16);
     U16Check = BigEndianU16(dataU16);
 
-    if(byteOrderCheck((u8*)&dataU16, &U16Check, sizeof(dataU16))) {
+    if(byteOrderRevCheck((u8*)&dataU16, &U16Check, sizeof(dataU16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -227,7 +230,7 @@ int endiansTest()
     printf("\nBigEndianI16\ndata: %d\n", dataI16);
     I16Check = BigEndianI16(dataI16);
 
-    if(byteOrderCheck((u8*)&dataI16, &I16Check, sizeof(dataI16))) {
+    if(byteOrderRevCheck((u8*)&dataI16, &I16Check, sizeof(dataI16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -246,7 +249,7 @@ int endiansTest()
     printf("\nBigEndianU32\ndata: %d\n", dataU32);
     U32Check = BigEndianU32(dataU32);
 
-    if(byteOrderCheck((u8*)&dataU32, &U32Check, sizeof(dataU32))) {
+    if(byteOrderRevCheck((u8*)&dataU32, &U32Check, sizeof(dataU32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -265,7 +268,7 @@ int endiansTest()
     printf("\nBigEndianI32\ndata: %d\n", dataI32);
     I32Check = BigEndianI32(dataI32);
 
-    if(byteOrderCheck((u8*)&dataI32, &I32Check, sizeof(dataI32))) {
+    if(byteOrderRevCheck((u8*)&dataI32, &I32Check, sizeof(dataI32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -284,7 +287,7 @@ int endiansTest()
     printf("\nBigEndianU64\ndata: %" PRId64 "\n", dataU64);
     U64Check = BigEndianU64(dataU64);
 
-    if(byteOrderCheck((u8*)&dataU64, &U64Check, sizeof(dataU64))) {
+    if(byteOrderRevCheck((u8*)&dataU64, &U64Check, sizeof(dataU64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -303,7 +306,7 @@ int endiansTest()
     printf("\nBigEndianI64\ndata: %" SCNd64 "\n", dataI64);
     I64Check = BigEndianI64(dataI64);
 
-    if(byteOrderCheck((u8*)&dataI64, &I64Check, sizeof(dataI64))) {
+    if(byteOrderRevCheck((u8*)&dataI64, &I64Check, sizeof(dataI64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -323,7 +326,7 @@ int endiansTest()
     printf("\nBigEndianf32\ndata: %f\n", dataF32);
     f32Check = BigEndianF32(dataF32);
 
-    if(byteOrderCheck((u8*)&dataF32, &f32Check, sizeof(dataF32))) {
+    if(byteOrderRevCheck((u8*)&dataF32, &f32Check, sizeof(dataF32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -342,7 +345,7 @@ int endiansTest()
     printf("\nBigEndianf64\ndata: %f\n", dataF64);
     f64Check = BigEndianF64(dataF64);
 
-    if(byteOrderCheck((u8*)&dataF64, &f64Check, sizeof(dataF64))) {
+    if(byteOrderRevCheck((u8*)&dataF64, &f64Check, sizeof(dataF64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -375,7 +378,7 @@ int endiansTest()
     printf("\nLittleEndianU16\ndata: %d\n", dataU16);
     U16Check = LittleEndianU16(dataU16);
 
-    if(byteOrderCheck((u8*)&dataU16, &U16Check, sizeof(dataU16))) {
+    if(byteOrderRevCheck((u8*)&dataU16, &U16Check, sizeof(dataU16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -394,7 +397,7 @@ int endiansTest()
     printf("\nLittleEndianI16\ndata: %d\n", dataI16);
     I16Check = LittleEndianI16(dataI16);
 
-    if(byteOrderCheck((u8*)&dataI16, &I16Check, sizeof(dataI16))) {
+    if(byteOrderRevCheck((u8*)&dataI16, &I16Check, sizeof(dataI16))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -413,7 +416,7 @@ int endiansTest()
     printf("\nLittleEndianU32\ndata: %d\n", dataU32);
     U32Check = LittleEndianU32(dataU32);
 
-    if(byteOrderCheck((u8*)&dataU32, &U32Check, sizeof(dataU32))) {
+    if(byteOrderRevCheck((u8*)&dataU32, &U32Check, sizeof(dataU32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -432,7 +435,7 @@ int endiansTest()
     printf("\nLittleEndianI32\ndata: %d\n", dataI32);
     I32Check = LittleEndianI32(dataI32);
 
-    if(byteOrderCheck((u8*)&dataI32, &I32Check, sizeof(dataI32))) {
+    if(byteOrderRevCheck((u8*)&dataI32, &I32Check, sizeof(dataI32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -451,7 +454,7 @@ int endiansTest()
     printf("\nLittleEndianU64\ndata: %" PRId64 "\n", dataU64);
     U64Check = LittleEndianU64(dataU64);
 
-    if(byteOrderCheck((u8*)&dataU64, &U64Check, sizeof(dataU64))) {
+    if(byteOrderRevCheck((u8*)&dataU64, &U64Check, sizeof(dataU64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -470,7 +473,7 @@ int endiansTest()
     printf("\nLittleEndianI64\ndata: %" SCNd64 "\n", dataI64);
     I64Check = LittleEndianI64(dataI64);
 
-    if(byteOrderCheck((u8*)&dataI64, &I64Check, sizeof(dataI64))) {
+    if(byteOrderRevCheck((u8*)&dataI64, &I64Check, sizeof(dataI64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -488,7 +491,7 @@ int endiansTest()
     printf("\nLittleEndianf32\ndata: %f\n", dataF32);
     f32Check = LittleEndianF32(dataF32);
 
-    if(byteOrderCheck((u8*)&dataF32, &f32Check, sizeof(dataF32))) {
+    if(byteOrderRevCheck((u8*)&dataF32, &f32Check, sizeof(dataF32))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -507,7 +510,7 @@ int endiansTest()
     printf("\nLittleEndianf64\ndata: %f\n", dataF64);
     f64Check = LittleEndianF64(dataF64);
 
-    if(byteOrderCheck((u8*)&dataF64, &f64Check, sizeof(dataF64))) {
+    if(byteOrderRevCheck((u8*)&dataF64, &f64Check, sizeof(dataF64))) {
         ++bytes_order_error;
         printf("bytes order check error: 1\n");
     } else {
@@ -660,6 +663,7 @@ int endiansTest()
     fflush(stdout);
     return test_passed;
 }
+#endif /* BYTE_ORDER_TEST_DISABLE */
 
 
 #undef C99MY_ENDIAN_STATIC_ASSERTION_CREATE

@@ -41,7 +41,7 @@ void templatetest()
 
     printf("%s\n", TO_TXT2(WHILE_MACRO(PRED, OP, 7)));
 
-    printf("%s\n", TO_TXT2(BITAND(1)(x,y,z)));
+    printf("bitand: %s\n", TO_TXT2(BITAND(1)(123, blablabla)));
 
     printf("%s\n", TO_TXT2(EQUAL(foo, foo)));
 

@@ -1,6 +1,8 @@
 
+
 #define INLINE
 #include "rawparser_dma.h"
+#include "byte_order.h"
 #include <stdlib.h>
 
 
@@ -13,22 +15,22 @@
 #define RECEIVE_LEN_0           0x00U
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-#define RECEIVE_LEN_LOW     0x01U
-#define RECEIVE_LEN_HIGH    0x02U
+#define RECEIVE_LEN_LOW         0x01U
+#define RECEIVE_LEN_HIGH        0x02U
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
 #define RECEIVE_DATA            0x03U
 
 #ifdef D_RAW_P_CRC_ENA
-#define RECEIVE_CRC_0         0x04U
+#define RECEIVE_CRC_0           0x04U
 
 #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
-#define RECEIVE_CRC_1         0x05U
+#define RECEIVE_CRC_1           0x05U
 #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
 
 #if defined(D_RAW_P_USE_CRC32)
-#define RECEIVE_CRC_2         0x06U
-#define RECEIVE_CRC_3         0x07U
+#define RECEIVE_CRC_2           0x06U
+#define RECEIVE_CRC_3           0x07U
 #endif /* defined(D_RAW_P_USE_CRC32) */
 
 #endif /* D_RAW_P_CRC_ENA */
@@ -324,7 +326,7 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, u8 * 
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
 void RawParser_dma_startTransmittPacket(RawParser_dma_t * const self, rawP_size_t predictedLen)
 {
-    M_Assert_Break(((self == (RawParser_dma_t*)NULL) || (predictedLen == 0) || ((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE - 2))), M_EMPTY, return , "RawParser_dma_startTransmittPacket: No valid input");
+    M_Assert_Break(((self == (RawParser_dma_t*)NULL) || (predictedLen == 0) || ((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE - 1))), M_EMPTY, return , "RawParser_dma_startTransmittPacket: No valid input");
 
 #ifdef D_RAW_P_CRC_ENA
     self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;
