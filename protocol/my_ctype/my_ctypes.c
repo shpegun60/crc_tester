@@ -6,7 +6,7 @@
  * *************************************************
  */
 C_INLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to);
-C_INLINE void  MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to);
+C_INLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to);
 C_INLINE void MY_CTYPE_USER_DATA_COPY_REGISTER(u8* from, u8* to);
 
 C_INLINE const u8* myCTypeGetTablePointer();
@@ -39,31 +39,20 @@ const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH] = {
 };
 
 // copy types -------------------------------------------------
-void myCTypeMemcpy(u8 type, u8* from, u8* to)
+void cTypeMemcpy(u8 type, u8* from, u8* to)
 {
     u8 len = getMYCTypeLen(type);
     MY_CTYPE_USER_DATA_MEMCPY(len, from, to);
 }
 
-void myCTypeRevcpy(u8 type, u8* from, u8* to)
+void cTypeRevcpy(u8 type, u8* from, u8* to)
 {
     u8 len = getMYCTypeLen(type);
     MY_CTYPE_USER_DATA_REVCPY(len, from, to);
 }
 
-// copy sizeof -------------------------------------------------
-void myMemcpy(u8 n, u8* from, u8* to)
-{
-    MY_CTYPE_USER_DATA_MEMCPY(n, from, to);
-}
-
-void myRevcpy(u8 n, u8* from, u8* to)
-{
-    MY_CTYPE_USER_DATA_REVCPY(n, from, to);
-}
-
 // init data type ---------------------------------------
-void myCTypePointerInit(u8 type, u8* ptr)
+void cTypePointerInit(u8 type, u8* ptr)
 {
     u8 len = getMYCTypeLen(type);
 
@@ -73,7 +62,7 @@ void myCTypePointerInit(u8 type, u8* ptr)
 }
 
 // init data sizeof ---------------------------------------
-void myPointerInit(u8 n, u8* ptr)
+void pointerInit(reg n, u8* ptr)
 {
     while(n--) {
         *ptr++ = ((u8)0);
@@ -82,7 +71,7 @@ void myPointerInit(u8 n, u8* ptr)
 
 
 // string compleate------------------------------------------
-u8 myStrnCmp(u8 n, const c8* str1, const c8* str2)
+u8 cTypeStrnCmp(reg n, const c8* str1, const c8* str2)
 {
     while(n--) {
         if(*str1++ != *str2++) {
@@ -92,5 +81,14 @@ u8 myStrnCmp(u8 n, const c8* str1, const c8* str2)
     return ((u8)0);
 }
 
+u8 cTypeStrnRevCmp(reg n, const c8* str1, const c8* str2)
+{
+    while(n--) {
+        if(*str1++ != *(str2 + n)) {
+            return ((u8)1);
+        }
+    }
+    return ((u8)0);
+}
 
 

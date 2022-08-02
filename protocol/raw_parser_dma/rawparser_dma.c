@@ -1,6 +1,3 @@
-
-
-#define INLINE
 #include "rawparser_dma.h"
 #include "byte_order.h"
 #include <stdlib.h>
@@ -38,6 +35,12 @@
 #define RECEIVE_ERR             0x08U
 #define RECEIVE_OK              0x09U
 //----------------------------------------------
+
+// receive functions-----------------------------------------------------------------------------------------
+C_INLINE void RawParser_dma_receiveByte(RawParser_dma_t *self, u8 byte);
+C_INLINE void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP_size_t len);
+
+
 
 RawParser_dma_t* rawParser_dma_new(u8 packStart)
 {
@@ -175,6 +178,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t * const self, const u8 ch,
         if (self->m_receiveHandlePos == self->m_receivePackLen) {
 
 #ifdef D_RAW_P_CRC_ENA
+            D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
             self->receiveState = RECEIVE_CRC_0;
 #else
             self->RX.size = self->m_receivePackLen;
@@ -189,7 +193,6 @@ static void RawParser_dma_proceedByte(RawParser_dma_t * const self, const u8 ch,
     case RECEIVE_CRC_0:
 
     #ifdef D_RAW_P_USE_CRC8
-        D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
 
         if(self->m_receiveCalcCRC == ch) {
             self->RX.size = self->m_receivePackLen;
@@ -217,7 +220,6 @@ static void RawParser_dma_proceedByte(RawParser_dma_t * const self, const u8 ch,
 
         #if defined(D_RAW_P_USE_CRC16)
             self->m_receiveCRCBuf = LittleEndianU16(self->m_receiveCRCBuf);
-            D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
 
             if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
                 self->RX.size = self->m_receivePackLen;
@@ -245,7 +247,6 @@ static void RawParser_dma_proceedByte(RawParser_dma_t * const self, const u8 ch,
         case RECEIVE_CRC_3:
             self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 24U) & 0xFF000000UL); // read 3 byte
             self->m_receiveCRCBuf = LittleEndianU32(self->m_receiveCRCBuf);
-            D_RAW_P_CRC_FINAL(self->m_receiveCalcCRC);
 
             if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
                 self->RX.size = self->m_receivePackLen;
@@ -326,7 +327,7 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, u8 * 
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
 void RawParser_dma_startTransmittPacket(RawParser_dma_t * const self, rawP_size_t predictedLen)
 {
-    M_Assert_Break(((self == (RawParser_dma_t*)NULL) || (predictedLen == 0) || ((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE - 1))), M_EMPTY, return , "RawParser_dma_startTransmittPacket: No valid input");
+    M_Assert_Break(((self == (RawParser_dma_t*)NULL) || (predictedLen == 0) || ( ((u32)predictedLen + 2) > D_RAW_P_TX_BUF_SIZE) ), M_EMPTY, return , "RawParser_dma_startTransmittPacket: No valid input");
 
 #ifdef D_RAW_P_CRC_ENA
     self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;
@@ -390,11 +391,11 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t * const s
 // elementary byte adding functions ----------------------------------------------------------------------------
 inline void RawParser_dma_addTxByte(RawParser_dma_t * const self, const u8 byte)
 {
-    M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
+    M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
 
     self->m_sendBuffer[self->m_transmittPos++] = byte;
     if(byte == self->m_startByte) {
-        M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
+        M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
 
         self->m_sendBuffer[self->m_transmittPos++] = byte;
     }
@@ -403,13 +404,13 @@ inline void RawParser_dma_addTxByte(RawParser_dma_t * const self, const u8 byte)
 #ifdef D_RAW_P_CRC_ENA
 inline void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const u8 byte)
 {
-    M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
+    M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
 
     self->m_transmittCalcCRC = D_RAW_P_CRC_UPDATE(self->m_transmittCalcCRC, byte);
 
     self->m_sendBuffer[self->m_transmittPos++] = byte;
     if(byte == self->m_startByte) {
-        M_Assert_Break((self->m_transmittPos == D_RAW_P_TX_BUF_SIZE), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
+        M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
 
         self->m_sendBuffer[self->m_transmittPos++] = byte;
     }

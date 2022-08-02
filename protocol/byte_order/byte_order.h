@@ -37,11 +37,11 @@
 
 
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    #define CAT_SYSTEM(name) CAT(name, _LSB)
+    #define CAT_ENDIAN(name) CAT(name, _LSB)
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    #define CAT_SYSTEM(name) CAT(name, _MSB)
+    #define CAT_ENDIAN(name) CAT(name, _MSB)
 #else
-    #define CAT_SYSTEM(name) CAT(name, _)
+    #define CAT_ENDIAN(name) CAT(name, _)
     #error unsupported endianness
 #endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
 

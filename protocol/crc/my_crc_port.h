@@ -1,8 +1,6 @@
 #ifndef __MY_CRC_PORT_H__
 #define __MY_CRC_PORT_H__
 
-#include "my_ctypes.h"
-
 #ifndef _MY_CRC_TEST_DISABLE
     //#define _MY_CRC_TEST_DISABLE
 #endif /* _MY_CRC_TEST_DISABLE */

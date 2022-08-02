@@ -1,6 +1,7 @@
 #ifndef __CRC_32_B_H__
 #define __CRC_32_B_H__
 
+#include "my_ctypes.h"
 #include "my_crc_port.h"
 
 #ifdef _MY_CRC32_ENA

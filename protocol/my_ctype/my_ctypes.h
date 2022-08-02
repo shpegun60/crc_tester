@@ -128,18 +128,22 @@ forceinline u8 getMYCTypeLen(u8 type) {
 }
 
 
+
 // copy types -------------------------------------------------
-void myCTypeMemcpy(u8 type, u8* from, u8* to);
-void myCTypeRevcpy(u8 type, u8* from, u8* to);
-// copy sizeof -------------------------------------------------
-void myMemcpy(u8 n, u8* from, u8* to);
-void myRevcpy(u8 n, u8* from, u8* to);
+void cTypeMemcpy(u8 type, u8* from, u8* to);
+void cTypeRevcpy(u8 type, u8* from, u8* to);
+
 // init data type ---------------------------------------
-void myCTypePointerInit(u8 type, u8* ptr);
+void cTypePointerInit(u8 type, u8* ptr);
+
 // init data sizeof ---------------------------------------
-void myPointerInit(u8 n, u8* ptr);
+void pointerInit(reg n, u8* ptr);
+
 // string compleate------------------------------------------
-u8 myStrnCmp(u8 n, const c8* str1, const c8* str2);
+u8 cTypeStrnCmp(reg n, const c8* str1, const c8* str2);
+// string reverse compleate------------------------------------------
+u8 cTypeStrnRevCmp(reg n, const c8* str1, const c8* str2);
+
 
 
 /*

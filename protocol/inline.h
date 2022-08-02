@@ -5,6 +5,7 @@
  * - GNU C(gnu89)
  * - C99
  * - younger С - compilers
+ * - all С++ compilers
  */
 
 /*
@@ -76,5 +77,13 @@
  * C_INLINE int max(int ​​a, int b);
  *
  */
+
+/*
+ * *********************************************************************
+ * STATIC INLINE
+ * *********************************************************************
+ */
+
+#define STATIC_INLINE static inline
 
 #endif /* __INLINE_H__ */

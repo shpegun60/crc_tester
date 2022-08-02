@@ -10,7 +10,7 @@
 #define __SMART_ASSERT_H_
 
 
-// this library must include only .c file!!!!!!!!!!!!!!!!
+// this library must include only .c or .cpp file!!!!!!!!!!!!!!!!
 
 //   C++ linking for mixed C++/C code
 #ifdef __cplusplus
@@ -37,7 +37,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
  *  defines simple if NDEBUG disable expr
  * ***********************************************************************************************************************************************
  */
-
+// this macros will disable if NDEBUG is defined
 #define M_Assert_disableExpr(...) __VA_ARGS__
 
 /*
