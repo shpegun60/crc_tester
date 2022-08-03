@@ -398,6 +398,7 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
 // elementary byte adding functions ----------------------------------------------------------------------------
 inline void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte)
 {
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByte: No valid input");
     M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
 
     self->m_sendBuffer[self->m_transmittPos++] = byte;
@@ -409,8 +410,9 @@ inline void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte)
 }
 
 #ifdef D_RAW_P_CRC_ENA
-inline void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const u8 byte)
+inline void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte)
 {
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByteCRC: No valid input");
     M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet more than buffer");
 
     self->m_transmittCalcCRC = D_RAW_P_CRC_UPDATE(self->m_transmittCalcCRC, byte);
@@ -453,5 +455,3 @@ inline void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const u8 by
 #undef RECEIVE_ERR
 #undef RECEIVE_OK
 //----------------------------------------------
-
-#undef INLINE

@@ -80,10 +80,16 @@
 
 /*
  * *********************************************************************
- * STATIC INLINE
+ * OTHER simple INLINE`s
  * *********************************************************************
  */
 
+#ifndef STATIC_INLINE
 #define STATIC_INLINE static inline
+#endif /* STATIC_INLINE */
+
+#ifndef INLINE
+#define INLINE inline
+#endif /* INLINE */
 
 #endif /* __INLINE_H__ */
