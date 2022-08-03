@@ -8,8 +8,8 @@
     INTERNAL BUFFER SIZE (number of rawP_data_t values)
 ***************************************************************************************************
 */
-#define D_RAW_P_RX_BUF_SIZE 256U // rx buffer must be is power of 2, else error
-#define D_RAW_P_TX_BUF_SIZE 256U // tx buffer must be is power of 2, else error
+#define D_RAW_P_RX_BUF_SIZE 1024U // rx buffer must be is power of 2, else error
+#define D_RAW_P_TX_BUF_SIZE 1024U // tx buffer must be is power of 2, else error
 
 /*
 ***************************************************************************************************
@@ -17,7 +17,7 @@
 ***************************************************************************************************
 */
 
-//#define D_RAW_P_TWO_BYTES_LEN_SUPPORT
+#define D_RAW_P_TWO_BYTES_LEN_SUPPORT
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     typedef u16 rawP_size_t;
@@ -50,13 +50,13 @@ typedef struct {
 ***************************************************************************************************
 */
 
-//#define D_RAW_P_CRC_ENA
+#define D_RAW_P_CRC_ENA
 
 #ifdef D_RAW_P_CRC_ENA
 
-    #define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
+    //#define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
-    //#define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
+    #define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
 
 #endif /* D_RAW_P_CRC_ENA */
 
@@ -196,8 +196,8 @@ typedef struct {
     #error D_RAW_P_TX_BUF_SIZE must be is power of 2
 #endif //check if power of 2 D_RAW_P_TX_BUF_SIZE
 
-#if ((D_RAW_P_RX_BUF_SIZE > 256) || (D_RAW_P_TX_BUF_SIZE > 256)) && !defined(D_RAW_P_TWO_BYTES_LEN_SUPPORT)
-    #error BUFFER`s must be less than 256 or uncommit D_RAW_P_TWO_BYTES_LEN_SUPPORT
+#if ((D_RAW_P_RX_BUF_SIZE > 512) || (D_RAW_P_TX_BUF_SIZE > 512)) && !defined(D_RAW_P_TWO_BYTES_LEN_SUPPORT)
+    #error BUFFER`s must be less than 512 or uncommit D_RAW_P_TWO_BYTES_LEN_SUPPORT
 #endif // two bytes len support buffer check
 
 

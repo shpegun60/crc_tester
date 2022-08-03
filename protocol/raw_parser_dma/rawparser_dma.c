@@ -133,7 +133,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
             self->receiveState = RECEIVE_DATA;
             M_Assert_WarningSaveCheck(((u32)self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
                                               self->receiveState = RECEIVE_ERR;
-                                          }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d\n", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
+                                          }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
 
             self->m_receiveHandlePos = 0;
 
@@ -166,7 +166,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         self->receiveState = RECEIVE_DATA;
         M_Assert_WarningSaveCheck((self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
                                           self->receiveState = RECEIVE_ERR;
-                                      }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d\n", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
+                                      }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
 
         self->m_receiveHandlePos = 0;
         break;
@@ -203,7 +203,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
             self->RX.size = self->m_receivePackLen;
             self->receiveState = RECEIVE_OK;
         } else {
-            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC8 error, rx_crc: %d, calc_crc: %d\n", ch, self->m_receiveCalcCRC);
+            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC8 error, rx_crc: %d, calc_crc: %d", ch, self->m_receiveCalcCRC);
             self->receiveState = RECEIVE_ERR;
         }
 
@@ -230,7 +230,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
                 self->RX.size = self->m_receivePackLen;
                 self->receiveState = RECEIVE_OK;
             } else {
-                M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC16 error, rx_crc: %d, calc_crc: %d\n", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
+                M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC16 error, rx_crc: %d, calc_crc: %d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
                 self->receiveState = RECEIVE_ERR;
             }
 
@@ -257,7 +257,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
                 self->RX.size = self->m_receivePackLen;
                 self->receiveState = RECEIVE_OK;
             } else {
-                M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC32 error, rx data: %d, crc calc:%d\n", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
+                M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC32 error, rx data: %d, crc calc:%d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
                 self->receiveState = RECEIVE_ERR;
             }
             break;
@@ -268,7 +268,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
 
     case RECEIVE_ERR:
-        M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive error, byte: %d, rx_len: %d, max_rxlen: %d\n", ch, self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
+        M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive error, byte: %d, rx_len: %d, max_rxlen: %d", ch, self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
         break;
 
     case RECEIVE_OK:
@@ -331,10 +331,12 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* da
 }
 
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
-void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, const rawP_size_t predictedLen)
+void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t predictedLen)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input");
-    M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > D_RAW_P_TX_BUF_SIZE) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d", predictedLen);
+    M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_TX_BUF_SIZE - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d", predictedLen);
+
+    M_Assert_Warning((predictedLen > D_RAW_P_TX_BUF_SIZE >> 1), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: recomended buffer size more than half-transmitt len!!!");
 
 #ifdef D_RAW_P_CRC_ENA
     self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;

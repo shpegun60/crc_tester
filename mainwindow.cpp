@@ -12,6 +12,8 @@ extern "C" {
 
 //#define CONVERT_TEST_DISABLE
 #include "convert.h"
+
+#include <time.h>       /* time */
 }
 
 #include "smart_assert.h"
@@ -62,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "---------------------------------------------------";
 //    qDebug() << "convert test exit with: "<< convertTest();
 
-    rawParserDmaTest();
+    rawParserDmaTest(time(NULL));
 }
 
 MainWindow::~MainWindow()

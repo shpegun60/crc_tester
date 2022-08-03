@@ -69,7 +69,7 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self);
 // slow shield functions (slow & more copy)-----------------------------------------------------------------------------------------
 RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* data, rawP_size_t len); // shield data array before transmitting
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
-void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, const rawP_size_t predictedLen);
+void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t predictedLen);
 RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const self);
 
 
