@@ -10,7 +10,7 @@
 #define __SMART_ASSERT_H_
 
 
-// this library must include only .c or .cpp file!!!!!!!!!!!!!!!!
+// this library recomended include only .c or .cpp file!!!!!!!!!!!!!!!!
 
 //   C++ linking for mixed C++/C code
 #ifdef __cplusplus

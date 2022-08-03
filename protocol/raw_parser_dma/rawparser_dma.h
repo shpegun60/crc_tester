@@ -5,7 +5,7 @@
 #include "smart_assert.h"
 
 /**
-  * @brief RawParser_DescriptorTypeDef structure definition
+  * @brief RawParser_dma_DescriptorTypeDef structure definition
   */
 typedef struct {
     // packet form -----------------------------------------
@@ -42,18 +42,18 @@ typedef struct {
 } RawParser_dma_t;
 
 // new / delete functions----------------------------------------------
-RawParser_dma_t* rawParser_dma_new(u8 packStart);
+RawParser_dma_t* rawParser_dma_new(const u8 packStart);
 int rawParser_dma_delete(RawParser_dma_t** data);
 
 
 // receive functions-----------------------------------------------------------------------------------------
-forceinline void RawParser_dma_receiveByte(RawParser_dma_t *self, u8 byte)
+forceinline void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "RawParser_dma_receiveByte: No valid input");
     self->m_receiveBuffer[(self->m_receivePos++) & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
 }
 
-forceinline void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP_size_t len)
+forceinline void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, rawP_size_t len)
 {
     M_Assert_Break((self == NULL || arr == NULL), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input");
     M_Assert_Break( ((u32)(len) + 1) > (D_RAW_P_RX_BUF_SIZE + 1), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, (D_RAW_P_RX_BUF_SIZE - 1));
@@ -64,19 +64,19 @@ forceinline void RawParser_dma_receiveArray(RawParser_dma_t *self, u8 *arr, rawP
 }
 
 
-RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t * const self);
+RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self);
 
 // slow shield functions (slow & more copy)-----------------------------------------------------------------------------------------
-RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t * const self, u8 * data, rawP_size_t len); // shield data array before transmitting
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* data, rawP_size_t len); // shield data array before transmitting
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
-void RawParser_dma_startTransmittPacket(RawParser_dma_t * const self, rawP_size_t predictedLen);
-RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t * const self);
+void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, const rawP_size_t predictedLen);
+RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const self);
 
 
 // elementary byte adding functions ----------------------------------------------------------------------------
-void RawParser_dma_addTxByte(RawParser_dma_t * const self, const u8 byte);
+void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte);
 #ifdef D_RAW_P_CRC_ENA
-void RawParser_dma_addTxByteCRC(RawParser_dma_t * const self, const u8 byte);
+void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte);
 #else
     #define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte((self), (byte))
 #endif /* D_RAW_P_CRC_ENA */
