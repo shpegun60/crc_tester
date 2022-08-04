@@ -1,7 +1,12 @@
 #include "crc64.h"
-#include <stdio.h>
 
 #ifdef _MY_CRC64_ENA
+
+/*
+*************************************************************************************************
+  Name  : CRC-64-JONES
+*************************************************************************************************
+*/
 
 #ifdef _MY_CRC64_TABLE_CALC_ENA
 
@@ -88,29 +93,90 @@ u64 slow_crc64jones_byte(u64 crc, const u8 data)
 #endif /* _MY_CRC64_GENERIC_CALC_ENA */
 
 
-#endif /* _MY_CRC64_ENA */
+
+#ifndef _MY_CRC_TEST_DISABLE
+
+#include <stdio.h>
+
+//***********************************************************************************************
+// CRC64 test
+//***********************************************************************************************
+
+int crc64_test(u8 *data, size_t len, u64 *res)
+{
+    u64 crc64[4] = {CRC64INIT, CRC64INIT, CRC64INIT, CRC64INIT};
+
+    printf("\n\n--------> crc64 test <-------------------------------------------\n");
+    printf("sizeof buffer: %d\n\n", len);
+
+#ifdef _MY_CRC64_TABLE_CALC_ENA
+
+    crc64[0] = fast_crc64jones_array(data, len);
+    printf("crc64 --> fast_crc64jones_array: 0x%llx", crc64[0]);
+
+    CRC64START(crc64[1]);
+    for(size_t i = 0; i < len; ++i) {
+        crc64[1] = fast_crc64jones_byte(crc64[1], data[i]);
+    }
+    CRC64FINAL(crc64[1]);
+    printf("\ncrc64 --> fast_crc64jones_byte: 0x%llx", crc64[1]);
+
+#endif /* _MY_CRC64_TABLE_CALC_ENA */
 
 
+#ifdef _MY_CRC64_GENERIC_CALC_ENA
 
-void crc64Test() {
+    crc64[2] = slow_crc64jones_array(data, len);
+    printf("\ncrc64 --> slow_crc64jones_array: 0x%llx", crc64[2]);
 
-    char str[10] = "123456789";
-    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) fast_crc64jones_array((u8*)str, 9));
+    CRC64START(crc64[3]);
+    for(size_t i = 0; i < len; ++i) {
+        crc64[3] = slow_crc64jones_byte(crc64[3], data[i]);
+    }
+    CRC64FINAL(crc64[3]);
+    printf("\ncrc64 --> slow_crc64jones_byte: 0x%llx", crc64[3]);
 
-    u64 crc = CRC64INIT;
-    for(int i = 0; i < 9; ++i) {
-        crc = fast_crc64jones_byte(crc, str[i]);
+#endif /* _MY_CRC64_GENERIC_CALC_ENA */
+
+
+    int counter_not_valid = 0;
+
+#if defined(_MY_CRC64_TABLE_CALC_ENA) && defined (_MY_CRC64_GENERIC_CALC_ENA)
+
+    for(int i = 1; i < 4; ++i) {
+        if(crc64[0] != crc64[i]) {
+            ++counter_not_valid;
+        }
     }
 
-    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) crc);
+    *res = crc64[0];
+#elif defined(_MY_CRC64_TABLE_CALC_ENA) && !defined (_MY_CRC64_GENERIC_CALC_ENA)
 
-
-    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) slow_crc64jones_array((u8*)str, 9));
-    crc = CRC64INIT;
-    for(int i = 0; i < 9; ++i) {
-        crc = slow_crc64jones_byte(crc, str[i]);
+    if(crc64[0] != crc64[1]) {
+        ++counter_not_valid;
     }
 
-    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) crc);
+    *res = crc64[0];
+#else
+
+    if(crc64[2] != crc64[3]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc64[2];
+#endif /* defined(_MY_CRC32_TABLE_CALC_ENA) && defined (_MY_CRC32_GENERIC_CALC_ENA) */
+
+
+
+    printf("\nerror counter %d\n", counter_not_valid);
+    fflush(stdout);
+    return counter_not_valid;
 }
+
+
+#endif /* _MY_CRC_TEST_DISABLE */
+
+
+
+#endif /* _MY_CRC64_ENA */
 

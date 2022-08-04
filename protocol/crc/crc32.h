@@ -7,6 +7,10 @@
 
 #include "my_ctypes.h"
 
+#ifndef _MY_CRC_TEST_DISABLE
+int crc32_test(u8 *data, size_t len, u32 *res);
+#endif /* _MY_CRC_TEST_DISABLE */
+
 /*
 **********************************************************************************************************************************
     Name  : CRC-32b

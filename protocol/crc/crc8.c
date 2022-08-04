@@ -78,4 +78,106 @@ u8 slow_crc8_maxim_byte(u8 crc, const u8 data)
 
 #endif /* _MY_CRC8_GENERIC_CALC_ENA */
 
+
+
+#ifndef _MY_CRC_TEST_DISABLE
+
+#include <stdio.h>
+
+__attribute__((unused)) static uint8_t _proceedCrc_OLD(uint8_t crc, uint8_t ch) { // original crc from old protocol
+    crc ^= ch;
+    for (int i = 0; i < 8; i++)
+        crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
+    return crc;
+}
+
+
+int crc8_test(u8 *data, size_t len, u8 * res)
+{
+    u8 crc8[5] = {CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT};
+
+    printf("\n\n------> crc 8 test <-------------------------------------------\n");
+    printf("data: 0x");
+    for(size_t i = 0; i < len; ++i) {
+        printf("%x.", data[i]);
+    }
+
+    printf("\nsizeof buffer: %d\n\n", (int)len);
+
+
+#ifdef _MY_CRC8_TABLE_CALC_ENA
+    crc8[0] = fast_crc8_maxim_array(data, len);
+    printf("crc8 --> fast_crc8_maxim_array: 0x%x", crc8[0]);
+
+    CRC8START(crc8[1]);
+    for(size_t i = 0; i < len; ++i) {
+        crc8[1] = fast_crc8_maxim_byte(crc8[1], data[i]);
+    }
+    CRC8FINAL(crc8[1]);
+    printf("\ncrc8 --> fast_crc8_maxim_byte: 0x%x", crc8[1]);
+#endif /* _MY_CRC8_TABLE_CALC_ENA */
+
+
+
+#ifdef _MY_CRC8_GENERIC_CALC_ENA
+    crc8[2] = slow_crc8_maxim_array(data, len);
+    printf("\ncrc8 --> slow_crc8_maxim_array: 0x%x", crc8[2]);
+
+    CRC8START(crc8[3]);
+    for(size_t i = 0; i < len; ++i) {
+        crc8[3] = slow_crc8_maxim_byte(crc8[3], data[i]);
+    }
+    CRC8FINAL(crc8[3]);
+    printf("\ncrc8 --> slow_crc8_maxim_byte: 0x%x", crc8[3]);
+#endif /* _MY_CRC8_GENERIC_CALC_ENA */
+
+    for(size_t i = 0; i < len; ++i) {
+        crc8[4] = _proceedCrc_OLD(crc8[4], data[i]);
+    }
+    printf("\ncrc8 --> _proceedCrc_OLD: 0x%x", crc8[4]);
+
+    int counter_not_valid = 0;
+
+#if defined(_MY_CRC8_TABLE_CALC_ENA) && defined (_MY_CRC8_GENERIC_CALC_ENA)
+
+    for(int i = 1; i < 5; ++i) {
+        if(crc8[0] != crc8[i]) {
+            ++counter_not_valid;
+        }
+    }
+
+    *res = crc8[0];
+#elif defined(_MY_CRC8_TABLE_CALC_ENA) && !defined (_MY_CRC8_GENERIC_CALC_ENA)
+
+    if(crc8[0] != crc8[1]) {
+        ++counter_not_valid;
+    }
+
+    if(crc8[0] != crc8[4]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc8[0];
+#else
+    if(crc8[2] != crc8[3]) {
+        ++counter_not_valid;
+    }
+
+    if(crc8[2] != crc8[4]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc8[2];
+#endif /* defined(_MY_CRC8_TABLE_CALC_ENA) && defined (_MY_CRC8_GENERIC_CALC_ENA) */
+
+
+
+    printf("\nerror counter %d\n", counter_not_valid);
+
+    fflush(stdout);
+    return counter_not_valid;
+}
+
+#endif /* _MY_CRC_TEST_DISABLE */
+
 #endif /* _MY_CRC8_ENA */

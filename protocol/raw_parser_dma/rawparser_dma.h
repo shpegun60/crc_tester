@@ -21,7 +21,7 @@ typedef struct {
     rawP_crc_t   m_receiveCalcCRC;            // rx crc calc data
     rawP_crc_t   m_transmittCalcCRC;          // tx crc calc data
 
-    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
         rawP_crc_t   m_receiveCRCBuf;            // buffer for rx crc
     #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
 

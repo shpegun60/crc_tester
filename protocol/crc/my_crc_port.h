@@ -75,6 +75,14 @@
 
 #endif /* _MY_CRC32_ENA */
 
+#ifdef _MY_CRC64_ENA
+
+    #if !defined (_MY_CRC64_TABLE_CALC_ENA) && !defined(_MY_CRC64_GENERIC_CALC_ENA)
+        #error At least one implementation CRC64 required
+    #endif // !defined (_MY_CRC64_TABLE_CALC_ENA) && !defined(_MY_CRC64_GENERIC_CALC_ENA)
+
+#endif /* _MY_CRC64_ENA */
+
 
 #endif /* __MY_CRC_PORT_H__*/
 

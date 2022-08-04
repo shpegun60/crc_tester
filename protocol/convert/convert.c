@@ -540,7 +540,4 @@ int convertTest()
 }
 #endif /* CONVERT_TEST_DISABLE */
 
-#ifdef CONVERT_TEST_DISABLE
-    #undef CONVERT_TEST_DISABLE
-#endif /* CONVERT_TEST_DISABLE */
 

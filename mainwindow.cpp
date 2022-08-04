@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     reg pos = 0;
 
     //crc_test();
-    crc64Test();
+    //crc64Test();
 
     //endiansTest();
     //__M_assert_test();
@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "---------------------------------------------------";
 //    qDebug() << "convert test exit with: "<< convertTest();
 
-    //rawParserDmaTest(time(NULL));
+    rawParserDmaTest(time(NULL));
 }
 
 MainWindow::~MainWindow()

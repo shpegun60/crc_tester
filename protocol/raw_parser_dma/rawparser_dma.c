@@ -1,6 +1,6 @@
 #include "rawparser_dma.h"
 
-#if defined(D_RAW_P_TWO_BYTES_LEN_SUPPORT) || defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+#if defined(D_RAW_P_TWO_BYTES_LEN_SUPPORT) || defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
     #include "byte_order.h"
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
@@ -26,19 +26,26 @@
 #ifdef D_RAW_P_CRC_ENA
 #define RECEIVE_CRC_0           0x04U
 
-#if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+#if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
 #define RECEIVE_CRC_1           0x05U
 #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
 
-#if defined(D_RAW_P_USE_CRC32)
+#if defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
 #define RECEIVE_CRC_2           0x06U
 #define RECEIVE_CRC_3           0x07U
 #endif /* defined(D_RAW_P_USE_CRC32) */
 
+#if defined(D_RAW_P_USE_CRC64)
+#define RECEIVE_CRC_4           0x08U
+#define RECEIVE_CRC_5           0x09U
+#define RECEIVE_CRC_6           0x0AU
+#define RECEIVE_CRC_7           0x0BU
+#endif /* defined(D_RAW_P_USE_CRC64) */
+
 #endif /* D_RAW_P_CRC_ENA */
 
-#define RECEIVE_ERR             0x08U
-#define RECEIVE_OK              0x09U
+#define RECEIVE_ERR             0x0CU
+#define RECEIVE_OK              0x0DU
 //----------------------------------------------
 
 // receive functions-----------------------------------------------------------------------------------------
@@ -63,9 +70,9 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
     self->m_receiveCalcCRC = D_RAW_P_CRC_INIT;
     self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;
 
-    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
         self->m_receiveCRCBuf = D_RAW_P_CRC_INIT;
-    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
+    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
 
 #endif /* D_RAW_P_CRC_ENA */
     
@@ -105,6 +112,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
 #ifdef D_RAW_P_CRC_ENA
         self->m_receiveCalcCRC = D_RAW_P_CRC_INIT;
+        D_RAW_P_CRC_START(self->m_receiveCalcCRC);
 #endif /* D_RAW_P_CRC_ENA */
 
         self->m_receiveHandlePos = 0U;
@@ -208,7 +216,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         }
 
 
-    #elif defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+    #elif defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
 
         self->m_receiveCRCBuf = (rawP_crc_t)(ch & 0x000000FFUL); // read 0 byte
         self->receiveState = RECEIVE_CRC_1;
@@ -219,7 +227,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
 
 
-    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
         case RECEIVE_CRC_1:
             self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 8U) & 0x0000FF00UL); // read 1 byte
 
@@ -234,16 +242,16 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
                 self->receiveState = RECEIVE_ERR;
             }
 
-        #elif defined(D_RAW_P_USE_CRC32)
+        #elif defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
             self->receiveState = RECEIVE_CRC_2;
-        #endif /* CRC16 - CRC32 SWITCH */
+        #endif /* CRC16 - CRC32 - CRC64 SWITCH */
             break;
 
-    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
+    #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
 
 
 
-    #if defined(D_RAW_P_USE_CRC32)
+    #if defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
         case RECEIVE_CRC_2:
             self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 16U) & 0x00FF0000UL); // read 2 byte
             self->receiveState = RECEIVE_CRC_3;
@@ -251,6 +259,8 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
         case RECEIVE_CRC_3:
             self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 24U) & 0xFF000000UL); // read 3 byte
+
+        #if defined(D_RAW_P_USE_CRC32)
             self->m_receiveCRCBuf = LittleEndianU32(self->m_receiveCRCBuf);
 
             if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
@@ -260,9 +270,42 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
                 M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC32 error, rx data: %d, crc calc:%d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
                 self->receiveState = RECEIVE_ERR;
             }
+        #elif defined(D_RAW_P_USE_CRC64)
+            self->receiveState = RECEIVE_CRC_4;
+        #endif /* defined(D_RAW_P_USE_CRC32) */
             break;
 
-    #endif /* defined(D_RAW_P_USE_CRC32) */
+    #endif /* defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
+
+    #if defined(D_RAW_P_USE_CRC64)
+        case RECEIVE_CRC_4:
+            self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 32U) & 0x000000FF00000000ULL); // read 4 byte
+            self->receiveState = RECEIVE_CRC_5;
+            break;
+
+        case RECEIVE_CRC_5:
+            self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 40U) & 0x0000FF0000000000ULL); // read 5 byte
+            self->receiveState = RECEIVE_CRC_6;
+            break;
+
+        case RECEIVE_CRC_6:
+            self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 48U) & 0x00FF000000000000ULL); // read 6 byte
+            self->receiveState = RECEIVE_CRC_7;
+            break;
+
+        case RECEIVE_CRC_7:
+            self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 56U) & 0xFF00000000000000ULL); // read 7 byte
+            self->m_receiveCRCBuf = LittleEndianU64(self->m_receiveCRCBuf);
+
+            if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
+                self->RX.size = self->m_receivePackLen;
+                self->receiveState = RECEIVE_OK;
+            } else {
+                M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC64 error, rx data: %d, crc calc:%d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
+                self->receiveState = RECEIVE_ERR;
+            }
+            break;
+    #endif /* defined(D_RAW_P_USE_CRC64) */
 
 #endif /* D_RAW_P_CRC_ENA */
 
@@ -336,7 +379,11 @@ void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input");
     M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_TX_BUF_SIZE - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d", predictedLen);
 
-    M_Assert_Warning((predictedLen > D_RAW_P_TX_BUF_SIZE >> 1), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: recomended buffer size more than half-transmitt len!!!");
+#ifndef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > D_RAW_P_MAX_ERROR_LEN) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d", predictedLen);
+#endif /* ndef D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: recomended buffer size more than half-transmitt len!!!");
 
 #ifdef D_RAW_P_CRC_ENA
     self->m_transmittCalcCRC = D_RAW_P_CRC_INIT;
@@ -350,13 +397,13 @@ void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t
         predictedLen = LittleEndianU16(predictedLen);
 
         RawParser_dma_addTxByteCRC(self, RECEIVE_EXTENDED_LEN_CMD);
-        RawParser_dma_addTxByteCRC(self, (u8)(predictedLen & 0x000000FFU));
-        RawParser_dma_addTxByteCRC(self, (u8)((predictedLen >> 8U) & 0x000000FFU));
+        RawParser_dma_addTxByteCRC(self, (u8)(predictedLen & 0x000000FFUL));
+        RawParser_dma_addTxByteCRC(self, (u8)((predictedLen >> 8U) & 0x000000FFUL));
 
     } else {
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-        RawParser_dma_addTxByteCRC(self, (u8)(((predictedLen >= self->m_startByte) ? (predictedLen + 1U) : predictedLen) & 0x000000FFU));
+        RawParser_dma_addTxByteCRC(self, (u8)(((predictedLen >= self->m_startByte) ? (predictedLen + 1U) : predictedLen) & 0x000000FFUL));
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     }
@@ -377,15 +424,27 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
     #elif defined(D_RAW_P_USE_CRC16)
         self->m_transmittCalcCRC = LittleEndianU16(self->m_transmittCalcCRC);
 
-        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC      ) & 0x000000FFU));
-        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 8U) & 0x000000FFU));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC      ) & 0x000000FFUL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 8U) & 0x000000FFUL));
     #elif defined(D_RAW_P_USE_CRC32)
         self->m_transmittCalcCRC = LittleEndianU32(self->m_transmittCalcCRC);
 
-        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC       ) & 0x000000FFU));
-        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 8U ) & 0x000000FFU));
-        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 16U) & 0x000000FFU));
-        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 24U) & 0x000000FFU));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC       ) & 0x000000FFUL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 8U ) & 0x000000FFUL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 16U) & 0x000000FFUL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 24U) & 0x000000FFUL));
+
+    #elif defined(D_RAW_P_USE_CRC64)
+        self->m_transmittCalcCRC = LittleEndianU64(self->m_transmittCalcCRC);
+
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC       ) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 8U ) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 16U) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 24U) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 32U) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 40U) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 48U) & 0x00000000000000FFULL));
+        RawParser_dma_addTxByte(self, (u8)((self->m_transmittCalcCRC >> 56U) & 0x00000000000000FFULL));
     #endif /* CRC SWITCH LOGIC */
 
 #endif /* D_RAW_P_CRC_ENA */
@@ -442,14 +501,21 @@ inline void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byt
 #ifdef D_RAW_P_CRC_ENA
     #undef RECEIVE_CRC_0
 
-    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32)
+    #if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
         #undef RECEIVE_CRC_1
     #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) */
 
-    #if defined(D_RAW_P_USE_CRC32)
+    #if defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
         #undef RECEIVE_CRC_2
         #undef RECEIVE_CRC_3
     #endif /* defined(D_RAW_P_USE_CRC32) */
+
+    #if defined(D_RAW_P_USE_CRC64)
+        #undef RECEIVE_CRC_4
+        #undef RECEIVE_CRC_5
+        #undef RECEIVE_CRC_6
+        #undef RECEIVE_CRC_7
+    #endif /* defined(D_RAW_P_USE_CRC64) */
 #else
     #undef RawParser_dma_addTxByteCRC
 #endif /* D_RAW_P_CRC_ENA */

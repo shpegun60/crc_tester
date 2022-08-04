@@ -1,6 +1,17 @@
 #ifndef CRC64_H
 #define CRC64_H
 
+#include "my_crc_port.h"
+
+#ifdef _MY_CRC64_ENA
+
+#include "my_ctypes.h"
+
+
+#ifndef _MY_CRC_TEST_DISABLE
+int crc64_test(u8 *data, size_t len, u64 *res);
+#endif /* _MY_CRC_TEST_DISABLE */
+
 /* Redis uses the CRC64 variant with "Jones" coefficients and init value of 0.
  *
  * Specification of this CRC64 variant follows:
@@ -50,13 +61,6 @@
  *   0x66E7A46C27F3AA2CULL, 0x1C3FD4A417C62355ULL, 0x935745FC4798B8DEULL, 0xE98F353477AD31A7ULL, 0xA6DF411FBFB21CA3ULL, 0xDC0731D78F8795DAULL, 0x536FA08FDFD90E51ULL, 0x29B7D047EFEC8728ULL,
  */
 
-#include "my_crc_port.h"
-
-#ifdef _MY_CRC64_ENA
-
-#include "my_ctypes.h"
-
-void crc64Test();
 // CRC-64-JONES -----------------------------------
 #define CRC64START(crc) /* ignored expression */
 #define CRC64INIT ((u64)0x0000000000000000ULL)

@@ -6,6 +6,11 @@
 #ifdef _MY_CRC16_ENA
 
 #include "my_ctypes.h"
+
+#ifndef _MY_CRC_TEST_DISABLE
+int crc16_test(u8 *data, size_t len, u16 * res);
+#endif /* _MY_CRC_TEST_DISABLE */
+
 /*
 **********************************************************************************************************************************
   Name  : CRC-16-T10-DIF

@@ -4,7 +4,7 @@
 
 
 #define BUFF_SIZE D_RAW_P_TX_BUF_SIZE
-#define RANDOM_TEST_CNT 1000
+#define RANDOM_TEST_CNT 500000
 
 
 static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
@@ -32,23 +32,25 @@ static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_siz
         byteReceiveCompl++;
     }
 
+    Txframe->size = 0;
 
 
-    // ------------- all byte pushing test---------------------------------------
-    Txframe = RawParser_dma_shieldFrame(desc, data, size);
 
-    if(!Txframe) {
-        return byteReceiveCompl + 1;
-    }
+//    // ------------- all byte pushing test---------------------------------------
+//    Txframe = RawParser_dma_shieldFrame(desc, data, size);
 
-    RawParser_dma_receiveArray(desc, Txframe->data, Txframe->size);
+//    if(Txframe == NULL) {
+//        return byteReceiveCompl + 1;
+//    }
 
-    Rxframe = RawParser_dma_proceed(desc);
-    if(Rxframe && Rxframe->size != 0) {
-        arrReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
-    } else {
-        arrReceiveCompl++;
-    }
+//    RawParser_dma_receiveArray(desc, Txframe->data, Txframe->size);
+
+//    Rxframe = RawParser_dma_proceed(desc);
+//    if(Rxframe && Rxframe->size != 0) {
+//        arrReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
+//    } else {
+//        arrReceiveCompl++;
+//    }
 
     int last = 0;
     while (last < size) {
@@ -65,6 +67,11 @@ static int receiveTransmittCollisionsTest(RawParser_dma_t* desc, u8 * data, rawP
     int arrCollisisons = 0;
 
     RawParser_Frame_t* Txframe = RawParser_dma_shieldFrame(desc, data, size);
+
+    if(Txframe == NULL) {
+        return 1;
+    }
+
     reg lenBreak = rand() % size;
 
     // replace data (emulate real glitches)
@@ -87,10 +94,16 @@ static int receiveTransmittCollisionsTest(RawParser_dma_t* desc, u8 * data, rawP
         byteCollisisons++;
     }
 
+    Txframe->size = 0;
+
 
 
     // ------------- all byte pushing test---------------------------------------
     Txframe = RawParser_dma_shieldFrame(desc, data, size);
+
+    if(Txframe == NULL) {
+        return 1;
+    }
 
     lenBreak = rand() % size;
 
@@ -145,14 +158,19 @@ int rawParserDmaTest(unsigned int random_seed)
         reg len = 0;
 
         while(len == 0) {
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
             len = rand() % (D_RAW_P_TX_BUF_SIZE >> 1);
+#else
+            len = rand() % (D_RAW_P_MAX_ERROR_LEN - 5);
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
         }
+
 
         for(reg j = 0; j < len; ++j) {
             data[j] = rand() % 256;
         }
         errorCounter += receiveTransmittSimpleTest(prot, data, len);
-        collisionCounter+= receiveTransmittCollisionsTest(prot, data, len);
+        //collisionCounter+= receiveTransmittCollisionsTest(prot, data, len);
     }
 
 

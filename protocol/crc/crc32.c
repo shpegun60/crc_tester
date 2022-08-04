@@ -101,4 +101,81 @@ u32 slow_crc32b_byte(u32 crc, const u8 data) // must ~crc if last byte
 #endif /*_MY_CRC32_GENERIC_CALC_ENA */
 
 
+#ifndef _MY_CRC_TEST_DISABLE
+
+#include <stdio.h>
+
+int crc32_test(u8 *data, size_t len, u32 *res)
+{
+    u32 crc32[4] = {CRC32INIT, CRC32INIT, CRC32INIT, CRC32INIT};
+
+    printf("\n\n--------> crc32 test <-------------------------------------------\n");
+    printf("sizeof buffer: %d\n\n", (int)len);
+
+#ifdef _MY_CRC32_TABLE_CALC_ENA
+
+    crc32[0] = fast_crc32b_array(data, len);
+    printf("crc32 --> fast_crc32b_array: 0x%x", (unsigned int)crc32[0]);
+
+    CRC32START(crc32[1]);
+    for(size_t i = 0; i < len; ++i) {
+        crc32[1] = fast_crc32b_byte(crc32[1], data[i]);
+    }
+    CRC32FINAL(crc32[1]);
+    printf("\ncrc32 --> fast_crc32b_byte: 0x%x", (unsigned int)crc32[1]);
+
+#endif /* _MY_CRC32_TABLE_CALC_ENA */
+
+
+#ifdef _MY_CRC32_GENERIC_CALC_ENA
+
+    crc32[2] = slow_crc32b_array(data, len);
+    printf("\ncrc32 --> slow_crc32b_array: 0x%x", (unsigned int)crc32[2]);
+
+    CRC32START(crc32[3]);
+    for(size_t i = 0; i < len; ++i) {
+        crc32[3] = slow_crc32b_byte(crc32[3], data[i]);
+    }
+    CRC32FINAL(crc32[3]);
+    printf("\ncrc32 --> slow_crc32b_byte: 0x%x", (unsigned int)crc32[3]);
+
+#endif /* _MY_CRC32_GENERIC_CALC_ENA */
+
+
+    int counter_not_valid = 0;
+
+#if defined(_MY_CRC32_TABLE_CALC_ENA) && defined (_MY_CRC32_GENERIC_CALC_ENA)
+
+    for(int i = 1; i < 4; ++i) {
+        if(crc32[0] != crc32[i]) {
+            ++counter_not_valid;
+        }
+    }
+
+    *res = crc32[0];
+#elif defined(_MY_CRC32_TABLE_CALC_ENA) && !defined (_MY_CRC32_GENERIC_CALC_ENA)
+
+    if(crc32[0] != crc32[1]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc32[0];
+#else
+
+    if(crc32[2] != crc32[3]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc32[2];
+#endif /* defined(_MY_CRC32_TABLE_CALC_ENA) && defined (_MY_CRC32_GENERIC_CALC_ENA) */
+
+    printf("\nerror counter %d\n", counter_not_valid);
+    fflush(stdout);
+    return counter_not_valid;
+}
+
+#endif /* _MY_CRC_TEST_DISABLE */
+
+
+
 #endif /* _MY_CRC32_ENA */

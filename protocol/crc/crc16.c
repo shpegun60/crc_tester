@@ -1,5 +1,6 @@
 #include "crc16.h"
 
+
 #ifdef _MY_CRC16_ENA
 
 /*
@@ -80,5 +81,81 @@ u16 slow_crc16_t10_dif_byte(u16 crc, const u8 data)
 }
 
 #endif /* _MY_CRC16_GENERIC_CALC_ENA */
+
+
+#ifndef _MY_CRC_TEST_DISABLE
+
+#include <stdio.h>
+
+int crc16_test(u8 *data, size_t len, u16 * res)
+{
+    u16 crc16[4] = {CRC16INIT, CRC16INIT, CRC16INIT, CRC16INIT};
+
+    printf("\n\n----> crc16 test <-------------------------------------------\n");
+    printf("sizeof buffer: %d\n\n", (int)len);
+
+#ifdef _MY_CRC16_TABLE_CALC_ENA
+
+    crc16[0] = fast_crc16_t10_dif_array(data, len);
+    printf("crc16 --> fast_crc16_t10_dif_array: 0x%x", crc16[0]);
+
+    CRC16START(crc16[1]);
+    for(size_t i = 0; i < len; ++i) {
+        crc16[1] = fast_crc16_t10_dif_byte(crc16[1], data[i]);
+    }
+    CRC16FINAL(crc16[1]);
+    printf("\ncrc16 --> fast_crc16_t10_dif_byte: 0x%x", crc16[1]);
+
+#endif /* _MY_CRC16_TABLE_CALC_ENA */
+
+
+#ifdef _MY_CRC16_GENERIC_CALC_ENA
+
+    crc16[2] = slow_crc16_t10_dif_array(data, len);
+    printf("\ncrc16 --> slow_crc16_t10_dif_array: 0x%x", crc16[2]);
+
+    CRC16START(crc16[3]);
+    for(size_t i = 0; i < len; ++i) {
+        crc16[3] = slow_crc16_t10_dif_byte(crc16[3], data[i]);
+    }
+    CRC16FINAL(crc16[3]);
+    printf("\ncrc16 --> slow_crc16_t10_dif_byte: 0x%x", crc16[3]);
+
+#endif /* _MY_CRC16_GENERIC_CALC_ENA */
+
+    int counter_not_valid = 0;
+
+#if defined(_MY_CRC16_TABLE_CALC_ENA) && defined (_MY_CRC16_GENERIC_CALC_ENA)
+
+    for(int i = 1; i < 4; ++i) {
+        if(crc16[0] != crc16[i]) {
+            ++counter_not_valid;
+        }
+    }
+
+    *res = crc16[0];
+
+#elif defined(_MY_CRC16_TABLE_CALC_ENA) && !defined (_MY_CRC16_GENERIC_CALC_ENA)
+    if(crc16[0] != crc16[1]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc16[0];
+#else
+    if(crc16[2] != crc16[3]) {
+        ++counter_not_valid;
+    }
+
+    *res = crc16[2];
+#endif /* defined(_MY_CRC16_TABLE_CALC_ENA) && defined (_MY_CRC16_GENERIC_CALC_ENA) */
+
+
+    printf("\nerror counter %d\n", counter_not_valid);
+    fflush(stdout);
+    return counter_not_valid;
+}
+
+#endif /* _MY_CRC_TEST_DISABLE */
+
 
 #endif /* _MY_CRC16_ENA */

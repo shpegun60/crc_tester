@@ -7,6 +7,10 @@
 
 #include "my_ctypes.h"
 
+#ifndef _MY_CRC_TEST_DISABLE
+int crc8_test(u8 *data, size_t len, u8 * res);
+#endif /* _MY_CRC_TEST_DISABLE */
+
 /*
 *************************************************************************************************
   Name  : CRC-8-Dallas/Maxim
