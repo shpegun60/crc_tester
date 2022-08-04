@@ -14,7 +14,7 @@
  * ****************************************
  */
 
-int crc_test(); // this is a test for your platform to check the performance CRC8/16/32
+int crc_test(); // this is a test for your platform to check the performance CRC8/16/32/64
 
 
 #endif /* _MY_CRC_TEST_DISABLE */

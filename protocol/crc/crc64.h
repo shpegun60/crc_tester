@@ -56,11 +56,13 @@
 
 #include "my_ctypes.h"
 
+void crc64Test();
 // CRC-64-JONES -----------------------------------
-#define CRC64INIT  ((u64)0x0000000000000000ULL)
-#define CRC64POLY  ((u64)0x95ac9329ac4bc9b5ULL)  // (revert is 0xad93d23594c935a9ULL)
+#define CRC64START(crc) /* ignored expression */
+#define CRC64INIT ((u64)0x0000000000000000ULL)
+#define CRC64POLY ((u64)0x95ac9329ac4bc9b5ULL)  // (revert is 0xad93d23594c935a9ULL)
 #define CRC64CHECK ((u64)0xe9c6d914c4b8d9caULL)
-#define CRC64FINAL (crc)
+#define CRC64FINAL(crc) /* ignored expression */
 
 #ifdef _MY_CRC64_TABLE_CALC_ENA
 

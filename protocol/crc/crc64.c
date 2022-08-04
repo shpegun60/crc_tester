@@ -45,14 +45,14 @@ u64 fast_crc64jones_array(const u8 * data, size_t len)
     u64 crc = CRC64INIT;
     while(len--) {
         u8 byte = *data++;
-        crc = crc64jones_tab[(u8)crc ^ byte] ^ (crc >> 8UL);
+        crc = crc64jones_tab[(u8)crc ^ byte] ^ (crc >> 8ULL);
     }
     return crc;
 }
 
 u64 fast_crc64jones_byte(const u64 crc, const u8 data)
 {
-    return crc64jones_tab[(u8)crc ^ data] ^ (crc >> 8UL);
+    return crc64jones_tab[(u8)crc ^ data] ^ (crc >> 8ULL);
 }
 
 #endif /* _MY_CRC64_TABLE_CALC_ENA */
@@ -92,25 +92,25 @@ u64 slow_crc64jones_byte(u64 crc, const u8 data)
 
 
 
-//void crc64Test() {
+void crc64Test() {
 
-//    char str[10] = "123456789";
-//    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) fast_crc64jones_array((u8*)str, 9));
+    char str[10] = "123456789";
+    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) fast_crc64jones_array((u8*)str, 9));
 
-//    u64 crc = CRC64INIT;
-//    for(int i = 0; i < 9; ++i) {
-//        crc = fast_crc64jones_byte(crc, str[i]);
-//    }
+    u64 crc = CRC64INIT;
+    for(int i = 0; i < 9; ++i) {
+        crc = fast_crc64jones_byte(crc, str[i]);
+    }
 
-//    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) crc);
+    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) crc);
 
 
-//    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) slow_crc64jones_array((u8*)str, 9));
-//    crc = CRC64INIT;
-//    for(int i = 0; i < 9; ++i) {
-//        crc = slow_crc64jones_byte(crc, str[i]);
-//    }
+    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) slow_crc64jones_array((u8*)str, 9));
+    crc = CRC64INIT;
+    for(int i = 0; i < 9; ++i) {
+        crc = slow_crc64jones_byte(crc, str[i]);
+    }
 
-//    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) crc);
-//}
+    printf("e9c6d914c4b8d9ca == %016llx\n",(unsigned long long) crc);
+}
 

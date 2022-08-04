@@ -37,8 +37,9 @@ Lookup Table:
 *************************************************************************************************
 */
 
-#define CRC8INIT  ((u8)0xFFU)
-#define CRC8POLY  ((u8)0x31U) // = x^8 + x^5 + x^4 + 1
+#define CRC8START(crc) /* ignored expression */
+#define CRC8INIT ((u8)0xFFU)
+#define CRC8POLY ((u8)0x31U) // = x^8 + x^5 + x^4 + 1
 #define CRC8CHECK ((u8)0xF7U)
 #define CRC8FINAL(crc) /* ignored expression */
 

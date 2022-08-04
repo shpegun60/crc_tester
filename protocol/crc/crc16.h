@@ -39,8 +39,9 @@ Lookup Table:
 */
 
 // CRC-16-T10-DIF -----------------------------------
-#define CRC16INIT  ((u16)0x0000U)
-#define CRC16POLY  ((u16)0x8BB7U) // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+#define CRC16START(crc)  /* ignored expression */
+#define CRC16INIT ((u16)0x0000U)
+#define CRC16POLY ((u16)0x8BB7U) // = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
 #define CRC16CHECK ((u16)0xD0DBU)
 #define CRC16FINAL(crc) /* ignored expression */
 
