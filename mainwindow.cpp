@@ -5,6 +5,8 @@
 
 extern "C" {
 #include "crc_test.h"
+#include "crc64.h"
+
 #include "byte_order.h"
 
 #include "rawparser_dma.h"
@@ -29,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     reg pos = 0;
 
     //crc_test();
+    crc64Test();
+
     //endiansTest();
     //__M_assert_test();
     M_Assert_disableExpr({
@@ -64,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "---------------------------------------------------";
 //    qDebug() << "convert test exit with: "<< convertTest();
 
-    rawParserDmaTest(time(NULL));
+    //rawParserDmaTest(time(NULL));
 }
 
 MainWindow::~MainWindow()

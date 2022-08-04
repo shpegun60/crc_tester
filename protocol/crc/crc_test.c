@@ -21,6 +21,7 @@ Write your code in this editor and press "Run" button to compile and execute it.
 #include "crc16.h"
 #include "crc32.h"
 
+
 #define CRC_RANDOM_TEST_NUM 500
 
 __attribute__((unused)) static uint8_t _proceedCrc_OLD(uint8_t crc, uint8_t ch) { // original crc from old protocol

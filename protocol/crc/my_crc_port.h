@@ -36,6 +36,15 @@
 
 /*
  * ******************************************************************************
+ * CRC64 SETTINGS (USER OVERWRITE)  commit define if do not use future
+ * ******************************************************************************
+ */
+#define _MY_CRC64_ENA                   // CRC64 enable/disable
+#define _MY_CRC64_TABLE_CALC_ENA        // CRC64 table fast calculation enable/disable
+#define _MY_CRC64_GENERIC_CALC_ENA      // CRC64 generic slow calculation enable/disable
+
+/*
+ * ******************************************************************************
  * check user input (DO NOT CHANGE THIS SECTION !!!!!!!)
  * ******************************************************************************
  */
