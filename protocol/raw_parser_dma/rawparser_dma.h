@@ -74,11 +74,59 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
 
 
 // elementary byte adding functions ----------------------------------------------------------------------------
-void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte);
-#ifdef D_RAW_P_CRC_ENA
-void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte);
+forceinline void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByte: No valid input");
+
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+    M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
 #else
-    #define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte((self), (byte))
+    M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
+#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
+
+    self->m_sendBuffer[self->m_transmittPos++] = byte;
+
+    if(byte == self->m_startByte) {
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+        M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
+#else
+        M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
+#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
+
+        self->m_sendBuffer[self->m_transmittPos++] = byte;
+    }
+}
+
+#ifdef D_RAW_P_CRC_ENA
+// elementary byte adding functions with calc crc----------------------------------------------------------------------------
+forceinline void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByteCRC: No valid input");
+
+
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+    M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
+#else
+    M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
+#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
+
+
+    self->m_transmittCalcCRC = D_RAW_P_CRC_UPDATE(self->m_transmittCalcCRC, byte);
+
+    self->m_sendBuffer[self->m_transmittPos++] = byte;
+    if(byte == self->m_startByte) {
+
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+        M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
+#else
+        M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
+#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
+
+        self->m_sendBuffer[self->m_transmittPos++] = byte;
+    }
+}
+#else
+    #define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte(self, byte)
 #endif /* D_RAW_P_CRC_ENA */
 
 

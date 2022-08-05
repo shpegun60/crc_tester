@@ -45,7 +45,7 @@ static const u64 crc64jones_tab[256] = {
     0x66E7A46C27F3AA2CULL, 0x1C3FD4A417C62355ULL, 0x935745FC4798B8DEULL, 0xE98F353477AD31A7ULL, 0xA6DF411FBFB21CA3ULL, 0xDC0731D78F8795DAULL, 0x536FA08FDFD90E51ULL, 0x29B7D047EFEC8728ULL,
 };
 
-u64 fast_crc64jones_array(const u8 * data, size_t len)
+u64 fast_crc64jones_array(const u8 * data, reg len)
 {
     u64 crc = CRC64INIT;
     while(len--) {
@@ -65,7 +65,7 @@ u64 fast_crc64jones_byte(const u64 crc, const u8 data)
 
 #ifdef _MY_CRC64_GENERIC_CALC_ENA
 
-u64 slow_crc64jones_array(const u8 * data, size_t len)
+u64 slow_crc64jones_array(const u8 * data, reg len)
 {
     u64 crc = CRC64INIT;
 
@@ -102,7 +102,7 @@ u64 slow_crc64jones_byte(u64 crc, const u8 data)
 // CRC64 test
 //***********************************************************************************************
 
-int crc64_test(u8 *data, size_t len, u64 *res)
+int crc64_test(u8 *data, reg len, u64 *res)
 {
     u64 crc64[4] = {CRC64INIT, CRC64INIT, CRC64INIT, CRC64INIT};
 
@@ -115,7 +115,7 @@ int crc64_test(u8 *data, size_t len, u64 *res)
     printf("crc64 --> fast_crc64jones_array: 0x%llx", crc64[0]);
 
     CRC64START(crc64[1]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc64[1] = fast_crc64jones_byte(crc64[1], data[i]);
     }
     CRC64FINAL(crc64[1]);
@@ -130,7 +130,7 @@ int crc64_test(u8 *data, size_t len, u64 *res)
     printf("\ncrc64 --> slow_crc64jones_array: 0x%llx", crc64[2]);
 
     CRC64START(crc64[3]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc64[3] = slow_crc64jones_byte(crc64[3], data[i]);
     }
     CRC64FINAL(crc64[3]);

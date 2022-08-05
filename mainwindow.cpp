@@ -30,8 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     quint8 data[100];
     reg pos = 0;
 
-    //crc_test();
-    //crc64Test();
+    //crc_test(time(NULL), 500);
 
     //endiansTest();
     //__M_assert_test();
@@ -39,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
-    //templatetest();
+    templatetest();
 
     TEMPLATE(convertWrite_MSB, f32)(data, &pos, 123.456);
     TEMPLATE(convertWrite_MSB, u16)(data, &pos, 853);
@@ -68,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "---------------------------------------------------";
 //    qDebug() << "convert test exit with: "<< convertTest();
 
-    rawParserDmaTest(time(NULL), 0);
+    //rawParserDmaTest(time(NULL),1000, 1);
 }
 
 MainWindow::~MainWindow()

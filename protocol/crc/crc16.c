@@ -87,7 +87,7 @@ u16 slow_crc16_t10_dif_byte(u16 crc, const u8 data)
 
 #include <stdio.h>
 
-int crc16_test(u8 *data, size_t len, u16 * res)
+int crc16_test(u8 *data, reg len, u16 * res)
 {
     u16 crc16[4] = {CRC16INIT, CRC16INIT, CRC16INIT, CRC16INIT};
 
@@ -100,7 +100,7 @@ int crc16_test(u8 *data, size_t len, u16 * res)
     printf("crc16 --> fast_crc16_t10_dif_array: 0x%x", crc16[0]);
 
     CRC16START(crc16[1]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc16[1] = fast_crc16_t10_dif_byte(crc16[1], data[i]);
     }
     CRC16FINAL(crc16[1]);
@@ -115,7 +115,7 @@ int crc16_test(u8 *data, size_t len, u16 * res)
     printf("\ncrc16 --> slow_crc16_t10_dif_array: 0x%x", crc16[2]);
 
     CRC16START(crc16[3]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc16[3] = slow_crc16_t10_dif_byte(crc16[3], data[i]);
     }
     CRC16FINAL(crc16[3]);

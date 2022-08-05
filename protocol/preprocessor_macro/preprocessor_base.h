@@ -128,6 +128,7 @@
 #define ZERO() 0
 #define ONE() 1
 #define UNDERSCORE() _
+#define COMMA_POINT() ;
 
 /************************************************************************************************************************************************************
  * Causes a function-style macro to require an additional pass to be expanded.
@@ -178,7 +179,18 @@
 #define CAT(a, ...) a ## __VA_ARGS__
 #define CAT3(a, b, ...) a ## b ## __VA_ARGS__
 #define CAT4(a, b, c, ...) a ## b ## c ## __VA_ARGS__
-
+#define CAT5(a, b, c, d, ...) a ## b ## c ## d ## __VA_ARGS__
+#define CAT6(a, b, c, d, e, ...) a ## b ## c ## d ## e ## __VA_ARGS__
+#define CAT7(a, b, c, d, e, f, ...) a ## b ## c ## d ## e ## f ## __VA_ARGS__
+#define CAT8(a, b, c, d, e, f, g, ...) a ## b ## c ## d ## e ## f ## g ## __VA_ARGS__
+#define CAT9(a, b, c, d, e, f, g, h, ...) a ## b ## c ## d ## e ## f ## g ## h ## __VA_ARGS__
+#define CAT10(a, b, c, d, e, f, g, h, i, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## __VA_ARGS__
+#define CAT11(a, b, c, d, e, f, g, h, i, j, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## j ## __VA_ARGS__
+#define CAT12(a, b, c, d, e, f, g, h, i, j, k, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## j ## k ## __VA_ARGS__
+#define CAT13(a, b, c, d, e, f, g, h, i, j, k, l, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## j ## k ## l ## __VA_ARGS__
+#define CAT14(a, b, c, d, e, f, g, h, i, j, k, l, m, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## j ## k ## l ## m ## __VA_ARGS__
+#define CAT15(a, b, c, d, e, f, g, h, i, j, k, l, m, n, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## j ## k ## l ## m ## n ## __VA_ARGS__
+#define CAT16(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, ...) a ## b ## c ## d ## e ## f ## g ## h ## i ## j ## k ## l ## m ## n ## o ## __VA_ARGS__
 
 /************************************************************************************************************************************************************
  * Get the first argument and ignore the rest.
@@ -405,6 +417,26 @@
     sep() DEFER2(_MAP_INNER)()(op, sep, ##__VA_ARGS__) \
   )
 #define _MAP_INNER() MAP_INNER
+
+
+/************************************************************************************************************************************************************
+ * MAP FOR MERGING OPERATION TO ALL PARAMETERS
+ *
+ * Example Usage:
+ *      MAP_MERGE_OPERATION(sizeof, PLUS, int, int, int, bool, char) // PLUS - is a separator +
+ *
+ * Which expands to:
+ *      sizeof(int) + sizeof(int) + sizeof(int) + sizeof(bool) + sizeof(char)
+ *
+ */
+#define MAP_MERGE_OPERATION(op, sep, ...) \
+ IF(HAS_ARGS(__VA_ARGS__))(EVAL(MAP_MERGE_OPERATION_INNER(op, sep, ##__VA_ARGS__)))
+#define MAP_MERGE_OPERATION_INNER(op, sep, cur_val, ...) \
+    op(cur_val) \
+    IF(HAS_ARGS(__VA_ARGS__))( \
+      sep() DEFER2(_MAP_MERGE_OPERATION_INNER)()(op, sep, ##__VA_ARGS__) \
+    )
+#define _MAP_MERGE_OPERATION_INNER() MAP_MERGE_OPERATION_INNER
 
 
 /************************************************************************************************************************************************************

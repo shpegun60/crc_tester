@@ -8,7 +8,7 @@
 #include "my_ctypes.h"
 
 #ifndef _MY_CRC_TEST_DISABLE
-int crc32_test(u8 *data, size_t len, u32 *res);
+int crc32_test(u8 *data, reg len, u32 *res);
 #endif /* _MY_CRC_TEST_DISABLE */
 
 /*
@@ -69,7 +69,7 @@ Lookup Table:
 #ifdef _MY_CRC32_TABLE_CALC_ENA
 
 // fast implementation (CRC MSB)------------------------------------------------------------------------------------------------------------------------------
-u32 fast_crc32b_array(const u8 * data, size_t len);
+u32 fast_crc32b_array(const u8 * data, reg len);
 u32 fast_crc32b_byte(const u32 crc, const u8 data);
 
 #endif /* _MY_CRC32_TABLE_CALC_ENA */
@@ -80,7 +80,7 @@ u32 fast_crc32b_byte(const u32 crc, const u8 data);
 //------------------------------------------------------------------------------------------------------------------------------
 // slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
 //------------------------------------------------------------------------------------------------------------------------------
-u32 slow_crc32b_array(const u8 * data, size_t len);         //must ~crc if last byte
+u32 slow_crc32b_array(const u8 * data, reg len);         //must ~crc if last byte
 u32 slow_crc32b_byte(u32 crc, const u8 data);               //must ~crc if last byte
 
 #endif /*_MY_CRC32_GENERIC_CALC_ENA */

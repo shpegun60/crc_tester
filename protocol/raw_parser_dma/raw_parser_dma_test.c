@@ -3,10 +3,6 @@
 #include <stdlib.h>
 
 
-#define BUFF_SIZE D_RAW_P_TX_BUF_SIZE
-#define RANDOM_TEST_CNT 1000
-
-
 static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
 {
     int byteReceiveCompl = 0;
@@ -129,20 +125,15 @@ static int receiveTransmittCollisionsTest(RawParser_dma_t* desc, u8 * data, rawP
     }
 
     return byteCollisisons + arrCollisisons;
-
-
-
-
-    return 0;
 }
 
-int rawParserDmaTest(unsigned int random_seed, int collisionTest)
+int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTestEna)
 {
     int errorCounter = 0;
     int collisionCounter = 0;
-    u8 * data = (u8*)calloc(BUFF_SIZE, sizeof(u8));
+    u8 * data = (u8*)calloc(D_RAW_P_TX_BUF_SIZE, sizeof(u8));
 
-    for(u32 i = 0; i < BUFF_SIZE; ++i) {
+    for(u32 i = 0; i < D_RAW_P_TX_BUF_SIZE; ++i) {
         data[i] = i;
     }
 
@@ -151,10 +142,10 @@ int rawParserDmaTest(unsigned int random_seed, int collisionTest)
 
     errorCounter += receiveTransmittSimpleTest(prot, data, 30);
 
-    srand(random_seed); // use current time as seed for random generator
+    srand(randomSeed); // use current time as seed for random generator
 
     // random rx/tx test----------------------------------------------------------
-    for(int i = 0; i < RANDOM_TEST_CNT; ++i) {
+    for(int i = 0; i < randTestCount; ++i) {
         reg len = 0;
 
         while(len == 0) {
@@ -171,17 +162,17 @@ int rawParserDmaTest(unsigned int random_seed, int collisionTest)
         }
         errorCounter += receiveTransmittSimpleTest(prot, data, len);
 
-        if(collisionTest) {
+        if(collisionTestEna) {
             collisionCounter+= receiveTransmittCollisionsTest(prot, data, len);
         }
     }
 
 
     printf("\n----------RAW PARSER DMA TEST FINISHED!!!-------------------------\nRAW_PARSER_DMA EXIT WITH ERROR: %d\n", errorCounter);
-    printf("PACKET COUNTER: %d\n", RANDOM_TEST_CNT * 2);
-    if(collisionTest) {
+    printf("PACKET COUNTER: %d\n", randTestCount * 2);
+    if(collisionTestEna) {
         printf("WITH COLLISIONS: %d\n", collisionCounter);
-        printf("PACKED CRC LOOSE percents: %f\n", (f32)((f32)collisionCounter / (f32)RANDOM_TEST_CNT) * 100.0f * 0.5f);
+        printf("PACKED CRC LOOSE percents: %f\n", (f32)((f32)collisionCounter / (f32)randTestCount) * 100.0f * 0.5f);
     }
 
     free(data);
@@ -190,10 +181,3 @@ int rawParserDmaTest(unsigned int random_seed, int collisionTest)
 
     return errorCounter;
 }
-
-
-
-
-
-#undef BUFF_SIZE
-#undef RANDOM_TEST_CNT

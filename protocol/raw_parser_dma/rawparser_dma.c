@@ -52,6 +52,10 @@
 C_INLINE void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte);
 C_INLINE void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, rawP_size_t len);
 
+// elementary byte adding functions ----------------------------------------------------------------------------
+C_INLINE void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte);
+C_INLINE void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte);
+
 
 
 RawParser_dma_t* rawParser_dma_new(const u8 packStart)
@@ -183,7 +187,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
     case RECEIVE_DATA:
 
 #ifdef D_RAW_P_CRC_ENA
-    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+        self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #endif /* D_RAW_P_CRC_ENA */
 
         self->m_receiveFrameBuffer[self->m_receiveHandlePos++] = ch;
@@ -380,10 +384,10 @@ void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t
 
 #if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
     M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_MAX_PROTOCOL_LEN - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, maxTxLen: %d", predictedLen, D_RAW_P_MAX_PROTOCOL_LEN);
-    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_MAX_PROTOCOL_LEN >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: recomended packet length must be less than half - maximun protocol size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_MAX_PROTOCOL_LEN >> 1));
+    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_MAX_PROTOCOL_LEN >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: UNDEFINED BEHAVIOR!!! recomended packet length must be less than half - maximun protocol size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_MAX_PROTOCOL_LEN >> 1));
 #else
     M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_TX_BUF_SIZE - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, buffer: %d", predictedLen, D_RAW_P_TX_BUF_SIZE);
-    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: recomended packet length must be less than half - buffer size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_TX_BUF_SIZE >> 1));
+    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: UNDEFINED BEHAVIOR!!! recomended packet length must be less than half - buffer size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_TX_BUF_SIZE >> 1));
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
 
@@ -456,62 +460,6 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
     self->TX.size = (rawP_size_t)self->m_transmittPos;
     return &self->TX;
 }
-
-
-
-
-// elementary byte adding functions ----------------------------------------------------------------------------
-inline void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte)
-{
-    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByte: No valid input");
-
-#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
-    M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
-#else
-    M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
-#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
-
-    self->m_sendBuffer[self->m_transmittPos++] = byte;
-
-    if(byte == self->m_startByte) {
-#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
-        M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
-#else
-        M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByte: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
-#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
-
-        self->m_sendBuffer[self->m_transmittPos++] = byte;
-    }
-}
-
-#ifdef D_RAW_P_CRC_ENA
-inline void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte)
-{
-    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByteCRC: No valid input");
-
-
-#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
-    M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
-#else
-    M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
-#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
-
-
-    self->m_transmittCalcCRC = D_RAW_P_CRC_UPDATE(self->m_transmittCalcCRC, byte);
-
-    self->m_sendBuffer[self->m_transmittPos++] = byte;
-    if(byte == self->m_startByte) {
-
-#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
-        M_Assert_Break((self->m_transmittPos == (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than protocol maximum len: %d", self->m_transmittPos + 1, D_RAW_P_MAX_PROTOCOL_LEN - 1);
-#else
-        M_Assert_Break((self->m_transmittPos == (D_RAW_P_TX_BUF_SIZE - 1)), M_EMPTY, return, "RawParser_dma_addTxByteCRC: LEN packet: %d,  more than buffer size: %d", self->m_transmittPos + 1, D_RAW_P_TX_BUF_SIZE - 1);
-#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
-
-        self->m_sendBuffer[self->m_transmittPos++] = byte;
-    }
-}
-#endif /* D_RAW_P_CRC_ENA */
 
 
 // FSM data fusion delete -----------------------------

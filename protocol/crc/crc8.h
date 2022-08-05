@@ -20,6 +20,8 @@ int crc8_test(u8 *data, size_t len, u8 * res);
   XorOut: 0x00
   Check : 0xF7 ("123456789")
   MaxLen: 15 byte`s (127 bit`s) - detection of single, double, triple and all odd errors
+
+  DALLAS SENSORS STANDARD!!!
   
 Lookup Table:
 0x00U, 0x31U, 0x62U, 0x53U, 0xC4U, 0xF5U, 0xA6U, 0x97U, 0xB9U, 0x88U, 0xDBU, 0xEAU, 0x7DU, 0x4CU, 0x1FU, 0x2EU,

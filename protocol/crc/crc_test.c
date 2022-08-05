@@ -23,9 +23,7 @@ Write your code in this editor and press "Run" button to compile and execute it.
 #include "crc64.h"
 
 
-#define CRC_RANDOM_TEST_NUM 500
-
-int crc_test()
+int crc_test(unsigned int randomSeed, int randomTestCnt)
 {
     u8 data[] = "123456789";
 
@@ -131,20 +129,20 @@ int crc_test()
     printf("\n-------------------------------\n");
 
     u8 randomData[4096*2];
-    srand(100); // use current time as seed for random generator
+    srand(randomSeed); // use current time as seed for random generator
 
 #ifdef _MY_CRC8_ENA
 
     // crc 8 random test ------------------------------------------------
-    for(size_t i = 0; i < CRC_RANDOM_TEST_NUM; ++i) {
+    for(reg i = 0; i < (reg)randomTestCnt; ++i) {
 
-        size_t len = 0;
+        reg len = 0;
 
         while(len == 0) {
             len = rand() % 16; // crc 8 maximum 15 bytes
         }
 
-        for(size_t j = 0; j < len; ++j) {
+        for(reg j = 0; j < len; ++j) {
             randomData[j] = rand() % 256;
         }
 
@@ -157,15 +155,15 @@ int crc_test()
 
 #ifdef _MY_CRC16_ENA
     // crc 16 random test ------------------------------------------------
-    for(size_t i = 0; i < CRC_RANDOM_TEST_NUM; ++i) {
+    for(reg i = 0; i < (reg)randomTestCnt; ++i) {
 
-        size_t len = 0;
+        reg len = 0;
 
         while(len == 0) {
             len = rand() % 4096; // crc 16 maximum 4095 bytes
         }
 
-        for(size_t j = 0; j < len; ++j) {
+        for(reg j = 0; j < len; ++j) {
             randomData[j] = rand() % 256;
         }
 
@@ -179,15 +177,15 @@ int crc_test()
 #ifdef _MY_CRC32_ENA
 
     // crc 32 random test ------------------------------------------------
-    for(size_t i = 0; i < CRC_RANDOM_TEST_NUM; ++i) {
+    for(reg i = 0; i < (reg)randomTestCnt; ++i) {
 
-        size_t len = 0;
+        reg len = 0;
 
         while(len == 0) {
             len = rand() % (4096*2); // crc 32 maximum over 4096 bytes
         }
 
-        for(size_t j = 0; j < len; ++j) {
+        for(reg j = 0; j < len; ++j) {
             randomData[j] = rand() % 256;
         }
 
@@ -200,15 +198,15 @@ int crc_test()
 #ifdef _MY_CRC64_ENA
 
     // crc 64 random test ------------------------------------------------
-    for(size_t i = 0; i < CRC_RANDOM_TEST_NUM; ++i) {
+    for(reg i = 0; i < (reg)randomTestCnt; ++i) {
 
-        size_t len = 0;
+        reg len = 0;
 
         while(len == 0) {
             len = rand() % (4096*2); // crc64 maximum over 4096 bytes
         }
 
-        for(size_t j = 0; j < len; ++j) {
+        for(reg j = 0; j < len; ++j) {
             randomData[j] = rand() % 256;
         }
 
@@ -218,7 +216,7 @@ int crc_test()
 
 #endif /* _MY_CRC32_ENA */
 
-    printf("\n-----------------------> END OF TEST <-----------------------");
+    printf("\n-----------------------> END OF CRC TEST <-----------------------");
 #ifdef _MY_CRC8_ENA
     printf("\nCRC8 is matched with test 0x%x: %d", CRC8CHECK, crc8_matched_with_test);
     printf("\nrandom test CRC8 exit with error: %d\n", not_passed8);
@@ -261,8 +259,6 @@ int crc_test()
     (void)data;
     return testPassed;
 }
-
-#undef CRC_RANDOM_TEST_NUM
 
 
 

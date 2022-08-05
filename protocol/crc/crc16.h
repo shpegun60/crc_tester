@@ -8,7 +8,7 @@
 #include "my_ctypes.h"
 
 #ifndef _MY_CRC_TEST_DISABLE
-int crc16_test(u8 *data, size_t len, u16 * res);
+int crc16_test(u8 *data, reg len, u16 * res);
 #endif /* _MY_CRC_TEST_DISABLE */
 
 /*

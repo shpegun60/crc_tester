@@ -9,7 +9,7 @@
 
 
 #ifndef _MY_CRC_TEST_DISABLE
-int crc64_test(u8 *data, size_t len, u64 *res);
+int crc64_test(u8 *data, reg len, u64 *res);
 #endif /* _MY_CRC_TEST_DISABLE */
 
 /* Redis uses the CRC64 variant with "Jones" coefficients and init value of 0.
@@ -71,7 +71,7 @@ int crc64_test(u8 *data, size_t len, u64 *res);
 #ifdef _MY_CRC64_TABLE_CALC_ENA
 
 // fast implementation ------------------------------------------------------------------------------------------------------------------------------
-u64 fast_crc64jones_array(const u8 * data, size_t len);
+u64 fast_crc64jones_array(const u8 * data, reg len);
 u64 fast_crc64jones_byte(const u64 crc, const u8 data);
 
 #endif /* _MY_CRC64_TABLE_CALC_ENA */
@@ -79,7 +79,7 @@ u64 fast_crc64jones_byte(const u64 crc, const u8 data);
 
 #ifdef _MY_CRC64_GENERIC_CALC_ENA
 // slow implementation------------------------------------------------------------------------------------------------------------------------------
-u64 slow_crc64jones_array(const u8 * data, size_t len);
+u64 slow_crc64jones_array(const u8 * data, reg len);
 u64 slow_crc64jones_byte(u64 crc, const u8 data);
 
 #endif /* _MY_CRC64_GENERIC_CALC_ENA */

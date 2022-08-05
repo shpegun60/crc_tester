@@ -92,13 +92,13 @@ __attribute__((unused)) static uint8_t _proceedCrc_OLD(uint8_t crc, uint8_t ch) 
 }
 
 
-int crc8_test(u8 *data, size_t len, u8 * res)
+int crc8_test(u8 *data, reg len, u8 * res)
 {
     u8 crc8[5] = {CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT, CRC8INIT};
 
     printf("\n\n------> crc 8 test <-------------------------------------------\n");
     printf("data: 0x");
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         printf("%x.", data[i]);
     }
 
@@ -110,7 +110,7 @@ int crc8_test(u8 *data, size_t len, u8 * res)
     printf("crc8 --> fast_crc8_maxim_array: 0x%x", crc8[0]);
 
     CRC8START(crc8[1]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc8[1] = fast_crc8_maxim_byte(crc8[1], data[i]);
     }
     CRC8FINAL(crc8[1]);
@@ -124,14 +124,14 @@ int crc8_test(u8 *data, size_t len, u8 * res)
     printf("\ncrc8 --> slow_crc8_maxim_array: 0x%x", crc8[2]);
 
     CRC8START(crc8[3]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc8[3] = slow_crc8_maxim_byte(crc8[3], data[i]);
     }
     CRC8FINAL(crc8[3]);
     printf("\ncrc8 --> slow_crc8_maxim_byte: 0x%x", crc8[3]);
 #endif /* _MY_CRC8_GENERIC_CALC_ENA */
 
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc8[4] = _proceedCrc_OLD(crc8[4], data[i]);
     }
     printf("\ncrc8 --> _proceedCrc_OLD: 0x%x", crc8[4]);

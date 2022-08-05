@@ -47,7 +47,7 @@ static const u32 crc32b_table[256] =
 };
 
 // fast implementation (CRC MSB -> LSB)------------------------------------------------------------------------------------------------------------------------------
-u32 fast_crc32b_array(const u8 * data, size_t len)
+u32 fast_crc32b_array(const u8 * data, reg len)
 {
     u32 crc = CRC32INIT;
 
@@ -72,7 +72,7 @@ u32 fast_crc32b_byte(const u32 crc, const u8 data) // must ~crc if last byte
 //------------------------------------------------------------------------------------------------------------------------------
 // slow implementation CRC LSB -> MSB variant read this--> http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
 //------------------------------------------------------------------------------------------------------------------------------
-u32 slow_crc32b_array(const u8 * data, size_t len)
+u32 slow_crc32b_array(const u8 * data, reg len)
 {
     unsigned int crc = CRC32INIT;
 
@@ -105,7 +105,7 @@ u32 slow_crc32b_byte(u32 crc, const u8 data) // must ~crc if last byte
 
 #include <stdio.h>
 
-int crc32_test(u8 *data, size_t len, u32 *res)
+int crc32_test(u8 *data, reg len, u32 *res)
 {
     u32 crc32[4] = {CRC32INIT, CRC32INIT, CRC32INIT, CRC32INIT};
 
@@ -118,7 +118,7 @@ int crc32_test(u8 *data, size_t len, u32 *res)
     printf("crc32 --> fast_crc32b_array: 0x%x", (unsigned int)crc32[0]);
 
     CRC32START(crc32[1]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc32[1] = fast_crc32b_byte(crc32[1], data[i]);
     }
     CRC32FINAL(crc32[1]);
@@ -133,7 +133,7 @@ int crc32_test(u8 *data, size_t len, u32 *res)
     printf("\ncrc32 --> slow_crc32b_array: 0x%x", (unsigned int)crc32[2]);
 
     CRC32START(crc32[3]);
-    for(size_t i = 0; i < len; ++i) {
+    for(reg i = 0; i < len; ++i) {
         crc32[3] = slow_crc32b_byte(crc32[3], data[i]);
     }
     CRC32FINAL(crc32[3]);
