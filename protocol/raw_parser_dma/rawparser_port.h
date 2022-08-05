@@ -21,16 +21,16 @@
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     typedef u16 rawP_size_t;
-    #define D_RAW_P_MAX_ERROR_LEN 8192U
+    #define D_RAW_P_MAX_PROTOCOL_LEN 8192U
 #else // use one byte of length
     typedef u8 rawP_size_t;
-    #define D_RAW_P_MAX_ERROR_LEN 252U
+    #define D_RAW_P_MAX_PROTOCOL_LEN 254U
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     #define RECEIVE_EXTENDED_LEN_CMD (u8)(0xFFU)
-    #define D_RAW_P_LEN_SEPARATOR 0xFBU
+    #define D_RAW_P_LEN_SEPARATOR (u8)(0xFBU)
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
 
@@ -231,8 +231,8 @@ typedef struct {
 #endif // two bytes len support buffer check
 
 
-#if ((D_RAW_P_RX_BUF_SIZE > 8192U) || (D_RAW_P_TX_BUF_SIZE > 8192U))
-    #error BUFFER`s must be less or equal than 8192 bytes per one packet (MTU)
+#if ((D_RAW_P_RX_BUF_SIZE > 16384U) || (D_RAW_P_TX_BUF_SIZE > 16384U))
+    #error BUFFER`s must be less or equal than 16384U bytes per one packet (MTU)
 #endif // two bytes len support buffer check
 
 #endif /* __RAW_PARSER_PORT_H__*/

@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "---------------------------------------------------";
 //    qDebug() << "convert test exit with: "<< convertTest();
 
-    rawParserDmaTest(time(NULL));
+    rawParserDmaTest(time(NULL), 0);
 }
 
 MainWindow::~MainWindow()

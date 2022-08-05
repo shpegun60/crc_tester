@@ -4,7 +4,7 @@
 
 
 #define BUFF_SIZE D_RAW_P_TX_BUF_SIZE
-#define RANDOM_TEST_CNT 500000
+#define RANDOM_TEST_CNT 1000
 
 
 static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
@@ -36,21 +36,21 @@ static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_siz
 
 
 
-//    // ------------- all byte pushing test---------------------------------------
-//    Txframe = RawParser_dma_shieldFrame(desc, data, size);
+    // ------------- all byte pushing test---------------------------------------
+    Txframe = RawParser_dma_shieldFrame(desc, data, size);
 
-//    if(Txframe == NULL) {
-//        return byteReceiveCompl + 1;
-//    }
+    if(Txframe == NULL) {
+        return byteReceiveCompl + 1;
+    }
 
-//    RawParser_dma_receiveArray(desc, Txframe->data, Txframe->size);
+    RawParser_dma_receiveArray(desc, Txframe->data, Txframe->size);
 
-//    Rxframe = RawParser_dma_proceed(desc);
-//    if(Rxframe && Rxframe->size != 0) {
-//        arrReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
-//    } else {
-//        arrReceiveCompl++;
-//    }
+    Rxframe = RawParser_dma_proceed(desc);
+    if(Rxframe && Rxframe->size != 0) {
+        arrReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
+    } else {
+        arrReceiveCompl++;
+    }
 
     int last = 0;
     while (last < size) {
@@ -136,7 +136,7 @@ static int receiveTransmittCollisionsTest(RawParser_dma_t* desc, u8 * data, rawP
     return 0;
 }
 
-int rawParserDmaTest(unsigned int random_seed)
+int rawParserDmaTest(unsigned int random_seed, int collisionTest)
 {
     int errorCounter = 0;
     int collisionCounter = 0;
@@ -158,10 +158,10 @@ int rawParserDmaTest(unsigned int random_seed)
         reg len = 0;
 
         while(len == 0) {
-#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-            len = rand() % (D_RAW_P_TX_BUF_SIZE >> 1);
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+            len = rand() % (D_RAW_P_MAX_PROTOCOL_LEN >> 1);
 #else
-            len = rand() % (D_RAW_P_MAX_ERROR_LEN - 5);
+            len = rand() % (D_RAW_P_TX_BUF_SIZE >> 1);
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
         }
 
@@ -170,14 +170,19 @@ int rawParserDmaTest(unsigned int random_seed)
             data[j] = rand() % 256;
         }
         errorCounter += receiveTransmittSimpleTest(prot, data, len);
-        //collisionCounter+= receiveTransmittCollisionsTest(prot, data, len);
+
+        if(collisionTest) {
+            collisionCounter+= receiveTransmittCollisionsTest(prot, data, len);
+        }
     }
 
 
-    printf("\n----------RAW PARSER DMA FINISHED!!!-------------------------\nRAW_PARSER_DMA EXIT WITH ERROR: %d\n", errorCounter);
+    printf("\n----------RAW PARSER DMA TEST FINISHED!!!-------------------------\nRAW_PARSER_DMA EXIT WITH ERROR: %d\n", errorCounter);
     printf("PACKET COUNTER: %d\n", RANDOM_TEST_CNT * 2);
-    printf("WITH COLLISIONS: %d\n", collisionCounter);
-    printf("PACKED CRC LOOSE percents: %f\n", (f32)((f32)collisionCounter / (f32)RANDOM_TEST_CNT) * 100.0f * 0.5f);
+    if(collisionTest) {
+        printf("WITH COLLISIONS: %d\n", collisionCounter);
+        printf("PACKED CRC LOOSE percents: %f\n", (f32)((f32)collisionCounter / (f32)RANDOM_TEST_CNT) * 100.0f * 0.5f);
+    }
 
     free(data);
     printf("RawParser_dma deleted error: %d\n", rawParser_dma_delete(&prot));
