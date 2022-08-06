@@ -13,6 +13,7 @@
 #define U64_C(x) x ## ULL
 #define F32_C(x) x ## f
 #define F64_C(x) x
+#define F128_C(x) x
 
 // type cast ------------------------------------------
 #define VOID_TYPE_C(x)              ((uni)(x))

@@ -14,7 +14,6 @@
 #define PRED(state, ...) BOOL(state)
 #define OP(state, ...) MAP_DEC(state), state, __VA_ARGS__
 
-
 #define foo(x) x
 #define bar(x) x
 
@@ -22,33 +21,6 @@
 
 
 #define TRANSLATE(name) CAT(name, MSB)
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAP_MERGE_OPERATION_ONE_PAR(op, par, cast, sep, ...) \
-    IF(HAS_ARGS(__VA_ARGS__))(EVAL(MAP_MERGE_OPERATION_ONE_PAR_INNER(op, par, cast, sep, ##__VA_ARGS__)))
-#define MAP_MERGE_OPERATION_ONE_PAR_INNER(op, par, cast, sep, cur_val, ...) \
-    op(par(cur_val), (cast)&cur_val) \
-    IF(HAS_ARGS(__VA_ARGS__))( \
-        sep()\
-        DEFER2(_MAP_MERGE_OPERATION_ONE_PAR_INNER)()(op, par, cast, sep, ##__VA_ARGS__) \
-    )
-#define _MAP_MERGE_OPERATION_ONE_PAR_INNER() MAP_MERGE_OPERATION_ONE_PAR_INNER
-
-void writeFoo(size_t len, uint8_t *data)
-{
-    printf("writeFoo size: %d\n", len);
-    (void)data;
-}
-
-
-#define WRITE_DATA_MACRO(foo, afterExpr, ...)\
-    do{\
-        size_t totalSize = MAP_MERGE_OPERATION(sizeof, PLUS, ##__VA_ARGS__);\
-        MAP_MERGE_OPERATION_ONE_PAR(foo, sizeof, uint8_t*, COMMA_POINT, ##__VA_ARGS__);\
-        afterExpr;\
-    }while(0U)
-
 
 
 void templatetest()
@@ -72,7 +44,7 @@ void templatetest()
 
     printf("bitand: %s\n", TO_TXT2(BITAND(1)(123, blablabla)));
 
-    printf("%s\n", TO_TXT2(EQUAL(foo, foo)));
+    printf("equal: %s\n", TO_TXT2(PRIMITIVE_COMPARE(foo, bar)));
 
 
 
@@ -83,27 +55,6 @@ void templatetest()
     printf("%s\n", TO_TXT2(TEMPLATE(sum, bla1, bla2, bla3, bla4)));
 
     printf("%s\n", TO_TXT2(TEMPLATE(TRANSLATE(convertWrite), sum)));
-
-    printf("%s\n", TO_TXT2(MAP_MERGE_OPERATION(sizeof, PLUS, int, int, int, bool, char)));
-    printf("%s\n", TO_TXT2(MAP_MERGE_OPERATION_ONE_PAR(sizeof,sizeof,u8*, COMMA_POINT, int, int, int, bool, char)));
-    printf("%s\n", TO_TXT2(    WRITE_DATA_MACRO(writeFoo, {
-                                                    printf("size: %d\n", totalSize);
-                                                }, a, b, c, d, POINTER(arr,2))));
-
-    int a;
-    size_t b;
-    char c;
-    uint16_t d;
-    uint16_t e;
-
-    uint8_t arr[10] = {0,0,0,0,0,0,0,0,0,0};
-
-
-    WRITE_DATA_MACRO(writeFoo, {
-                         printf("total size: %d\n", totalSize);
-                     }, a, b, c, d, e/*, POINTER(arr, 10), STATIC_ARRAY(arr)*/);
-
-
 
 
     fflush(stdout);

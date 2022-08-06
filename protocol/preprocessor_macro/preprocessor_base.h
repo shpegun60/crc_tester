@@ -171,6 +171,18 @@
 #define DEFER6(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()
 #define DEFER7(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()
 #define DEFER8(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()
+#define DEFER9(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()
+#define DEFER10(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()
+#define DEFER11(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()
+#define DEFER12(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()
+#define DEFER13(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()
+#define DEFER14(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()
+#define DEFER15(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()()
+#define DEFER16(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()()()
+#define DEFER17(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()()()()
+#define DEFER18(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()()()()()
+#define DEFER19(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()()()()()()
+#define DEFER20(...) __VA_ARGS__ EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY EMPTY()()()()()()()()()()()()()()()()()()()()
 
 /************************************************************************************************************************************************************
  * Indirection around the standard ## concatenation operator. This simply
@@ -198,9 +210,17 @@
 #define FIRST(a, ...) a
 
 /************************************************************************************************************************************************************
- * Get the second argument and ignore the rest.
+ * Get the second ... N argument and ignore the rest.
  */
 #define SECOND(a, b, ...) b
+#define THIRD(a, b, c, ...) c
+#define FOURTH(a, b, c, d, ...) d
+#define FIFTH(a, b, c, d, e, ...) e
+#define SIXTH(a, b, c, d, e, f, ...) f
+#define SEVENTH(a, b, c, d, e, f, g ...) g
+#define EIGHTH(a, b, c, d, e, f, g, h, ...) h
+#define NINTH(a, b, c, d, e, f, g, h, i, ...) i
+#define TENTH(a, b, c, d, e, f, g, h, i, j, ...) j
 
 /************************************************************************************************************************************************************
  * Expects a single input (not containing commas). Returns 1 if the input is
@@ -417,26 +437,6 @@
     sep() DEFER2(_MAP_INNER)()(op, sep, ##__VA_ARGS__) \
   )
 #define _MAP_INNER() MAP_INNER
-
-
-/************************************************************************************************************************************************************
- * MAP FOR MERGING OPERATION TO ALL PARAMETERS
- *
- * Example Usage:
- *      MAP_MERGE_OPERATION(sizeof, PLUS, int, int, int, bool, char) // PLUS - is a separator +
- *
- * Which expands to:
- *      sizeof(int) + sizeof(int) + sizeof(int) + sizeof(bool) + sizeof(char)
- *
- */
-#define MAP_MERGE_OPERATION(op, sep, ...) \
- IF(HAS_ARGS(__VA_ARGS__))(EVAL(MAP_MERGE_OPERATION_INNER(op, sep, ##__VA_ARGS__)))
-#define MAP_MERGE_OPERATION_INNER(op, sep, cur_val, ...) \
-    op(cur_val) \
-    IF(HAS_ARGS(__VA_ARGS__))( \
-      sep() DEFER2(_MAP_MERGE_OPERATION_INNER)()(op, sep, ##__VA_ARGS__) \
-    )
-#define _MAP_MERGE_OPERATION_INNER() MAP_MERGE_OPERATION_INNER
 
 
 /************************************************************************************************************************************************************

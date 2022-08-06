@@ -15,6 +15,8 @@ extern "C" {
 //#define CONVERT_TEST_DISABLE
 #include "convert.h"
 
+#include "rawparser_macro.h"
+
 #include <time.h>       /* time */
 }
 
@@ -38,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
-    templatetest();
+    //templatetest();
 
     TEMPLATE(convertWrite_MSB, f32)(data, &pos, 123.456);
     TEMPLATE(convertWrite_MSB, u16)(data, &pos, 853);
@@ -68,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    qDebug() << "convert test exit with: "<< convertTest();
 
     //rawParserDmaTest(time(NULL),1000, 1);
+
+    rawParserMacroTest();
 }
 
 MainWindow::~MainWindow()
