@@ -95,11 +95,18 @@
 
 
 
-void rawPTestWriteFoo(reg len, u8 *data)
+void rawPTestWriteType(reg typelen, u8 *data)
 {
-    printf("writeFoo size: %d\n", len);
+    printf("writeTypeFoo size: %d\n", typelen);
     (void)data;
 }
+
+void rawPTestWriteArray(reg typelen, u8 *data, reg typeLen)
+{
+    printf("writeArrayFoo size: %d\n", typelen);
+    (void)data;
+}
+
 
 void rawParserMacroTest()
 {
@@ -119,7 +126,7 @@ void rawParserMacroTest()
     u8 * arr3_ptr = arr2;
 
 
-    WRITE_DATA_MACRO(rawPTestWriteFoo, EMPTY(),{
+    WRITE_DATA_MACRO(rawPTestWriteType, EMPTY(),{
                          printf("total size: %d\n", totalSize);
                          printf("const: %d\n", const_5);
                      }, a, b, c, $STATIC_ARRAY, arr, $POINTER, 11, arr3_ptr, $CONST, 123, i32);
