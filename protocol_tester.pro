@@ -13,10 +13,26 @@ include(protocol/protocol.pri)
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    preprocessor/preprocessor.c
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    preprocessor/preprocessor.h \
+    preprocessor/preprocessor_arguments.h \
+    preprocessor/preprocessor_arithmetic.h \
+    preprocessor/preprocessor_boolean.h \
+    preprocessor/preprocessor_comparison.h \
+    preprocessor/preprocessor_complement.h \
+    preprocessor/preprocessor_concatenation.h \
+    preprocessor/preprocessor_detection.h \
+    preprocessor/preprocessor_for.h \
+    preprocessor/preprocessor_if.h \
+    preprocessor/preprocessor_logical.h \
+    preprocessor/preprocessor_serial.h \
+    preprocessor/preprocessor_stringify.h \
+    preprocessor/preprocessor_symbol.h \
+    preprocessor/preprocessor_tuple.h
 
 FORMS += \
     mainwindow.ui

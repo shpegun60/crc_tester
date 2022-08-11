@@ -5,8 +5,13 @@
 #include "preprocessor_base.h"
 #include "byte_order.h"
 
+#include <preprocessor/preprocessor.h>
 #include <stdio.h>
 
+
+
+#define foo(x) x
+#define bar(x) x
 
 #define $POINTER(x) x
 #define $STATIC_ARRAY(x) x
@@ -142,14 +147,14 @@ void rawParserMacroTest()
     printf("\n------------- RAW_PARSER_MACRO_TEST -----------------------------\n");
     printf("%s\n\n", TO_TXT2(RAW_P_MERGE_OPERATION(sizeof, PLUS, int, int, int, bool, char)));
     printf("%s\n\n", TO_TXT2(RAW_P_MERGE_WRITE_OPERATION(sizeof,par1, sizeof,u8*, COMMA_POINT, int, int, int, bool, char)));
-    printf("%s\n\n", TO_TXT2(            WRITE_PAYLOAD_MACRO(rawPTestWriteType, NULL, EMPTY(), {
+    printf("%s\n\n", PREPROCESSOR_STRINGIFY_VARIADIC(            WRITE_PAYLOAD_MACRO(rawPTestWriteType, NULL, EMPTY(), {
                                                                  printf("total size: %d\n", totalSize);
                                                                  printf("const: %d\n", const_5);
                                                              }, a, b, c, $STATIC_ARRAY, arr, $POINTER, 11, arr3_ptr, $CONST, 123, i32)));
 
     i32 a = 1;
     reg b = 2;
-    u16 c = 3;
+    u16 c = 6;
 
     u32 arr16[10] = {0x01020304,2,3,4,5,6,7,8,9,10};
     u32 arr16_tmp[100] = {0,0,0,0,0,0,0,0,0,0};
@@ -181,9 +186,19 @@ void rawParserMacroTest()
                         }, a, b, c, $STATIC_ARRAY, arr, $POINTER, 11, arr3_ptr, $CONST, 123, i32);
 
     printf("\n------------- END OF RAW_PARSER_MACRO_TEST -----------------------------\n");
+
+
+    printf("%s \n",         TO_TXT2(  PREPROCESSOR_SIMPLE_HAS_ARGS(,))       );
+
+
+//    *
+//    *    // Expands to 1
+//    *   PREPROCESSOR_PRIMITIVE_COMPARE(foo, foo) // Expands to 0
+
+
+
     fflush(stdout);
     fflush(stderr);
 }
-
 
 #endif // __RAWPARSER_MACRO_H__

@@ -38,6 +38,8 @@
 #define TO_TXT2(X) TO_TXT1(TO_TXT1(X))
 #define TO_TXT1(X) #X
 
+#define TO_TXT_EXPAND(X) X
+
 /************************************************************************************************************************************************************
  * Force the pre-processor to expand the macro a large number of times. Usage:
  *
@@ -188,9 +190,12 @@
  * Indirection around the standard ## concatenation operator. This simply
  * ensures that the arguments are expanded (once) before concatenation.
  */
-#define CAT(a, ...) a ## __VA_ARGS__
-#define CAT3(a, b, ...) a ## b ## __VA_ARGS__
-#define CAT4(a, b, c, ...) a ## b ## c ## __VA_ARGS__
+
+#define CAT_EXPAND(x) x
+
+#define CAT(a, ...) CAT_EXPAND(a ## __VA_ARGS__)
+#define CAT3(a, b, ...) CAT_EXPAND(a ## b ## __VA_ARGS__)
+#define CAT4(a, b, c, ...) CAT_EXPAND(a ## b ## c ## __VA_ARGS__)
 #define CAT5(a, b, c, d, ...) a ## b ## c ## d ## __VA_ARGS__
 #define CAT6(a, b, c, d, e, ...) a ## b ## c ## d ## e ## __VA_ARGS__
 #define CAT7(a, b, c, d, e, f, ...) a ## b ## c ## d ## e ## f ## __VA_ARGS__
@@ -628,11 +633,11 @@
  *
  ***********************************************************************************************************************************************************
  */
-#define IS_COMPARABLE(x) IS_PAREN(x(()) )
+#define IS_COMPARABLE(x) IS_PAREN(x(()))
 
 #define PRIMITIVE_COMPARE(x, y) IS_PAREN \
     ( \
-        x(y) (())  \
+        x(y)(()) \
     )
 
 #define NOT_EQUAL(x, y) \
