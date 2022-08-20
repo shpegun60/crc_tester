@@ -1,9 +1,7 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
+ *	CREATED BY SHPEGUN60
  *
- *	A generic header-only preprocessor metaprogramming library.
- *
+ *  COMPLEMENT FIND MACROCES
  */
 
 #ifndef PREPROCESSOR_COMPLEMENT_H

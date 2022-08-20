@@ -1,13 +1,12 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
+ *	CREATED BY SHPEGUN60
  *
- *	A generic header-only preprocessor metaprogramming library.
- *
+ *  BIT & LOGICAL MACROCES
  */
 
-#ifndef PREPROCESSOR_LOGICAL_H
-#define PREPROCESSOR_LOGICAL_H 
+
+#ifndef __PREPROCESSOR_LOGICAL_H__
+#define __PREPROCESSOR_LOGICAL_H__ 1
 
 /* -- Headers -- */
 
@@ -21,6 +20,20 @@ extern "C" {
 #endif
 
 /* -- Methods -- */
+
+#define PREPROCESSOR_TRUE(...)  1
+#define PREPROCESSOR_FALSE(...) 0
+
+
+/************************************************************************************************************************************************************
+ * Simple preprocessor BINARY operation (other implementation):
+ * Logical NOT. Simply performs a lookup.
+ */
+#define PREPROCESSOR_PRIMITIVE_NOT(b) PREPROCESSOR_CONCAT(PREPROCESSOR_PRIMITIVE_NOT_, b)
+#define PREPROCESSOR_PRIMITIVE_NOT_0  1
+#define PREPROCESSOR_PRIMITIVE_NOT_1  0
+
+
 
 /************************************************************************************************************************************************************
  * Simple preprocessor BINARY bit operation:
@@ -65,6 +78,10 @@ extern "C" {
 #define _PREPROCESSOR_OR_10 1
 #define _PREPROCESSOR_OR_11 1
 
+
+#define PREPROCESSOR_OR3(a, b, c)    PREPROCESSOR_OR(a, PREPROCESSOR_OR(b, c))
+#define PREPROCESSOR_OR4(a, b, c, d) PREPROCESSOR_OR3(a, b, PREPROCESSOR_OR(c, d))
+
 /************************************************************************************************************************************************************
  * Simple preprocessor BINARY operation (other implementation):
  * Logical AND. Simply performs a lookup.
@@ -74,6 +91,26 @@ extern "C" {
 #define _PREPROCESSOR_AND_01 0
 #define _PREPROCESSOR_AND_10 0
 #define _PREPROCESSOR_AND_11 1
+
+/************************************************************************************************************************************************************
+ * Simple preprocessor BINARY operation (other implementation):
+ * Logical XOR. Simply performs a lookup.
+ */
+#define PREPROCESSOR_XOR(x, y) PREPROCESSOR_CONCAT3(_PREPROCESSOR__XOR_, x, y)
+#define _PREPROCESSOR_XOR_00    0
+#define _PREPROCESSOR_XOR_01    1
+#define _PREPROCESSOR_XOR_10    1
+#define _PREPROCESSOR_XOR_11    0
+
+
+/************************************************************************************************************************************************************
+ * Simple preprocessor BOOLEAN COMPARATOR
+ */
+#define PREPROCESSOR_BOOL_EQ(x, y) PREPROCESSOR_CONCAT3(_PREPROCESSOR_BOOL_EQ_, x, y)
+#define _PREPROCESSOR_BOOL_EQ_00    1
+#define _PREPROCESSOR_BOOL_EQ_01    0
+#define _PREPROCESSOR_BOOL_EQ_10    0
+#define _PREPROCESSOR_BOOL_EQ_11    1
 
 
 /************************************************************************************************************************************************************
@@ -91,4 +128,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PREPROCESSOR_LOGICAL_H */
+#endif /* __PREPROCESSOR_LOGICAL_H__ */

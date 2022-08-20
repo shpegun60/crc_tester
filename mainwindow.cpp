@@ -5,7 +5,6 @@
 
 extern "C" {
 #include "crc_test.h"
-#include "crc64.h"
 
 #include "byte_order.h"
 
@@ -21,7 +20,6 @@ extern "C" {
 }
 
 #include "smart_assert.h"
-#include "templateTest.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -34,13 +32,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     //crc_test(time(NULL), 500);
 
-    //endiansTest();
+    endiansTest();
     //__M_assert_test();
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
-    //templatetest();
 
     TEMPLATE(convertWrite_MSB, f32)(data, &pos, 123.456);
     TEMPLATE(convertWrite_MSB, u16)(data, &pos, 853);
@@ -59,17 +56,17 @@ MainWindow::MainWindow(QWidget *parent)
     TEMPLATE(CAT_ENDIAN(convertRead), uni)(sizeof(u64), data, &pos, (u8*)&tmpunitest);
 
 
-//    qDebug() << "---------------------------------------------------";
-//    qDebug() << tmp;
-//    qDebug() << tmp16;
-//    qDebug() << tmp64;
-//    qDebug() << tmpunitest;
-//    qDebug() << pos;
-//    qDebug() << "long double "<<sizeof(long double);
-//    qDebug() << "---------------------------------------------------";
-//    qDebug() << "convert test exit with: "<< convertTest();
+    qDebug() << "---------------------------------------------------";
+    qDebug() << tmp;
+    qDebug() << tmp16;
+    qDebug() << tmp64;
+    qDebug() << tmpunitest;
+    qDebug() << pos;
+    qDebug() << "long double "<<sizeof(long double);
+    qDebug() << "---------------------------------------------------";
+    qDebug() << "convert test exit with: "<< convertTest();
 
-    //rawParserDmaTest(time(NULL),1000, 1);
+    rawParserDmaTest(time(NULL),1000, 0);
 
     rawParserMacroTest();
 }

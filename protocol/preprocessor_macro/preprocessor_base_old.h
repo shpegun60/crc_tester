@@ -17,8 +17,8 @@
  * macro definitions to handle O(N) arguments (with the exception of DEFERn).
  */
 
-#ifndef PREPROCESSOR_BASE_H
-#define PREPROCESSOR_BASE_H
+#ifndef PREPROCESSOR_BASE_OLD_H
+#define PREPROCESSOR_BASE_OLD_H
 
 #include "preprocessor_dec_inc.h"
 
@@ -648,4 +648,4 @@
 
 #define EQUAL(x, y) NOT(NOT_EQUAL(x, y))
 
-#endif /*PREPROCESSOR_BASE_H*/
+#endif /*PREPROCESSOR_BASE_OLD_H*/

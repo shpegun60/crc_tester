@@ -1,13 +1,11 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
+ *	CREATED BY SHPEGUN60
  *
- *	A generic header-only preprocessor metaprogramming library.
- *
+ *   LINE CONCATENATION MACROCES
  */
 
-#ifndef PREPROCESSOR_SERIAL_H
-#define PREPROCESSOR_SERIAL_H 1
+#ifndef __PREPROCESSOR_SERIAL_H__
+#define __PREPROCESSOR_SERIAL_H__ 1
 
 /* -- Headers -- */
 #include <preprocessor/preprocessor_concatenation.h>
@@ -28,4 +26,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PREPROCESSOR_SERIAL_H */
+#endif /* __PREPROCESSOR_SERIAL_H__ */

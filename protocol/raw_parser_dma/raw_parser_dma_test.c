@@ -1,9 +1,16 @@
 #include "rawparser_dma.h"
+#include "rawparser_macro.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 
-static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
+/**********************************************************************************************
+ *
+ * SIMPLE RANDOM TRANSMITT/RECEIVE TEST
+ *
+ */
+
+static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
 {
     int byteReceiveCompl = 0;
     int arrReceiveCompl = 0;
@@ -57,7 +64,13 @@ static int receiveTransmittSimpleTest(RawParser_dma_t* desc, u8 * data, rawP_siz
     return byteReceiveCompl + arrReceiveCompl;
 }
 
-static int receiveTransmittCollisionsTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
+/**********************************************************************************************
+ *
+ * SIMPLE COLLISION TEST (MAY BE OFF ALL ASSERSTS)
+ *
+ */
+
+static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
 {
     int byteCollisisons = 0;
     int arrCollisisons = 0;
@@ -127,6 +140,96 @@ static int receiveTransmittCollisionsTest(RawParser_dma_t* desc, u8 * data, rawP
     return byteCollisisons + arrCollisisons;
 }
 
+
+/**********************************************************************************************
+ *
+ * MACRO WRITE / READ TEST
+ *
+ */
+
+static int receiveTransmittMacroWriteReadDmaTest(RawParser_dma_t* desc, int randTestCount)
+{
+#define RAW_P_DMA_TEST_ARR_SIZE 10
+    int byteReceiveCompl = 0;
+
+    printf("\n\n ---------------------------RAW PARSER DMA MACRO ------------------------\n");
+
+    while(randTestCount--) {
+
+
+        // randomization --------------------------------------------------------------------------------------
+        i32 a = rand();
+        reg b = rand();
+        u16 c = rand();
+        u8  d = rand();
+        i32 inner = rand();
+        u32 arr1[RAW_P_DMA_TEST_ARR_SIZE];
+
+        u8 arr2[RAW_P_DMA_TEST_ARR_SIZE];
+        u8 * arr3_ptr = arr2;
+
+        for(int i = 0; i < RAW_P_DMA_TEST_ARR_SIZE; ++i) {
+            arr1[i] = rand();
+            arr2[i] = rand();
+        }
+
+
+
+        // transmitting packet -------------------------------------------------------------------------------
+        RawParser_Frame_t* Txframe = NULL;
+
+        WRITE_PAYLOAD_MACRO(RawParser_dma_universalWrite, desc, {
+                                RawParser_dma_startTransmittPacket(desc, totalSize);
+                            }, {
+                                Txframe = RawParser_dma_finishTransmittPacket(desc);
+                            }, a, b, c, d, $STATIC_ARRAY, arr1, $CONST, inner, i32, $POINTER, 10, arr3_ptr);
+
+        if(Txframe == NULL) {
+            return 1;
+        }
+
+        for(int i = 0; i < Txframe->size; ++i) {
+            RawParser_dma_receiveByte(desc, Txframe->data[i]);
+        }
+
+        // receiving packet -------------------------------------------------------------------------------
+        i32 CHK_a = 0;
+        reg CHK_b = 0;
+        u16 CHK_c = 0;
+        u8  CHK_d = 0;
+        i32 CHK_inner = 0;
+        u32 CHK_arr1[RAW_P_DMA_TEST_ARR_SIZE];
+
+        u8 CHK_arr2[RAW_P_DMA_TEST_ARR_SIZE];
+        u8 * CHK_arr3_ptr = CHK_arr2;
+
+        RawParser_Frame_t* Rxframe = RawParser_dma_proceed(desc);
+
+        if(Rxframe && Rxframe->size != 0) {
+            READ_PAYLOAD_MACRO(RawParser_dma_universalRead, desc, {
+                                   desc->uniRXPosition = 0;
+                               }, {
+                                   CHK_inner = const_5;
+                               }, CHK_a, CHK_b, CHK_c, CHK_d, $STATIC_ARRAY, CHK_arr1, $CONST, inner, i32, $POINTER, RAW_P_DMA_TEST_ARR_SIZE, CHK_arr3_ptr);
+
+            if(CHK_a != a || CHK_b != b || CHK_c != c || CHK_d != d || CHK_inner != inner) {
+                byteReceiveCompl++;
+            }
+
+            byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr1, (c8*)arr1);
+            byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr3_ptr, (c8*)arr3_ptr);
+
+        } else {
+            byteReceiveCompl++;
+        }
+    }
+
+#undef RAW_P_DMA_TEST_ARR_SIZE
+
+    printf("\ntest exit with error: %d\n---------------------------RAW PARSER DMA MACRO END ------------------------\n", byteReceiveCompl);
+    return byteReceiveCompl;
+}
+
 int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTestEna)
 {
     int errorCounter = 0;
@@ -140,11 +243,11 @@ int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTe
     RawParser_dma_t * prot = rawParser_dma_new(0x1A);
 
 
-    errorCounter += receiveTransmittSimpleTest(prot, data, 30);
+    errorCounter += receiveTransmittSimpleDmaTest(prot, data, 30);
 
     srand(randomSeed); // use current time as seed for random generator
 
-    // random rx/tx test----------------------------------------------------------
+    // simple random rx/tx test----------------------------------------------------------
     for(int i = 0; i < randTestCount; ++i) {
         reg len = 0;
 
@@ -160,12 +263,14 @@ int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTe
         for(reg j = 0; j < len; ++j) {
             data[j] = rand() % 256;
         }
-        errorCounter += receiveTransmittSimpleTest(prot, data, len);
+        errorCounter += receiveTransmittSimpleDmaTest(prot, data, len);
 
         if(collisionTestEna) {
-            collisionCounter+= receiveTransmittCollisionsTest(prot, data, len);
+            collisionCounter+= receiveTransmittCollisionsDmaTest(prot, data, len);
         }
     }
+
+    receiveTransmittMacroWriteReadDmaTest(prot, randTestCount);
 
 
     printf("\n----------RAW PARSER DMA TEST FINISHED!!!-------------------------\nRAW_PARSER_DMA EXIT WITH ERROR: %d\n", errorCounter);

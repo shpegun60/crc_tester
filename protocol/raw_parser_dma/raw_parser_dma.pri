@@ -3,7 +3,8 @@ DEPENDPATH += $$PWD
 
 SOURCES += \
     $$PWD/raw_parser_dma_test.c \
-    $$PWD/rawparser_dma.c
+    $$PWD/rawparser_dma.c \
+    $$PWD/rawparser_macro.c
 
 HEADERS += \
     $$PWD/raw_parser_dma_test.h \

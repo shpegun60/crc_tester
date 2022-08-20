@@ -7,8 +7,7 @@ include($$PWD/crc/crc.pri)
 include($$PWD/my_ctype/my_ctype.pri)
 include($$PWD/raw_parser_dma/raw_parser_dma.pri)
 include($$PWD/smart_assert/smart_assert.pri)
-include($$PWD/preprocessor_macro/preprocessor.pri)
-include($$PWD/templatec/templatec.pri)
+#include($$PWD/preprocessor_macro/preprocessor.pri)
 
 SOURCES += 
 

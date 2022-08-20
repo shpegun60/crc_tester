@@ -94,6 +94,8 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
     self->RX.data = self->m_receiveFrameBuffer;
     self->RX.size = (rawP_size_t)0;
 
+    self->uniRXPosition = 0;
+
     return self;
 }
 
@@ -460,6 +462,54 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
     self->TX.size = (rawP_size_t)self->m_transmittPos;
     return &self->TX;
 }
+
+
+// function for use universal macro ---------------------------------------------------------------------------------------------------------
+void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByte, reg typelenInByte, u8 *data)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL || data == NULL), M_EMPTY, return, "RawParser_dma_universalWrite: No valid input");
+
+#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+    while(totalLenInByte--) {
+        RawParser_dma_addTxByteCRC(self, *data++);
+    }
+
+    (void)typelenInByte;
+#else /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+    for(reg i = 0; i < totalLenInByte; i+= typelenInByte) {
+        reg n = typelenInByte;
+        while(n--) {
+            RawParser_dma_addTxByteCRC(self, *(data + n + i));
+        }
+    }
+#endif /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+
+}
+
+void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte, reg typelenInByte, u8 *data)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL || data == NULL), M_EMPTY, return, "RawParser_dma_universalRead: No valid input");
+    M_Assert_BreakSaveCheck(((self->uniRXPosition + totalLenInByte) > self->RX.size), M_EMPTY, return, "RawParser_dma_universalRead: no length for reading");
+
+#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+    while(totalLenInByte--) {
+        *data++ = self->RX.data[self->uniRXPosition];
+        ++self->uniRXPosition;
+    }
+
+    (void)typelenInByte;
+#else /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+    for(reg i = 0; i < totalLenInByte; i+= typelenInByte) {
+        reg n = typelenInByte;
+        while(n--) {
+            *(data + n + i) = self->RX.data[self->uniRXPosition];
+            ++self->uniRXPosition;
+        }
+    }
+#endif /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+
+}
+
 
 
 // FSM data fusion delete -----------------------------

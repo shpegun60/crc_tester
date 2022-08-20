@@ -1,13 +1,11 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
+ *	CREATED BY SHPEGUN60
  *
- *	A generic header-only preprocessor metaprogramming library.
- *
+ *  CHAR LITERALS EQUALUATION MACROCES
  */
 
-#ifndef PREPROCESSOR_COMPARISON_H
-#define PREPROCESSOR_COMPARISON_H 1
+#ifndef __PREPROCESSOR_COMPARISON_H__
+#define __PREPROCESSOR_COMPARISON_H__ 1
 
 /* -- Headers -- */
 
@@ -65,4 +63,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PREPROCESSOR_COMPARISON_H */
+#endif /* __PREPROCESSOR_COMPARISON_H__ */

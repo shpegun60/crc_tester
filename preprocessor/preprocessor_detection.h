@@ -1,13 +1,11 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
+ *	CREATED BY SHPEGUN60
  *
- *	A generic header-only preprocessor metaprogramming library.
- *
+ *  DETECTION MACROCES
  */
 
-#ifndef PREPROCESSOR_DETECTION_H
-#define PREPROCESSOR_DETECTION_H 1
+#ifndef __PREPROCESSOR_DETECTION_H__
+#define __PREPROCESSOR_DETECTION_H__ 1
 
 /* -- Headers -- */
 
@@ -32,7 +30,7 @@ extern "C" {
  * PREPROCESSOR_IS_PROBE(xxx)                       // Expands to 0
  */
 #define PREPROCESSOR_IS_PROBE(...) _PREPROCESSOR_IS_PROBE(__VA_ARGS__) // expand all arguments
-#define _PREPROCESSOR_IS_PROBE(...) PREPROCESSOR_ARGS_SECOND(__VA_ARGS__, 0)
+#define _PREPROCESSOR_IS_PROBE(...) PREPROCESSOR_ARGS_SND(__VA_ARGS__, 0)
 #define PREPROCESSOR_PROBE() ~, 1
 
 /************************************************************************************************************************************************************
@@ -47,8 +45,11 @@ extern "C" {
 
 /************************************************************************************************************************************************************/
 
+
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PREPROCESSOR_DETECTION_H */
+#endif /* __PREPROCESSOR_DETECTION_H__ */

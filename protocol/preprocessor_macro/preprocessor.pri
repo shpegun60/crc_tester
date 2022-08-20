@@ -5,7 +5,7 @@ SOURCES += \
     $$PWD/example_preprocessor.c
 
 HEADERS += \
-	$$PWD/preprocessor_base.h\
-        $$PWD/preprocessor_map.h\
-        $$PWD/preprocessor_dec_inc.h
+        $$PWD/preprocessor_base_old.h \
+        $$PWD/preprocessor_dec_inc.h \
+        $$PWD/preprocessor_map_old.h
 	

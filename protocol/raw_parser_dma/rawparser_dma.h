@@ -39,6 +39,7 @@ typedef struct {
 
     RawParser_Frame_t TX;
     RawParser_Frame_t RX;
+    u32 uniRXPosition; // value for universal read position function
 } RawParser_dma_t;
 
 // new / delete functions----------------------------------------------
@@ -50,7 +51,8 @@ int rawParser_dma_delete(RawParser_dma_t** data);
 forceinline void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "RawParser_dma_receiveByte: No valid input");
-    self->m_receiveBuffer[(self->m_receivePos++) & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
+    self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
+    ++self->m_receivePos;
 }
 
 forceinline void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, rawP_size_t len)
@@ -59,7 +61,8 @@ forceinline void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr
     M_Assert_Break( ((u32)(len) + 1) > (D_RAW_P_RX_BUF_SIZE + 1), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, (D_RAW_P_RX_BUF_SIZE - 1));
 
     while(len--) {
-        self->m_receiveBuffer[(self->m_receivePos++) & (D_RAW_P_RX_BUF_SIZE - 1U)] = *arr++;
+        self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = *arr++;
+        ++self->m_receivePos;
     }
 }
 
@@ -130,6 +133,9 @@ forceinline void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u
 #endif /* D_RAW_P_CRC_ENA */
 
 
+// function for use universal macro ---------------------------------------------------------------------------------------------------------
+void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByte, reg typelenInByte, u8 *data);
+void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte, reg typelenInByte, u8 *data);
 
 
 #endif /* __RAW_PARSER_DMA_FUSION_H__ */

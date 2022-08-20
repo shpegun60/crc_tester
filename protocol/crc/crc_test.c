@@ -6,8 +6,6 @@ Write your code in this editor and press "Run" button to compile and execute it.
 
 *******************************************************************************/
 
-
-
 #include "crc_test.h"
 
 #ifndef _MY_CRC_TEST_DISABLE

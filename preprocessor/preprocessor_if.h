@@ -1,9 +1,7 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
+ *	CREATED BY SHPEGUN60
  *
- *	A generic header-only preprocessor metaprogramming library.
- *
+ *  PREPROCESSOR IF, IF_ELSE MACROCES
  */
 
 #ifndef PREPROCESSOR_IF_H

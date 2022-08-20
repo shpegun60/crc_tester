@@ -1,25 +1,12 @@
 /*
- *	Preprocessor Library by Parra Studios
- *	A generic header-only preprocessor metaprogramming library.
+ *	CREATED BY SHPEGUN60
  *
- *	Copyright (C) 2016 - 2022 Vicente Eduardo Ferrer Garcia <vic798@gmail.com>
- *
- *	Licensed under the Apache License, Version 2.0 (the "License");
- *	you may not use this file except in compliance with the License.
- *	You may obtain a copy of the License at
- *
- *		http://www.apache.org/licenses/LICENSE-2.0
- *
- *	Unless required by applicable law or agreed to in writing, software
- *	distributed under the License is distributed on an "AS IS" BASIS,
- *	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *	See the License for the specific language governing permissions and
- *	limitations under the License.
+ *  VARIADIC MACRO INSTRUMENTS
  *
  */
 
-#ifndef PREPROCESSOR_ARGUMENTS_H
-#define PREPROCESSOR_ARGUMENTS_H 1
+#ifndef __PREPROCESSOR_ARGUMENTS_H__
+#define __PREPROCESSOR_ARGUMENTS_H__ 1
 
 /* -- Headers -- */
 
@@ -40,9 +27,6 @@ extern "C" {
  *      If you want increase number of arguments you must extends next macro:
  *          - PREPROCESSOR_ARGS_COUNT_SEQ_IMPL,
  *          - PREPROCESSOR_ARGS_N_IMPL,
- *          - PREPROCESSOR_ARGS_COMMA_IMPL_0 ... PREPROCESSOR_ARGS_COMMA_IMPL_X,
- *          - PREPROCESSOR_ARGS_COUNT_PREFIX__PREPROCESSOR_ARGS_COUNT_POSTFIX (number of commas)
- *          - PREPROCESSOR_ARGS_COMMA_SEQ_IMPL
  *          - PREPROCESSOR_ARGS_SIZE
  *
  *      WARNING!!! some compilers do not support when number of arguments more than 127
@@ -53,11 +37,99 @@ extern "C" {
 
 /* -- Macros -- */
 
-#define PREPROCESSOR_ARGS_FIRST(first, ...) first
-#define PREPROCESSOR_ARGS_FIRST_REMOVE(first, ...) __VA_ARGS__
+/************************************************************************************************************************************************************
+ * Get the first ... N argument and ignore the rest, adds variadic end symbol. Maximum 10 elements !!!!! if you need more, please implement this
+ *
+ *      PREPROCESSOR_GET_ARG(9)(1aa,2bb,3cc,4dd,5ee,6ff,7gg,8hh,9gg,10kk, 11lll)    // expands to 10kk
+ *      PREPROCESSOR_GET_ARG(1)(x, y, z)                                            // expands to y
+ *      PREPROCESSOR_GET_ARG(0)(0, 1, 2)                                            // expands to 0
+ *      PREPROCESSOR_EVAL(PREPROCESSOR_GET_ARG(2)PREPROCESSOR_TUPLE_MAKE(x,y,z))    // expands to z
+ *      PREPROCESSOR_GET_ARG(0)(PREPROCESSOR_TUPLE_MAKE(x, x), 1, 2)                // expands to (x, x)
+ */
 
-#define PREPROCESSOR_ARGS_SECOND(first, second, ...) second
-#define PREPROCESSOR_ARGS_SECOND_REMOVE(first, second, ...) first, __VA_ARGS__
+#define PREPROCESSOR_GET_ARG(x) PREPROCESSOR_GET_ARG_IMPL(x)
+#define PREPROCESSOR_GET_ARG_IMPL(x) PREPROCESSOR_CONCAT(PREPROCESSOR_ARGS_GET_, x)
+
+#define PREPROCESSOR_ARGS_GET_0(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_0(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_1(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_1(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_2(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_2(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_3(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_3(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_4(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_4(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_5(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_5(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_6(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_6(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_7(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_7(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_8(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_8(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_9(...)  PREPROCESSOR_ARGS_PRIMITIVE_GET_9(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_GET_10(...) PREPROCESSOR_ARGS_PRIMITIVE_GET_10(__VA_ARGS__, ~)
+
+
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_0(_0, ...) _0                 // Get the first argument and ignore the rest.
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_1(_0, _1, ...) _1
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_2(_0, _1, _2, ...) _2
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_3(_0, _1, _2, _3, ...) _3
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_4(_0, _1, _2, _3, _4, ...) _4
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_5(_0, _1, _2, _3, _4, _5, ...) _5
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_6(_0, _1, _2, _3, _4, _5, _6, ...) _6
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_7(_0, _1, _2, _3, _4, _5, _6, _7, ...) _7
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_8(_0, _1, _2, _3, _4, _5, _6, _7, _8, ...) _8
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_9(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, ...) _9
+#define PREPROCESSOR_ARGS_PRIMITIVE_GET_10(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, ...) _10
+
+/************************************************************************************************************************************************************
+ *  HEAD, TAIL, SND VARIADIC GETTING
+ *
+ *      PREPROCESSOR_ARGS_HEAD(x,y,z) // expands to x
+ *      PREPROCESSOR_ARGS_TAIL(x,y,z) // expands to y,z
+ *      PREPROCESSOR_ARGS_SND(x,y,z)  // expands to y
+ *
+ */
+#define PREPROCESSOR_ARGS_HEAD(...)        PREPROCESSOR_ARGS_IMPL(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_IMPL(x, ...) x
+
+#define PREPROCESSOR_ARGS_TAIL(...)         PREPROCESSOR_ARGS_TAIL_IMPL(__VA_ARGS__)
+#define PREPROCESSOR_ARGS_TAIL_IMPL(_x, ...) __VA_ARGS__
+
+#define PREPROCESSOR_ARGS_SND(...)            PREPROCESSOR_ARGS_SND_IMPL(__VA_ARGS__, ~)
+#define PREPROCESSOR_ARGS_SND_IMPL(_x, y, ...) y
+
+
+/************************************************************************************************************************************************************
+ * Remove the first ... N argument and ignore the rest. Maximum 10 elements !!!!! if you need more, please implement this
+ *
+ *      PREPROCESSOR_REMOVE_ARG(9)(1aa,2bb,3cc,4dd,5ee,6ff,7gg,8hh,9gg,10kk, 11lll)     // expands to 1aa, 2bb, 3cc, 4dd, 5ee, 6ff, 7gg, 8hh, 9gg, 11lll
+ *      PREPROCESSOR_REMOVE_ARG(0)(x, y, z)                                             // expands to y, z
+ *      PREPROCESSOR_REMOVE_ARG(1)(0, 1, 2)                                             // expands to 0, 2
+ *      PREPROCESSOR_EVAL(PREPROCESSOR_REMOVE_ARG(1)PREPROCESSOR_TUPLE_MAKE(x,y,z))     // expands to x, z
+ *      PREPROCESSOR_REMOVE_ARG(0)((x, x), y, (z, z))                                   // expands to y, (z, z)
+ */
+
+#define PREPROCESSOR_REMOVE_ARG(x) PREPROCESSOR_REMOVE_ARG_IMPL(x)
+#define PREPROCESSOR_REMOVE_ARG_IMPL(x) PREPROCESSOR_CONCAT(PREPROCESSOR_ARGS_REMOVE_, x)
+
+// remove element
+#define PREPROCESSOR_ARGS_REMOVE_0(_0, ...) __VA_ARGS__ // Remove the first argument and ignore the rest.
+
+#define PREPROCESSOR_ARGS_REMOVE_1(_0, _1, ...) \
+    _0 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_2(_0, _1, _2, ...) \
+    _0, _1 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_3(_0, _1, _2, _3, ...) \
+    _0, _1, _2 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_4(_0, _1, _2, _3, _4, ...) \
+    _0, _1, _2, _3 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_5(_0, _1, _2, _3, _4, _5, ...) \
+    _0, _1, _2, _3, _4 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_6(_0, _1, _2, _3, _4, _5, _6, ...) \
+    _0, _1, _2, _3, _4, _5 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_7(_0, _1, _2, _3, _4, _5, _6, _7, ...) \
+    _0, _1, _2, _3, _4, _5, _6 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_8(_0, _1, _2, _3, _4, _5, _6, _7, _8, ...) \
+    _0, _1, _2, _3, _4, _5, _6, _7 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_9(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, ...) \
+    _0, _1, _2, _3, _4, _5, _6, _7, _8 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+#define PREPROCESSOR_ARGS_REMOVE_10(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, ...) \
+   _0, _1, _2, _3, _4, _5, _6, _7, _8, _9 PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__)) (, __VA_ARGS__)
+
 
 /*********************************************************************************************************************
  * VARIADIC ARGUMENTS IS EMPTY IMPLEMENTATION
@@ -71,16 +143,16 @@ extern "C" {
  *
  */
 
-#define PREPROCESSOR_ARGS_EMPTY(...)                                        \
-    PREPROCESSOR_ARGS_EMPTY_IMPL(                                           \
-        PREPROCESSOR_ARGS_COMMA(__VA_ARGS__),                               \
-        PREPROCESSOR_ARGS_COMMA(PREPROCESSOR_COMMA_VARIADIC __VA_ARGS__),   \
-        PREPROCESSOR_ARGS_COMMA(__VA_ARGS__ ()),                            \
-        PREPROCESSOR_ARGS_COMMA(PREPROCESSOR_COMMA_VARIADIC __VA_ARGS__ ()) \
+#define PREPROCESSOR_ARGS_EMPTY(...)                                                 \
+    PREPROCESSOR_ARGS_EMPTY_IMPL(                                                    \
+        PREPROCESSOR_ARGS_CONTAINS_COMMA(__VA_ARGS__),                               \
+        PREPROCESSOR_ARGS_CONTAINS_COMMA(PREPROCESSOR_COMMA_VARIADIC __VA_ARGS__),   \
+        PREPROCESSOR_ARGS_CONTAINS_COMMA(__VA_ARGS__ ()),                            \
+        PREPROCESSOR_ARGS_CONTAINS_COMMA(PREPROCESSOR_COMMA_VARIADIC __VA_ARGS__ ()) \
     )
 
 #define PREPROCESSOR_ARGS_EMPTY_IMPL(_0, _1, _2, _3) PREPROCESSOR_ARGS_EMPTY_IMPL_I(_0, _1, _2, _3)
-#define PREPROCESSOR_ARGS_EMPTY_IMPL_I(_0, _1, _2, _3) PREPROCESSOR_ARGS_COMMA(PREPROCESSOR_ARGS_EMPTY_CASE(PREPROCESSOR_ARGS_EMPTY_CASE_IMPL_, _0, _1, _2, _3))
+#define PREPROCESSOR_ARGS_EMPTY_IMPL_I(_0, _1, _2, _3) PREPROCESSOR_ARGS_CONTAINS_COMMA(PREPROCESSOR_ARGS_EMPTY_CASE(PREPROCESSOR_ARGS_EMPTY_CASE_IMPL_, _0, _1, _2, _3))
 #define PREPROCESSOR_ARGS_EMPTY_CASE(_0, _1, _2, _3, _4) _0 ## _1 ## _2 ## _3 ## _4
 #define PREPROCESSOR_ARGS_EMPTY_CASE_IMPL_0001 ,
 
@@ -105,31 +177,18 @@ extern "C" {
  *      PREPROCESSOR_ARGS_COUNT()                                    // expand to 0
  *      PREPROCESSOR_ARGS_COUNT(x,y,z)                               // expand to 3
  *      PREPROCESSOR_ARGS_COUNT(x, PREPROCESSOR_TUPLE_MAKE(1,2,3))   // expand to 2
- *      PREPROCESSOR_ARGS_COUNT(,,)                                  // expand to 3 (NOT TESTED ON _MSC_VER!!! may be not work)
+ *      PREPROCESSOR_ARGS_COUNT(,,)                                  // expand to 3
  *
  */
 
-#if defined(__GNUC__) || defined(__clang__)
 
-    #define PREPROCESSOR_ARGS_COUNT(...) \
-        PREPROCESSOR_IF_ELSE(PREPROCESSOR_ARGS_EMPTY(__VA_ARGS__)) ( \
-            0, \
-            PREPROCESSOR_ARGS_COUNT_IMPL(__VA_ARGS__, PREPROCESSOR_ARGS_COUNT_SEQ_IMPL()) \
-        )
+#define PREPROCESSOR_ARGS_COUNT(...) \
+    PREPROCESSOR_IF_ELSE(PREPROCESSOR_ARGS_EMPTY(__VA_ARGS__)) ( \
+        0, \
+        PREPROCESSOR_ARGS_COUNT_IMPL(__VA_ARGS__, PREPROCESSOR_ARGS_COUNT_SEQ_IMPL()) \
+    )
 
-    #define PREPROCESSOR_ARGS_COUNT_IMPL(...) PREPROCESSOR_ARGS_N_IMPL(__VA_ARGS__)
-
-#elif defined(_MSC_VER) && !defined(__clang__)
-
-    #define PREPROCESSOR_ARGS_COUNT(...) \
-        PREPROCESSOR_ARGS_COUNT_IMPL((PREPROCESSOR_ARGS_COUNT_PREFIX_ ## __VA_ARGS__ ## _PREPROCESSOR_ARGS_COUNT_POSTFIX, PREPROCESSOR_ARGS_COUNT_SEQ_IMPL()))
-
-    #define PREPROCESSOR_ARGS_COUNT_PREFIX__PREPROCESSOR_ARGS_COUNT_POSTFIX ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0
-    #define PREPROCESSOR_ARGS_COUNT_IMPL(expr) PREPROCESSOR_ARGS_N_IMPL expr
-
-#else
-#	error "Unkwnown argument counter implementation for variadic arguments. Source: preprocessor_arguments.h"
-#endif /* variadic counter implementation switch */
+#define PREPROCESSOR_ARGS_COUNT_IMPL(...) PREPROCESSOR_ARGS_N_IMPL(__VA_ARGS__)
 
 
 // MACRO COUNT TABLES ------------------------------------------------------------------------
@@ -182,130 +241,70 @@ extern "C" {
  *          PREPROCESSOR_SIMPLE_HAS_ARGS(a,b)       // expands to 1
  *          PREPROCESSOR_SIMPLE_HAS_ARGS(a)         // expands to 1
  */
-#define PREPROCESSOR_SIMPLE_HAS_ARGS(...) PREPROCESSOR_BOOL(PREPROCESSOR_ARGS_FIRST(PREPROCESSOR_END_OF_ARGUMENTS_ __VA_ARGS__)(0))
-#define PREPROCESSOR_END_OF_ARGUMENTS_(...) PREPROCESSOR_BOOL(PREPROCESSOR_ARGS_FIRST(__VA_ARGS__))
+#define PREPROCESSOR_SIMPLE_HAS_ARGS(...) PREPROCESSOR_BOOL(PREPROCESSOR_ARGS_HEAD(PREPROCESSOR_END_OF_ARGUMENTS_ __VA_ARGS__)(0))
+#define PREPROCESSOR_END_OF_ARGUMENTS_(...) PREPROCESSOR_BOOL(PREPROCESSOR_ARGS_HEAD(__VA_ARGS__))
 
 
 /*********************************************************************************************************************
  * VARIADIC ARGUMENT COMMA FINDER IMPLEMENTATION
  *  Check if the next sequence symbol comma (,) is exists
  *
- *      PREPROCESSOR_ARGS_COMMA(x)      // expands to 0
- *      PREPROCESSOR_ARGS_COMMA()       // expands to 0
- *      PREPROCESSOR_ARGS_COMMA(,)      // expands to 1 (NOT TESTED ON _MSC_VER!!! may be not work)
- *      PREPROCESSOR_ARGS_COMMA(x,y)    // expands to 1
+ *      PREPROCESSOR_ARGS_CONTAINS_COMMA(x)      // expands to 0
+ *      PREPROCESSOR_ARGS_CONTAINS_COMMA()       // expands to 0
+ *      PREPROCESSOR_ARGS_CONTAINS_COMMA(,)      // expands to 1
+ *      PREPROCESSOR_ARGS_CONTAINS_COMMA(x,y)    // expands to 1
  *
  */
 
-#if defined(__GNUC__) || defined(__clang__)
-    #if (defined(__cplusplus) && (__cplusplus >= 201103L)) || (defined(__STDC__) && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
-
-        #define PREPROCESSOR_ARGS_COMMA(...) \
-                    PREPROCESSOR_ARGS_COMMA_IMPL( \
-                        PREPROCESSOR_DEC(PREPROCESSOR_ARGS_COUNT_IMPL(~, __VA_ARGS__, PREPROCESSOR_ARGS_COUNT_SEQ_IMPL())) \
-                    )
-
-        #define PREPROCESSOR_ARGS_COMMA_IMPL(value) PREPROCESSOR_NOT(PREPROCESSOR_CONCAT(PREPROCESSOR_ARGS_COMMA_IMPL_, value))
+#define PREPROCESSOR_ARGS_CONTAINS_COMMA(...)                      PREPROCESSOR_ARGS_X_AS_COMMA(__VA_ARGS__, PREPROCESSOR_COMMA(), ~)
+#define PREPROCESSOR_ARGS_X_AS_COMMA(_head, x, ...)                PREPROCESSOR_ARGS_CONTAINS_COMMA_RESULT(x, 0, 1, ~)
+#define PREPROCESSOR_ARGS_CONTAINS_COMMA_RESULT(x, _, result, ...) result
 
 
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_0 1
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_1 1
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_2 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_3 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_4 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_5 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_6 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_7 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_8 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_9 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_10 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_11 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_12 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_13 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_14 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_15 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_16 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_17 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_18 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_19 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_20 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_21 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_22 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_23 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_24 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_25 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_26 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_27 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_28 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_29 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_30 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_31 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_32 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_33 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_34 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_35 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_36 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_37 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_38 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_39 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_40 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_41 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_42 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_43 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_44 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_45 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_46 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_47 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_48 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_49 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_50 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_51 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_52 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_53 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_54 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_55 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_56 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_57 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_58 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_59 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_60 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_61 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_62 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_63 0
-        #define PREPROCESSOR_ARGS_COMMA_IMPL_64 0
+/*********************************************************************************************************************
+ * VARIADIC IS SINGLE IMPLEMENTATION
+ *  Check if the next sequence symbol comma (,) is exists
+ *
+ *      PREPROCESSOR_ARGS_IS_SINGLE(x)      // expands to 1
+ *      PREPROCESSOR_ARGS_IS_SINGLE()       // expands to 1
+ *      PREPROCESSOR_ARGS_IS_SINGLE(,)      // expands to 0
+ *      PREPROCESSOR_ARGS_IS_SINGLE(x,y)    // expands to 0
+ *
+ */
+
+#define PREPROCESSOR_ARGS_IS_SINGLE(...) PREPROCESSOR_NOT(PREPROCESSOR_ARGS_CONTAINS_COMMA(__VA_ARGS__))
 
 
-    #else
-
-        #define PREPROCESSOR_ARGS_COMMA(...) PREPROCESSOR_ARGS_COUNT_IMPL(__VA_ARGS__, PREPROCESSOR_ARGS_COMMA_SEQ_IMPL())
-
-    #endif /* (defined(__cplusplus) && (__cplusplus >= 201103L)) || (defined(__STDC__) && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) */
-
-#elif defined(_MSC_VER) && !defined(__clang__)
-
-    #define PREPROCESSOR_ARGS_COMMA(...) \
-        PREPROCESSOR_ARGS_COUNT_IMPL((PREPROCESSOR_ARGS_COUNT_PREFIX_ ## __VA_ARGS__ ## _PREPROCESSOR_ARGS_COUNT_POSTFIX, PREPROCESSOR_ARGS_COMMA_SEQ_IMPL()))
-#else
-#	error "Unkwnown preprocessor implementation for variadic arguments. Source: preprocessor_arguments.h"
-#endif
-
-// MACRO COMMA TABLES ------------------------------------------------------------------------
-#define PREPROCESSOR_ARGS_COMMA_SEQ_IMPL()  \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,           \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,           \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,           \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,           \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,           \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1,           \
-    1, 1, 0
-
-
-/*********************************************************************************************************************/
-
+/************************************************************************************************************************************************************
+ * Overloads @p f on a number of arguments.
+ *
+ * This function counts the number of provided arguments, appends it to @p f and calls the resulting
+ * macro identifier with provided arguments.
+ *
+ * At most 63 variadic arguments are acceptable.
+ *
+ * # Examples
+ *
+ * @code
+ *
+ * #define X(...)    PREPROCESSOR_OVERLOAD(X_, __VA_ARGS__)
+ * #define X_1(a)    Billie & a
+ * #define X_2(a, b) Jean & a & b
+ *
+ * // Billie & 4
+ * X(4)
+ *
+ * // Jean & 5 & 6
+ * X(5, 6)
+ * @endcode
+ *
+ */
+#define PREPROCESSOR_OVERLOAD(f, ...) PREPROCESSOR_OVERLOAD_IMPL(f, __VA_ARGS__)
+#define PREPROCESSOR_OVERLOAD_IMPL(f, ...) PREPROCESSOR_CONCAT(f, PREPROCESSOR_ARGS_COUNT(__VA_ARGS__))(__VA_ARGS__)
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PREPROCESSOR_ARGUMENTS_H */
+#endif /* __PREPROCESSOR_ARGUMENTS_H__ */

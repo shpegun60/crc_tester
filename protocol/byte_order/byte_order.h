@@ -2,7 +2,7 @@
 #define __BYTE_ORDER_H__
 
 #include "my_ctypes.h"
-#include "preprocessor_base.h"
+#include <preprocessor/preprocessor_concatenation.h>
 
 #ifndef BYTE_ORDER_TEST_DISABLE
     //#define BYTE_ORDER_TEST_DISABLE
@@ -37,11 +37,11 @@
 
 
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
-    #define CAT_ENDIAN(name) CAT(name, _LSB)
+    #define CAT_ENDIAN(name) PREPROCESSOR_CONCAT(name, _LSB)
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
-    #define CAT_ENDIAN(name) CAT(name, _MSB)
+    #define CAT_ENDIAN(name) PREPROCESSOR_CONCAT(name, _MSB)
 #else
-    #define CAT_ENDIAN(name) CAT(name, _)
+    #define CAT_ENDIAN(name) PREPROCESSOR_CONCAT(name, _)
     #error unsupported endianness
 #endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
 
