@@ -1,5 +1,7 @@
 #include "rawparser_macro.h"
 
+#ifndef D_RAW_P_TEST_DISABLE
+
 //**************************************************************************************************
 // TEST
 //**************************************************************************************************
@@ -36,7 +38,7 @@ void rawPTestWriteType(u8* desc, reg totalLenInByte, reg typelenInByte, u8 *data
 }
 
 
-void rawParserMacroTest()
+int rawParserMacroTest()
 {
     printf("\n------------- RAW_PARSER_MACRO_TEST -----------------------------\n");
     printf("%s\n\n", PREPROCESSOR_MACRO_DEBUG(RAW_P_MERGE_OPERATION(sizeof, PREPROCESSOR_PLUS, int, int, int, bool, char)));
@@ -85,4 +87,8 @@ void rawParserMacroTest()
 
     fflush(stdout);
     fflush(stderr);
+
+    return 0;
 }
+
+#endif /* D_RAW_P_TEST_DISABLE */

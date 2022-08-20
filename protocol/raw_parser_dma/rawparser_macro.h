@@ -1,6 +1,7 @@
 #ifndef __RAWPARSER_MACRO_H__
 #define __RAWPARSER_MACRO_H__
 
+#include "rawparser_port.h"
 #include "my_ctypes.h"
 #include "byte_order.h"
 
@@ -102,6 +103,8 @@
 
 
 
-void rawParserMacroTest();
+#ifndef D_RAW_P_TEST_DISABLE
+int rawParserMacroTest();
+#endif /* D_RAW_P_TEST_DISABLE */
 
 #endif // __RAWPARSER_MACRO_H__

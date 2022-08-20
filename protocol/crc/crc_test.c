@@ -255,7 +255,7 @@ int crc_test(unsigned int randomSeed, int randomTestCnt)
 
     (void)randomData;
     (void)data;
-    return testPassed;
+    return !testPassed;
 }
 
 

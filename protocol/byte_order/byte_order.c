@@ -661,7 +661,7 @@ int endiansTest()
 
 
     fflush(stdout);
-    return test_passed;
+    return !test_passed;
 }
 #endif /* BYTE_ORDER_TEST_DISABLE */
 

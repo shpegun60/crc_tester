@@ -3,6 +3,11 @@
 
 #include "my_ctypes.h"
 
+#ifndef D_RAW_P_TEST_DISABLE
+    //#define D_RAW_P_TEST_DISABLE
+#endif /* D_RAW_P_TEST_DISABLE */
+
+
 /*
 ***************************************************************************************************
     INTERNAL BUFFER SIZE (number of rawP_data_t values)

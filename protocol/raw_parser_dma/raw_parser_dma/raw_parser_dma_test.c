@@ -1,8 +1,14 @@
+#include "raw_parser_dma_test.h"
+
+
+#ifndef D_RAW_P_TEST_DISABLE
+
 #include "rawparser_dma.h"
 #include "rawparser_macro.h"
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "convert.h"
 
 /**********************************************************************************************
  *
@@ -66,7 +72,7 @@ static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_
 
 /**********************************************************************************************
  *
- * SIMPLE COLLISION TEST (MAY BE OFF ALL ASSERSTS)
+ * SIMPLE COLLISION TEST (MAY BE DISABLE SMART ASSERSTS ???)
  *
  */
 
@@ -105,8 +111,6 @@ static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, r
 
     Txframe->size = 0;
 
-
-
     // ------------- all byte pushing test---------------------------------------
     Txframe = RawParser_dma_shieldFrame(desc, data, size);
 
@@ -130,7 +134,6 @@ static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, r
         arrCollisisons++;
     }
 
-
     int last = 0;
     while (last < size) {
         RawParser_dma_proceed(desc);
@@ -152,7 +155,7 @@ static int receiveTransmittMacroWriteReadDmaTest(RawParser_dma_t* desc, int rand
 #define RAW_P_DMA_TEST_ARR_SIZE 10
     int byteReceiveCompl = 0;
 
-    printf("\n\n ---------------------------RAW PARSER DMA MACRO ------------------------\n");
+    printf("\n\n ---------------------------RAW PARSER DMA MACRO (FAST) ------------------------\n");
 
     while(randTestCount--) {
 
@@ -226,7 +229,90 @@ static int receiveTransmittMacroWriteReadDmaTest(RawParser_dma_t* desc, int rand
 
 #undef RAW_P_DMA_TEST_ARR_SIZE
 
-    printf("\ntest exit with error: %d\n---------------------------RAW PARSER DMA MACRO END ------------------------\n", byteReceiveCompl);
+    printf("\ntest exit with error: %d\n---------------------------RAW PARSER DMA MACRO (FAST) END ------------------------\n", byteReceiveCompl);
+    return byteReceiveCompl;
+}
+
+/**********************************************************************************************
+ *
+ * CONVERT WRITE / READ TEST
+ *
+ */
+
+static int receiveTransmittConvertDmaTest(RawParser_dma_t* desc, int randTestCount)
+{
+#define RAW_P_DMA_TEST_ARR_SIZE 10
+    int byteReceiveCompl = 0;
+
+    printf("\n\n ---------------------------RAW PARSER DMA CONVERT (SLOW) ------------------------\n");
+
+    while(randTestCount--) {
+        // randomization --------------------------------------------------------------------------------------
+        i32 a = rand();
+        reg b = rand();
+        u16 c = rand();
+        u8  d = rand();
+        i32 inner = rand();
+        u32 arr1[RAW_P_DMA_TEST_ARR_SIZE];
+
+        for(int i = 0; i < RAW_P_DMA_TEST_ARR_SIZE; ++i) {
+            arr1[i] = rand();
+        }
+
+
+        // transmitting packet -------------------------------------------------------------------------------
+        u8 buffdata [D_RAW_P_TX_BUF_SIZE];
+        reg pos = 0;
+        TEMPLATE(CAT_ENDIAN(convertWrite), i32)(buffdata, &pos, a);
+        TEMPLATE(CAT_ENDIAN(convertWrite), reg)(buffdata, &pos, b);
+        TEMPLATE(CAT_ENDIAN(convertWrite), u16)(buffdata, &pos, c);
+        TEMPLATE(CAT_ENDIAN(convertWrite), u8 )(buffdata, &pos, d);
+        TEMPLATE(CAT_ENDIAN(convertWrite), i32)(buffdata, &pos, inner);
+
+        for(int i = 0; i < RAW_P_DMA_TEST_ARR_SIZE; ++i) {
+            TEMPLATE(CAT_ENDIAN(convertWrite), u32)(buffdata, &pos, arr1[i]);
+        }
+
+        RawParser_Frame_t* Txframe = RawParser_dma_shieldFrame(desc, buffdata, pos);
+
+        if(Txframe == NULL) {
+            return 1;
+        }
+
+        for(int i = 0; i < Txframe->size; ++i) {
+            RawParser_dma_receiveByte(desc, Txframe->data[i]);
+        }
+
+        // receiving packet -------------------------------------------------------------------------------
+        RawParser_Frame_t* Rxframe = RawParser_dma_proceed(desc);
+
+        if(Rxframe && Rxframe->size != 0) {
+            pos = 0;
+
+            i32 CHK_a = TEMPLATE(CAT_ENDIAN(convertRead), i32)(Rxframe->data, &pos);
+            reg CHK_b = TEMPLATE(CAT_ENDIAN(convertRead), reg)(Rxframe->data, &pos);
+            u16 CHK_c = TEMPLATE(CAT_ENDIAN(convertRead), u16)(Rxframe->data, &pos);
+            u8  CHK_d = TEMPLATE(CAT_ENDIAN(convertRead), u8 )(Rxframe->data, &pos);
+            i32 CHK_inner = TEMPLATE(CAT_ENDIAN(convertRead), i32)(Rxframe->data, &pos);
+            u32 CHK_arr1[RAW_P_DMA_TEST_ARR_SIZE];
+
+            for(int i = 0; i < RAW_P_DMA_TEST_ARR_SIZE; ++i) {
+                CHK_arr1[i] = TEMPLATE(CAT_ENDIAN(convertRead), u32)(Rxframe->data, &pos);
+            }
+
+            if(CHK_a != a || CHK_b != b || CHK_c != c || CHK_d != d || CHK_inner != inner) {
+                byteReceiveCompl++;
+            }
+
+            byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr1, (c8*)arr1);
+        } else {
+            byteReceiveCompl++;
+        }
+    }
+
+#undef RAW_P_DMA_TEST_ARR_SIZE
+
+    printf("\ntest exit with error: %d\n---------------------------RAW PARSER DMA CONVERT (SLOW) END ------------------------\n", byteReceiveCompl);
     return byteReceiveCompl;
 }
 
@@ -270,8 +356,8 @@ int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTe
         }
     }
 
-    receiveTransmittMacroWriteReadDmaTest(prot, randTestCount);
-
+    errorCounter += receiveTransmittMacroWriteReadDmaTest(prot, randTestCount);
+    errorCounter += receiveTransmittConvertDmaTest(prot, randTestCount);
 
     printf("\n----------RAW PARSER DMA TEST FINISHED!!!-------------------------\nRAW_PARSER_DMA EXIT WITH ERROR: %d\n", errorCounter);
     printf("PACKET COUNTER: %d\n", randTestCount * 2);
@@ -286,3 +372,5 @@ int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTe
 
     return errorCounter;
 }
+
+#endif /* D_RAW_P_TEST_DISABLE */

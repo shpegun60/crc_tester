@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     quint8 data[100];
     reg pos = 0;
 
-    //crc_test(time(NULL), 500);
+    crc_test(time(NULL), 500);
 
     endiansTest();
     //__M_assert_test();
