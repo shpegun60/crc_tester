@@ -30,6 +30,7 @@
 #include <preprocessor/preprocessor_symbol.h>
 #include <preprocessor/preprocessor_template.h>
 #include <preprocessor/preprocessor_tuple.h>
+#include <preprocessor/preprocessor_type_eq.h>
 
 
 

@@ -107,7 +107,7 @@ void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* va
  * ****************************************
  */
 
-int convertTest();
+int convertTest(int testCount, int randomSeed);
 #endif /* CONVERT_TEST_DISABLE */
 
 

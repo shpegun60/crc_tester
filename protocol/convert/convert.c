@@ -1,5 +1,4 @@
 #include "convert.h"
-#include <stdio.h>
 
 #ifdef T
 #undef T
@@ -202,7 +201,7 @@ void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* va
 //---------TEST----------------------------------------------------------
 #ifndef CONVERT_TEST_DISABLE
 
-#define CONVERT_RAND_TEST_COUNT 50000
+#include <stdio.h>
 
 
 /*
@@ -396,9 +395,9 @@ int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, uni) (void (*read_ptr)(reg 
 
 
 
-__attribute__((unused)) static int TEMPLATE(convertTest, uni) (int testN)
+__attribute__((unused)) static int TEMPLATE(convertTest, uni) (int testN, int randomSeed)
 {
-    srand(sizeof(reg)); // use type size as seed for random generator
+    srand(sizeof(reg) + randomSeed); // use type size as seed for random generator
 
     u64 value = (u64)(sizeof(u64));
     u64 valueLast = 0;
@@ -452,81 +451,81 @@ __attribute__((unused)) static int TEMPLATE(convertTest, uni) (int testN)
 }
 
 
-int convertTest()
+int convertTest(int testCount, int randomSeed)
 {
     int convertTestcnt = 0;
 
-    printf("\n\nCONVERT TEST START--> randon cnt: %d------------------------------------------\n", CONVERT_RAND_TEST_COUNT);
-    int test = TEMPLATE(convertTest, u8)(CONVERT_RAND_TEST_COUNT);
+    printf("\n\nCONVERT TEST START--> randon cnt: %d------------------------------------------\n", testCount);
+    int test = TEMPLATE(convertTest, u8)(testCount, randomSeed);
     printf("u8 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, u16)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, u16)(testCount, randomSeed);
     printf("u16 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, u24)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, u24)(testCount, randomSeed);
     printf("u24 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, u32)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, u32)(testCount, randomSeed);
     printf("u32 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, u64)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, u64)(testCount, randomSeed);
     printf("u64 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, c8)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, c8)(testCount, randomSeed);
     printf("c8 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, i8)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, i8)(testCount, randomSeed);
     printf("i8 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, i16)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, i16)(testCount, randomSeed);
     printf("i16 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, i24)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, i24)(testCount, randomSeed);
     printf("i24 test exit with error: %d\n", test);
     convertTestcnt += test;
 
 
-    test = TEMPLATE(convertTest, i32)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, i32)(testCount, randomSeed);
     printf("i32 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, i64)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, i64)(testCount, randomSeed);
     printf("i64 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, f32)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, f32)(testCount, randomSeed);
     printf("f32 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, f64)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, f64)(testCount, randomSeed);
     printf("f64 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, f128)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, f128)(testCount, randomSeed);
     printf("f128 test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, b)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, b)(testCount, randomSeed);
     printf("b test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, reg)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, reg)(testCount, randomSeed);
     printf("reg test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, sreg)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, sreg)(testCount, randomSeed);
     printf("sreg test exit with error: %d\n", test);
     convertTestcnt += test;
 
-    test = TEMPLATE(convertTest, uni)(CONVERT_RAND_TEST_COUNT);
+    test = TEMPLATE(convertTest, uni)(testCount, randomSeed);
     printf("universal test exit with error: %d\n", test);
     convertTestcnt += test;
     printf("CONVERT TEST FINISHED!!!------------------------------------------\n");

@@ -11,8 +11,6 @@ Write your code in this editor and press "Run" button to compile and execute it.
 #ifndef _MY_CRC_TEST_DISABLE
 
 #include <stdlib.h>
-
-
 #include <stdio.h>
 
 #include "crc8.h"

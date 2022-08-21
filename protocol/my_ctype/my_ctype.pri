@@ -7,4 +7,5 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/my_ctype_cast.h \
+    $$PWD/my_ctype_id.h \
     $$PWD/my_ctypes.h\

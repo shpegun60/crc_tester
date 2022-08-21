@@ -1,7 +1,5 @@
 #include "byte_order.h"
 
-#include <stdio.h>
-#include <inttypes.h>
 
 /*
  * ********************************************************
@@ -58,7 +56,18 @@ C_INLINE f64 LittleEndianF64(f64 value);
 C_INLINE f64 BigEndianF64(f64 value);
 //---------------------------------------------------------
 
+
+
+
+/*
+ * ******************************************
+ * test
+ * ******************************************
+ */
 #ifndef BYTE_ORDER_TEST_DISABLE
+
+#include <stdio.h>
+#include <inttypes.h>
 
 __attribute__((unused)) static int byteOrderRevCheck(void * source, void * destination, int len)
 {
@@ -663,7 +672,6 @@ int endiansTest()
     fflush(stdout);
     return !test_passed;
 }
+
+
 #endif /* BYTE_ORDER_TEST_DISABLE */
-
-
-#undef C99MY_ENDIAN_STATIC_ASSERTION_CREATE

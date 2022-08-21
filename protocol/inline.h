@@ -1,5 +1,5 @@
 #ifndef __INLINE_H__
-#define __INLINE_H__
+#define __INLINE_H__ 1
 /*
  * This library implemented for support external inline linkage for different compilers:
  * - GNU C(gnu89)

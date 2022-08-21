@@ -10,7 +10,7 @@
  *  1) known input data --> "123456789" and compleate with CRCXCHECK
  *  2) random length & random data test
  *
- *      * return 1 if test compleated, 0 - not compleated
+ *      * return 0 if test compleated, else - not compleated
  * ****************************************
  */
 

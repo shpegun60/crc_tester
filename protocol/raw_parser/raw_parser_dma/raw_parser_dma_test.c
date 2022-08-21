@@ -5,10 +5,13 @@
 
 #include "rawparser_dma.h"
 #include "rawparser_macro.h"
+#include "byte_order.h"
+#include "convert.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "convert.h"
+
 
 /**********************************************************************************************
  *

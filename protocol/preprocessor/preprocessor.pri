@@ -18,6 +18,7 @@ HEADERS += \
     $$PWD/preprocessor_div.h \
     $$PWD/preprocessor_if.h \
     $$PWD/preprocessor_keyword_eq.h \
+    $$PWD/preprocessor_type_eq.h \
     $$PWD/preprocessor_logical.h \
     $$PWD/preprocessor_map.h \
     $$PWD/preprocessor_nat_eq.h \

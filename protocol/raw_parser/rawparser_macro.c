@@ -38,6 +38,7 @@ void rawPTestWriteType(u8* desc, reg totalLenInByte, reg typelenInByte, u8 *data
 }
 
 
+
 int rawParserMacroTest()
 {
     printf("\n------------- RAW_PARSER_MACRO_TEST -----------------------------\n");
@@ -82,6 +83,12 @@ int rawParserMacroTest()
                         }, a, b, c, $STATIC_ARRAY, arr, $POINTER, 11, arr3_ptr, $CONST, 123, i32);
 
     printf("\n------------- END OF RAW_PARSER_MACRO_TEST -----------------------------\n");
+
+
+    MY_CTYPE_GET_TYPE(UINT8_TYPE) vvv = 0;
+
+    (void)vvv;
+    printf("detect type: %s\n", PREPROCESSOR_STRINGIFY_VARIADIC( MY_CTYPE_GET_TYPE_ID(b) ) );
 
 
 

@@ -2,10 +2,9 @@
 #define __RAWPARSER_MACRO_H__
 
 #include "rawparser_port.h"
+#include "preprocessor.h"
 #include "my_ctypes.h"
-#include "byte_order.h"
 
-#include <preprocessor/preprocessor.h>
 #include <stdio.h>
 
 

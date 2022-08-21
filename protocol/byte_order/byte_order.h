@@ -2,7 +2,7 @@
 #define __BYTE_ORDER_H__
 
 #include "my_ctypes.h"
-#include <preprocessor/preprocessor_concatenation.h>
+#include "preprocessor_concatenation.h"
 
 #ifndef BYTE_ORDER_TEST_DISABLE
     //#define BYTE_ORDER_TEST_DISABLE
@@ -46,15 +46,18 @@
 #endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
 
 
-
-//------------------------------------------------------------------------
+/*
+ * ******************************************
+ * test
+ * ******************************************
+ */
 
 #ifndef BYTE_ORDER_TEST_DISABLE
 
 /*
  * ****************************************
  * dataset read/write test for bytes order
- *  * return 1 if test compleated, 0 - not compleated
+ *  * return 0 if test compleated, else - not compleated
  * ****************************************
  */
 int endiansTest();

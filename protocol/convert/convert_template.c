@@ -1,9 +1,6 @@
-#include <preprocessor/preprocessor_template.h>
+#include "preprocessor_template.h"
 #include "my_ctypes.h"
 
-#ifndef CONVERT_TEST_DISABLE
-#include <stdlib.h>
-#endif /* CONVERT_TEST_DISABLE */
 
 #ifndef T
 #define T int
@@ -176,13 +173,16 @@ void TEMPLATE(convertWriteCheck_cpos_MSB, T) (u8* data, reg pos, T value, reg bu
 }
 
 
-#ifndef CONVERT_TEST_DISABLE
 
 /*
  * ******************************************
  * test
  * ******************************************
  */
+#ifndef CONVERT_TEST_DISABLE
+
+#include <stdlib.h>
+
 
 int TEMPLATE(convertTest_WRITE_READ, T) (T (*read_ptr)(u8* data, reg * pos), void (*write_ptr)(u8* data, reg* pos, T value), T value)
 {
@@ -369,9 +369,9 @@ int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, T) (T (*read_ptr)(u8* data,
 
 
 
-int TEMPLATE(convertTest, T) (int testN)
+int TEMPLATE(convertTest, T) (int testN, int randomSeed)
 {
-    srand(sizeof(T)); // use type size as seed for random generator
+    srand(sizeof(T) + randomSeed); // use type size as seed for random generator
 
     T value = (T)(sizeof(T));
     T valueLast = 0;

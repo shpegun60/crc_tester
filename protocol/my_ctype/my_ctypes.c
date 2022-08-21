@@ -32,8 +32,8 @@ const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH] = {
     (u8)sizeof(f128),           //LONG_DOUBLE_TYPE    ((u8) 12)
     // other types
     (u8)sizeof(b),              //BOOL_TYPE           ((u8) 13)
-    (u8)(sizeof(i24) - 0x01U),  //UINT24_TYPE         ((u8) 14)
-    (u8)(sizeof(u24) - 0x01U),  //INT24_TYPE          ((u8) 15)
+    (u8)sizeof(i24),            //UINT24_TYPE         ((u8) 14)
+    (u8)sizeof(u24),            //INT24_TYPE          ((u8) 15)
     (u8)sizeof(reg),            //REG_TYPE            ((u8) 16) // platform depend type
     (u8)sizeof(sreg)            //SREG_TYPE           ((u8) 17) // platform depend type
 };

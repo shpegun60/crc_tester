@@ -5,6 +5,8 @@
 #include <stdint.h>
 
 #include "inline.h"
+#include "my_ctype_id.h"
+
 
 
 // all types. Commit this if types defines upper--------------------------
@@ -37,33 +39,6 @@ typedef unsigned char   b;
 typedef size_t      reg;    // platform depend type
 typedef ptrdiff_t   sreg;   // platform depend type
 //------------------------------------------------------------------
-
-
-// types mapping ------------------------------------------
-#define VOID_TYPE 			((u8) 0)
-// unsigned type
-#define UINT8_TYPE  		((u8) 1)
-#define UINT16_TYPE 		((u8) 2)
-#define UINT32_TYPE 		((u8) 3)
-#define UINT64_TYPE 		((u8) 4)
-//signed type
-#define CHAR_TYPE 			((u8) 5)
-#define INT8_TYPE 			((u8) 6)
-#define INT16_TYPE 			((u8) 7)
-#define INT32_TYPE 			((u8) 8)
-#define INT64_TYPE 			((u8) 9)
-// floating point type
-#define FLOAT_TYPE 			((u8) 10)
-#define DOUBLE_TYPE 		((u8) 11)
-#define LONG_DOUBLE_TYPE 	((u8) 12) // platform depend type
-// other types
-#define BOOL_TYPE 			((u8) 13)
-#define UINT24_TYPE 		((u8) 14)
-#define INT24_TYPE 			((u8) 15)
-#define REG_TYPE 			((u8) 16) // platform depend type
-#define SREG_TYPE 			((u8) 17) // platform depend type
-#define TYPE_ARRAY_LENGTH   ((u8)(SREG_TYPE + 1))
-//--------------------------------------------------------
 
 
 /*
