@@ -1,5 +1,5 @@
 #ifndef __MY_C_TYPES_H__
-#define __MY_C_TYPES_H__
+#define __MY_C_TYPES_H__ 1
 
 #include <stddef.h>
 #include <stdint.h>

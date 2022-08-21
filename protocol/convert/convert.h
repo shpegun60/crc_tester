@@ -1,5 +1,5 @@
 #ifndef __CONVERT_H__
-#define __CONVERT_H__
+#define __CONVERT_H__ 1
 
 #ifdef T
     #undef T

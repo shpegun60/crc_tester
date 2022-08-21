@@ -1,5 +1,5 @@
 #ifndef __RAWPARSER_MACRO_H__
-#define __RAWPARSER_MACRO_H__
+#define __RAWPARSER_MACRO_H__ 1
 
 #include "rawparser_port.h"
 #include "preprocessor.h"

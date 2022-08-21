@@ -1,5 +1,5 @@
 #ifndef __CRC8_DALLAS_MAXIM_H__
-#define __CRC8_DALLAS_MAXIM_H__
+#define __CRC8_DALLAS_MAXIM_H__ 1
 
 #include "my_crc_port.h"
 

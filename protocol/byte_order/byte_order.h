@@ -1,5 +1,5 @@
 #ifndef __BYTE_ORDER_H__
-#define __BYTE_ORDER_H__
+#define __BYTE_ORDER_H__ 1
 
 #include "my_ctypes.h"
 #include "preprocessor_concatenation.h"

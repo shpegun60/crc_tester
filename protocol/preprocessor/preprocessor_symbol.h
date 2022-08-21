@@ -4,8 +4,8 @@
  *   SYMBOL MACROCES
  */
 
-#ifndef PREPROCESSOR_SYMBOL_H
-#define PREPROCESSOR_SYMBOL_H 
+#ifndef __PREPROCESSOR_SYMBOL_H__
+#define __PREPROCESSOR_SYMBOL_H__ 1
 
 /* -- Headers -- */
 
@@ -78,4 +78,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PREPROCESSOR_SYMBOL_H */
+#endif /* __PREPROCESSOR_SYMBOL_H__ */

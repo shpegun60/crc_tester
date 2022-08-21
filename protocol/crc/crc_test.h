@@ -1,5 +1,5 @@
 #ifndef __MY_CRC_TEST_H__
-#define __MY_CRC_TEST_H__
+#define __MY_CRC_TEST_H__ 1
 
 #include "my_crc_port.h"
 

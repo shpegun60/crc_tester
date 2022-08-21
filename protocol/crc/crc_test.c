@@ -7,6 +7,7 @@ Write your code in this editor and press "Run" button to compile and execute it.
 *******************************************************************************/
 
 #include "crc_test.h"
+#include <inttypes.h>
 
 #ifndef _MY_CRC_TEST_DISABLE
 
@@ -98,7 +99,7 @@ int crc_test(unsigned int randomSeed, int randomTestCnt)
     printf("\ncheck test CRC64 exit with error: %d", not_passed64);
 
     crc64_matched_with_test = (resCrc64 == CRC64CHECK);
-    printf("\nCRC64 is matched with test 0x%llx: %d", CRC64CHECK, crc64_matched_with_test);
+    printf("\nCRC64 is matched with test 0x%" PRIx64 ": %d", CRC64CHECK, crc64_matched_with_test);
 
     if(!crc64_matched_with_test) {
         ++not_passed64;
@@ -235,7 +236,7 @@ int crc_test(unsigned int randomSeed, int randomTestCnt)
 #endif /* _MY_CRC32_ENA */
 
 #ifdef _MY_CRC64_ENA
-    printf("\nCRC64 is matched with test 0x%llx: %d", CRC64CHECK, crc64_matched_with_test);
+    printf("\nCRC64 is matched with test 0x%" PRIx64 ": %d", CRC64CHECK, crc64_matched_with_test);
     printf("\nrandom test CRC64 exit with error: %d\n", not_passed64);
 #else
     printf("\nCRC64 is disabled\n");

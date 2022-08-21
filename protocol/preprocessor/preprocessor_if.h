@@ -4,8 +4,8 @@
  *  PREPROCESSOR IF, IF_ELSE MACROCES
  */
 
-#ifndef PREPROCESSOR_IF_H
-#define PREPROCESSOR_IF_H 1
+#ifndef __PREPROCESSOR_IF_H__
+#define __PREPROCESSOR_IF_H__ 1
 
 /* -- Headers -- */
 
@@ -60,4 +60,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PREPROCESSOR_IF_H */
+#endif /* __PREPROCESSOR_IF_H__ */

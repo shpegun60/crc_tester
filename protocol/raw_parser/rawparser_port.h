@@ -1,5 +1,5 @@
 #ifndef __RAW_PARSER_DMA_PORT_H__
-#define __RAW_PARSER_DMA_PORT_H__
+#define __RAW_PARSER_DMA_PORT_H__ 1
 
 #include "my_ctypes.h"
 

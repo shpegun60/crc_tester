@@ -1,5 +1,5 @@
 #ifndef __RAW_PARSER_DMA_FUSION_H__
-#define __RAW_PARSER_DMA_FUSION_H__
+#define __RAW_PARSER_DMA_FUSION_H__ 1
 
 #include "rawparser_port.h"
 #include "smart_assert.h"

@@ -1,5 +1,5 @@
 #ifndef __CRC_32_B_H__
-#define __CRC_32_B_H__
+#define __CRC_32_B_H__ 1
 
 #include "my_crc_port.h"
 

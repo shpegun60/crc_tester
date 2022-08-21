@@ -1,5 +1,5 @@
 #ifndef __CRC_16_T10_DIF_H__
-#define __CRC_16_T10_DIF_H__
+#define __CRC_16_T10_DIF_H__ 1
 
 #include "my_crc_port.h"
 

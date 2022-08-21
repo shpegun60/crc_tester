@@ -4,8 +4,8 @@
  *  COMPLEMENT FIND MACROCES
  */
 
-#ifndef PREPROCESSOR_COMPLEMENT_H
-#define PREPROCESSOR_COMPLEMENT_H 1
+#ifndef __PREPROCESSOR_COMPLEMENT_H__
+#define __PREPROCESSOR_COMPLEMENT_H__ 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,4 +47,4 @@ extern "C" {
 }
 #endif
 
-#endif /* PREPROCESSOR_COMPLEMENT_H */
+#endif /* __PREPROCESSOR_COMPLEMENT_H__ */

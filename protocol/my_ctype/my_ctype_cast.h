@@ -1,5 +1,5 @@
 #ifndef __MY_CTYPE_CAST_H__
-#define __MY_CTYPE_CAST_H__
+#define __MY_CTYPE_CAST_H__ 1
 
 #include "my_ctypes.h"
 

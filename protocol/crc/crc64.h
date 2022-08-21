@@ -1,5 +1,5 @@
-#ifndef CRC64_H
-#define CRC64_H
+#ifndef __CRC64_H__
+#define __CRC64_H__ 1
 
 #include "my_crc_port.h"
 
@@ -87,4 +87,4 @@ u64 slow_crc64jones_byte(u64 crc, const u8 data);
 #endif /* _MY_CRC64_ENA */
 
 
-#endif
+#endif /* __CRC64_H__ */
