@@ -141,6 +141,8 @@ int rs_code_test(int randomSeed, int testCount)
     srand(randomSeed); // use current time as seed for random generator
     while(testCount--) {
 
+        printf("\n\n ----------------- ITERATION: %d ----------------------- \n", testCount);
+
         len = rand() % (256 - RSCODE_NPAR - 1);
         while(len == 0 || len_last == len) {
             len = rand() % (256 - RSCODE_NPAR - 1);

@@ -71,11 +71,11 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("\n***************************************************************************************\n");
     printf("----------->>RAWPARSER DMA TEST<<--------------------\n");
     printf("***************************************************************************************\n");
-    int RawPTest = 0;
+    int RawP_DMA_Test = 0;
 #ifndef D_RAW_P_TEST_DISABLE
     if(testFlags & TESTER_RAW_P_DMA) {
         rawParserMacroTest();
-        RawPTest = rawParserDmaTest(randomSeed, testCnt, 1);
+        RawP_DMA_Test = rawParserDmaTest(randomSeed, testCnt, 1);
     } else {
         printf("...FLAGS: RAWPARSER TEST DISABLED\n");
     }
@@ -88,7 +88,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
     printf("\n***************************************************************************************\n");
     printf("----------->>REED-SOLOMON ECC TEST<<--------------------\n");
-    printf("ERASURES ERRORS: %d, UNDEFINED POSITON ERRORS: %d \n", RSCODE_NPAR, RSCODE_NPAR/2);
+    printf("ERASURES ERRORS DETECTION (+ bytes to packet): %d, UNDEFINED POSITON ERRORS DETECTION: %d \n", RSCODE_NPAR, RSCODE_NPAR/2);
     printf("***************************************************************************************\n");
 
 
@@ -116,7 +116,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("CRC TEST EXIT WITH ERROR: %d\n", CRCtest);
     printf("ENDIAN TEST EXIT WITH ERROR: %d\n", Endianstest);
     printf("CONVERT TEST EXIT WITH ERROR: %d\n", ConvertTest);
-    printf("RAWPARSER DMA TEST EXIT WITH ERROR: %d\n", RawPTest);
+    printf("RAWPARSER DMA TEST EXIT WITH ERROR: %d\n", RawP_DMA_Test);
     printf("REED-SOLOMON TEST EXIT WITH ERROR: %d\n", Reed_Solomon_Test);
 
 

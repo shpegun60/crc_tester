@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    protocolAllTest(time(NULL), 500, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA));
+    protocolAllTest(time(NULL), 500, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC));
     //__M_assert_test();
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);

@@ -294,9 +294,9 @@ void Find_Roots (rscode_driver * driver)
  */
 
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-int correct_errors_erasures (rscode_driver * driver, unsigned char codeword[], int csize, int nerasures, int erasures[]) {
+int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize, int nerasures, int * erasures) {
 #else
-int correct_errors_erasures (rscode_driver * driver, unsigned char codeword[], int csize) {
+int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize) {
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
     int r, i, j, err;

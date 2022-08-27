@@ -19,9 +19,9 @@ void zero_poly(rscode_driver * driver, int poly[]);
 
 /* Error location routines */
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-int correct_errors_erasures (rscode_driver * driver, unsigned char codeword[], int csize, int nerasures, int erasures[]);
+int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize, int nerasures, int* erasures);
 #else
-int correct_errors_erasures (rscode_driver * driver, unsigned char codeword[], int csize);
+int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize);
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
 #ifdef __cplusplus

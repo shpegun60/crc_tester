@@ -65,6 +65,11 @@ extern "C" {
 /****************************************************************************************
  * ECC LIBS
  */
+
+#ifndef RSCODE_TEST_DISABLE
+    //#define RSCODE_TEST_DISABLE 1
+#endif /* RSCODE_TEST_DISABLE */
+
 #include "rscode-config.h"
 
 #include "rs_ecc.h"
