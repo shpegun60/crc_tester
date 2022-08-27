@@ -63,7 +63,7 @@ extern "C" {
 
 
 /****************************************************************************************
- * ECC LIBS
+ * REED - SOLOMON ECC LIB
  */
 
 #ifndef RSCODE_TEST_DISABLE

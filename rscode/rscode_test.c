@@ -190,7 +190,6 @@ int rs_code_test(int randomSeed, int testCount)
 
         errCount += rscodeDataCmp(len_last, rnd_msg, codeword);
         printf("COMPLEATE ERROR: %d\n", errCount);
-
     }
 
     printf("\n\n-----------------------------------------------\n");
