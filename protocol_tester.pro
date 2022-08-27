@@ -10,13 +10,16 @@ CONFIG += c++17
 
 
 include(protocol/protocol.pri)
+include(rscode/rscode.pri)
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+
 
 FORMS += \
     mainwindow.ui

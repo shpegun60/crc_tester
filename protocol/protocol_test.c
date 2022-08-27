@@ -85,6 +85,30 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 #endif /* D_RAW_P_TEST_DISABLE */
 
 
+
+    printf("\n***************************************************************************************\n");
+    printf("----------->>REED-SOLOMON ECC TEST<<--------------------\n");
+    printf("ERASURES ERRORS: %d, UNDEFINED POSITON ERRORS: %d \n", RSCODE_NPAR, RSCODE_NPAR/2);
+    printf("***************************************************************************************\n");
+
+
+
+    int Reed_Solomon_Test = 0;
+#ifndef RSCODE_TEST_DISABLE
+    if(testFlags & TESTER_REED_SOLOMON_ECC) {
+        Reed_Solomon_Test = rs_code_test(randomSeed, testFlags);
+    } else {
+        printf("...FLAGS: REED-SOLOMON TEST DISABLED\n");
+    }
+
+#else
+    printf("...DEFINE: REED-SOLOMON TEST DISABLED\n");
+#endif /* RSCODE_TEST_DISABLE */
+
+
+
+
+
     printf("\n***************************************************************************************\n");
     printf("----------->>RESULTS<<--------------------\n");
     printf("***************************************************************************************\n");
@@ -93,6 +117,8 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("ENDIAN TEST EXIT WITH ERROR: %d\n", Endianstest);
     printf("CONVERT TEST EXIT WITH ERROR: %d\n", ConvertTest);
     printf("RAWPARSER DMA TEST EXIT WITH ERROR: %d\n", RawPTest);
+    printf("REED-SOLOMON TEST EXIT WITH ERROR: %d\n", Reed_Solomon_Test);
+
 
 
 

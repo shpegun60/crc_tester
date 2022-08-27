@@ -62,6 +62,18 @@ extern "C" {
 
 
 
+/****************************************************************************************
+ * ECC LIBS
+ */
+#include "rscode-config.h"
+
+#include "rs_ecc.h"
+#include "rs.h"
+#include "berlekamp.h"
+
+#include "rscode_test.h"
+
+
 #ifdef __cplusplus
 }
 #endif
