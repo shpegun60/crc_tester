@@ -38,6 +38,20 @@
     #define D_RAW_P_LEN_SEPARATOR (u8)(0xFBU)
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
+/*
+***************************************************************************************************
+   SUPPORT REED-SOLOMON ECC CORECTION (ADDS SOME PARITY BYTES TO DATA)
+***************************************************************************************************
+*/
+
+#ifndef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    #define D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+#include "rs_ecc.h"
+#include "rs.h"
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
 
 /*
@@ -57,14 +71,14 @@ typedef struct {
 ***************************************************************************************************
 */
 
-#define D_RAW_P_CRC_ENA
+//#define D_RAW_P_CRC_ENA
 
 #ifdef D_RAW_P_CRC_ENA
 
-    //#define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
+    #define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
-    #define D_RAW_P_USE_CRC64               // enable crc64, check if multiple use crc then error
+    //#define D_RAW_P_USE_CRC64               // enable crc64, check if multiple use crc then error
 
 #endif /* D_RAW_P_CRC_ENA */
 

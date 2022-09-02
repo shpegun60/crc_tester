@@ -16,7 +16,7 @@ void rs_zero_fill_from (unsigned char * buf, int from, int to);
 
 void rs_decode_data (rscode_driver * driver, unsigned char *data, int nbytes);
 void rs_encode_data (rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
-void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int nbytes, int* pos);
+void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int nbytes);
 
 
 

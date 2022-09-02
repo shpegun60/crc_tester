@@ -39,7 +39,11 @@ static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_
     RawParser_Frame_t* Rxframe = RawParser_dma_proceed(desc);
 
     if(Rxframe && Rxframe->size != 0) {
-        byteReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
+        if(Rxframe->size != size) {
+            byteReceiveCompl++;
+        } else {
+            byteReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
+        }
     } else {
         byteReceiveCompl++;
     }
@@ -59,7 +63,11 @@ static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_
 
     Rxframe = RawParser_dma_proceed(desc);
     if(Rxframe && Rxframe->size != 0) {
-        arrReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
+        if(Rxframe->size != size) {
+            byteReceiveCompl++;
+        } else {
+            arrReceiveCompl += cTypeStrnCmp(size, (c8*)data, (c8*)Rxframe->data);
+        }
     } else {
         arrReceiveCompl++;
     }
@@ -183,10 +191,23 @@ static int receiveTransmittMacroWriteReadDmaTest(RawParser_dma_t* desc, int rand
 
         // transmitting packet -------------------------------------------------------------------------------
         RawParser_Frame_t* Txframe = NULL;
+        reg totSize;
 
         WRITE_PAYLOAD_MACRO(RawParser_dma_universalWrite, desc, {
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+                                rs_encode_data_continious_start(&desc->rs_ecc);
+                                RawParser_dma_startTransmittPacket(desc, totalSize + RSCODE_NPAR);
+#else
                                 RawParser_dma_startTransmittPacket(desc, totalSize);
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
+                                totSize = totalSize;
                             }, {
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+                                for (int i = 0; i < RSCODE_NPAR; ++i) {
+                                    RawParser_dma_addTxByteCRC(desc, desc->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
+                                }
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
                                 Txframe = RawParser_dma_finishTransmittPacket(desc);
                             }, a, b, c, d, $STATIC_ARRAY, arr1, $CONST, inner, i32, $POINTER, 10, arr3_ptr);
 
@@ -212,18 +233,23 @@ static int receiveTransmittMacroWriteReadDmaTest(RawParser_dma_t* desc, int rand
         RawParser_Frame_t* Rxframe = RawParser_dma_proceed(desc);
 
         if(Rxframe && Rxframe->size != 0) {
-            READ_PAYLOAD_MACRO(RawParser_dma_universalRead, desc, {
-                                   desc->uniRXPosition = 0;
-                               }, {
-                                   CHK_inner = const_5;
-                               }, CHK_a, CHK_b, CHK_c, CHK_d, $STATIC_ARRAY, CHK_arr1, $CONST, inner, i32, $POINTER, RAW_P_DMA_TEST_ARR_SIZE, CHK_arr3_ptr);
-
-            if(CHK_a != a || CHK_b != b || CHK_c != c || CHK_d != d || CHK_inner != inner) {
+            if(totSize != Rxframe->size) {
                 byteReceiveCompl++;
+            } else {
+                READ_PAYLOAD_MACRO(RawParser_dma_universalRead, desc, {
+                                       desc->uniRXPosition = 0;
+                                   }, {
+                                       CHK_inner = const_5;
+                                   }, CHK_a, CHK_b, CHK_c, CHK_d, $STATIC_ARRAY, CHK_arr1, $CONST, inner, i32, $POINTER, RAW_P_DMA_TEST_ARR_SIZE, CHK_arr3_ptr);
+
+                if(CHK_a != a || CHK_b != b || CHK_c != c || CHK_d != d || CHK_inner != inner) {
+                    byteReceiveCompl++;
+                }
+
+                byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr1, (c8*)arr1);
+                byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr3_ptr, (c8*)arr3_ptr);
             }
 
-            byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr1, (c8*)arr1);
-            byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr3_ptr, (c8*)arr3_ptr);
 
         } else {
             byteReceiveCompl++;
@@ -290,24 +316,30 @@ static int receiveTransmittConvertDmaTest(RawParser_dma_t* desc, int randTestCou
         RawParser_Frame_t* Rxframe = RawParser_dma_proceed(desc);
 
         if(Rxframe && Rxframe->size != 0) {
-            pos = 0;
 
-            i32 CHK_a = TEMPLATE(CAT_ENDIAN(convertRead), i32)(Rxframe->data, &pos);
-            reg CHK_b = TEMPLATE(CAT_ENDIAN(convertRead), reg)(Rxframe->data, &pos);
-            u16 CHK_c = TEMPLATE(CAT_ENDIAN(convertRead), u16)(Rxframe->data, &pos);
-            u8  CHK_d = TEMPLATE(CAT_ENDIAN(convertRead), u8 )(Rxframe->data, &pos);
-            i32 CHK_inner = TEMPLATE(CAT_ENDIAN(convertRead), i32)(Rxframe->data, &pos);
-            u32 CHK_arr1[RAW_P_DMA_TEST_ARR_SIZE];
-
-            for(int i = 0; i < RAW_P_DMA_TEST_ARR_SIZE; ++i) {
-                CHK_arr1[i] = TEMPLATE(CAT_ENDIAN(convertRead), u32)(Rxframe->data, &pos);
-            }
-
-            if(CHK_a != a || CHK_b != b || CHK_c != c || CHK_d != d || CHK_inner != inner) {
+            if(pos != Rxframe->size) {
                 byteReceiveCompl++;
-            }
+            } else {
 
-            byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr1, (c8*)arr1);
+                pos = 0;
+
+                i32 CHK_a = TEMPLATE(CAT_ENDIAN(convertRead), i32)(Rxframe->data, &pos);
+                reg CHK_b = TEMPLATE(CAT_ENDIAN(convertRead), reg)(Rxframe->data, &pos);
+                u16 CHK_c = TEMPLATE(CAT_ENDIAN(convertRead), u16)(Rxframe->data, &pos);
+                u8  CHK_d = TEMPLATE(CAT_ENDIAN(convertRead), u8 )(Rxframe->data, &pos);
+                i32 CHK_inner = TEMPLATE(CAT_ENDIAN(convertRead), i32)(Rxframe->data, &pos);
+                u32 CHK_arr1[RAW_P_DMA_TEST_ARR_SIZE];
+
+                for(int i = 0; i < RAW_P_DMA_TEST_ARR_SIZE; ++i) {
+                    CHK_arr1[i] = TEMPLATE(CAT_ENDIAN(convertRead), u32)(Rxframe->data, &pos);
+                }
+
+                if(CHK_a != a || CHK_b != b || CHK_c != c || CHK_d != d || CHK_inner != inner) {
+                    byteReceiveCompl++;
+                }
+
+                byteReceiveCompl += cTypeStrnCmp(RAW_P_DMA_TEST_ARR_SIZE, (c8*)CHK_arr1, (c8*)arr1);
+            }
         } else {
             byteReceiveCompl++;
         }

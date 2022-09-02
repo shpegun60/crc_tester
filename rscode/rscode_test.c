@@ -159,7 +159,8 @@ static int rs_code_only_par_func_test(rscode_driver * drv, int testCount)
         }
 
         /* Encode data into codeword, adding NPAR parity bytes */
-        rs_encode_data_onlyParity(drv, rnd_msg, len_last, &pos);
+        rs_encode_data_onlyParity(drv, rnd_msg, len_last);
+        rs_encode_data_continious_end(drv, rnd_msg, &pos);
         rscodePrintArray((unsigned char *)"Encoded -->", rnd_msg, len_last/* + RSCODE_NPAR*/);
 
         int nErrors = rand() % (RSCODE_NPAR / 2);

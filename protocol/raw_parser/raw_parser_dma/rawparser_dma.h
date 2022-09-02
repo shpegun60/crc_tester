@@ -40,6 +40,12 @@ typedef struct {
     RawParser_Frame_t TX;
     RawParser_Frame_t RX;
     u32 uniRXPosition; // value for universal read position function
+
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    rscode_driver rs_ecc;
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
 } RawParser_dma_t;
 
 // new / delete functions----------------------------------------------

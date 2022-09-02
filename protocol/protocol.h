@@ -18,21 +18,21 @@ extern "C" {
 
 // BYTE ORDER LIB--------------------------------------
 #ifndef BYTE_ORDER_TEST_DISABLE
-    //#define BYTE_ORDER_TEST_DISABLE
+    //#define BYTE_ORDER_TEST_DISABLE 1
 #endif /* BYTE_ORDER_TEST_DISABLE */
 
 #include "byte_order.h"
 
 // CONVERTER LIB--------------------------------------
 #ifndef CONVERT_TEST_DISABLE
-    //#define CONVERT_TEST_DISABLE
+    //#define CONVERT_TEST_DISABLE 1
 #endif /* CONVERT_TEST_DISABLE */
 
 #include "convert.h"
 
 // CRC8/16/32/64 LIB--------------------------------------
 #ifndef _MY_CRC_TEST_DISABLE
-    //#define _MY_CRC_TEST_DISABLE
+    //#define _MY_CRC_TEST_DISABLE 1
 #endif /* _MY_CRC_TEST_DISABLE */
 
 #include "my_crc_port.h"
@@ -50,7 +50,7 @@ extern "C" {
  */
 
 #ifndef D_RAW_P_TEST_DISABLE
-    //#define D_RAW_P_TEST_DISABLE
+    //#define D_RAW_P_TEST_DISABLE 1
 #endif /* D_RAW_P_TEST_DISABLE */
 
 #include "rawparser_port.h"

@@ -213,7 +213,7 @@ void rs_encode_data(rscode_driver * driver, unsigned char *msg, int nbytes, unsi
     rs_build_codeword(driver, msg, nbytes, dst);
 }
 
-void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int nbytes, int* pos)
+void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int nbytes)
 {
     int i,dbyte, j;
 
@@ -229,8 +229,6 @@ void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int n
         }
         driver->pBytes[0] = gmult(driver, driver->genPoly[0], dbyte);
     }
-
-    rs_encode_data_continious_end(driver, msg, pos);
 }
 
 

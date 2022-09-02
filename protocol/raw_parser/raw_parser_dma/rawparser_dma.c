@@ -96,6 +96,11 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
 
     self->uniRXPosition = 0;
 
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    rs_initialize_ecc(&self->rs_ecc);
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
     return self;
 }
 
@@ -356,6 +361,15 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
         ++self->m_receiveReadPos;
 
         if(self->RX.size != 0) {
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+            if(self->RX.size > RSCODE_NPAR) {
+                /* Now decode -- encoded codeword size must be passed */
+                rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);
+                self->RX.size -= RSCODE_NPAR;
+            } else {
+                self->RX.size = 0;
+            }
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
             return &self->RX;
         }
     }
@@ -372,10 +386,26 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* da
                        return &self->TX;
                    }, "RawParser_dma_shieldFrame: No valid input");
 
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    RawParser_dma_startTransmittPacket(self, (len + RSCODE_NPAR));
+
+    rs_encode_data_onlyParity(&self->rs_ecc, data, len);
+#else
     RawParser_dma_startTransmittPacket(self, len);
+
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
     while(len--) {
         RawParser_dma_addTxByteCRC(self, *data++);
     }
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    for (int i = 0; i < RSCODE_NPAR; ++i) {
+        RawParser_dma_addTxByteCRC(self, self->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
+    }
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
     return RawParser_dma_finishTransmittPacket(self);
 }
 
@@ -470,16 +500,29 @@ void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByt
     M_Assert_Break((self == (RawParser_dma_t*)NULL || data == NULL), M_EMPTY, return, "RawParser_dma_universalWrite: No valid input");
 
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    for(reg i = 0; i < totalLenInByte; ++i) {
+        RawParser_dma_addTxByteCRC(self, data[i]);
+        rs_encode_data_continious_proceed(&self->rs_ecc, data[i]);
+    }
+#else
     while(totalLenInByte--) {
         RawParser_dma_addTxByteCRC(self, *data++);
     }
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
     (void)typelenInByte;
 #else /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
-    for(reg i = 0; i < totalLenInByte; i+= typelenInByte) {
+    for(reg i = 0; i < totalLenInByte; i += typelenInByte) {
         reg n = typelenInByte;
         while(n--) {
             RawParser_dma_addTxByteCRC(self, *(data + n + i));
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+            rs_encode_data_continious_proceed(&self->rs_ecc, *(data + n + i));
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
         }
     }
 #endif /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
