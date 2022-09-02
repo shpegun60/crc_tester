@@ -53,9 +53,6 @@ extern "C" {
 #include "rscode-config.h"
 #include <inttypes.h>
 
-#define TRUE  (1)
-#define FALSE (0)
-
 
 /* **************************************************************** */
 
@@ -88,6 +85,7 @@ typedef struct {
 void rscode_init(rscode_driver * driver);
 void rscode_encode(rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
 int rscode_decode(rscode_driver * driver, unsigned char *data, int nbytes);
+
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
 int rscode_decode_with_erasures(rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures);
 #endif

@@ -4,21 +4,24 @@
 
 void rscode_init(rscode_driver * driver)
 {
-    zero_fill_from ((unsigned char *)driver, 0, sizeof(rscode_driver));
-    initialize_ecc (driver);
+    rs_zero_fill_from ((unsigned char *)driver, 0, sizeof(rscode_driver));
+    rs_initialize_ecc (driver);
 }
 
 void rscode_encode(rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst)
 {
-    encode_data(driver, msg, nbytes,dst);
+    rs_encode_data(driver, msg, nbytes, dst);
 }
 
 int rscode_decode(rscode_driver * driver, unsigned char *data, int nbytes)
 {
     int ret;
 
-    decode_data(driver, data, nbytes);
-    ret = check_syndrome (driver);
+    /* Now decode -- encoded codeword size must be passed */
+    rs_decode_data(driver, data, nbytes);
+
+    /* check if syndrome is all zeros */
+    ret = rs_check_syndrome (driver);
     if(ret != 0) {
         #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
             correct_errors_erasures(driver, data, nbytes, 0, 0);
@@ -34,8 +37,8 @@ int rscode_decode(rscode_driver * driver, unsigned char *data, int nbytes)
 int rscode_decode_with_erasures(rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures)
 {
     int ret;
-    decode_data(driver, data, nbytes);
-    ret = check_syndrome (driver);
+    rs_decode_data(driver, data, nbytes);
+    ret = rs_check_syndrome (driver);
     if(ret!=0) {
         int newret = correct_errors_erasures (driver, data,
                                               nbytes,

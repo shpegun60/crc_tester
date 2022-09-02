@@ -63,6 +63,205 @@ void rscodePrintArray(const unsigned char* descr, const unsigned char* data, int
     fflush(stderr);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static int rs_code_copy_func_test(rscode_driver * drv, int testCount)
+{
+    unsigned char rnd_msg[256] = {};
+    int len = 0;
+    int len_last = 0;
+    int errCount = 0;
+
+    printf("\n\n-----------------------------------------------\n");
+    printf("rscode_encode slow test\n");
+    printf("-----------------------------------------------\n");
+
+    while(testCount--) {
+
+        printf("\n\n ----------------- ITERATION: %d ----------------------- \n", testCount);
+
+        len = rand() % (256 - RSCODE_NPAR - 1);
+        while(len == 0 || len_last == len) {
+            len = rand() % (256 - RSCODE_NPAR - 1);
+        }
+        len_last = len;
+
+
+
+        while(len--) {
+            rnd_msg[len] = rand() % 256;
+        }
+
+        /* Encode data into codeword, adding NPAR parity bytes */
+        rscode_encode(drv, rnd_msg, len_last, codeword);
+        rscodePrintArray((unsigned char *)"Encoded -->", codeword, len_last/* + RSCODE_NPAR*/);
+
+        int nErrors = rand() % (RSCODE_NPAR / 2);
+        while(nErrors == 0) {
+            nErrors = rand() % (RSCODE_NPAR / 2);
+        }
+
+        printf("Make Error: %d\n", nErrors);
+        while(nErrors--) {
+            int pos = rand() % len_last;
+            codeword[pos] = rand() % 256;
+        }
+
+        rscodePrintArray((unsigned char *)"WITH ERRORS -->", codeword, len_last/* + RSCODE_NPAR*/);
+
+        /* Now decode -- encoded codeword size must be passed */
+        rscode_decode(drv, codeword, len_last + RSCODE_NPAR);
+
+        rscodePrintArray((unsigned char *)"Decoded -->", codeword, len_last);
+
+        errCount += rscodeDataCmp(len_last, rnd_msg, codeword);
+        printf("COMPLEATE ERROR: %d\n", errCount);
+    }
+
+    return errCount;
+}
+
+
+static int rs_code_only_par_func_test(rscode_driver * drv, int testCount)
+{
+    unsigned char rnd_msg[256] = {};
+    unsigned char rnd_msg_CHK[256] = {};
+    int pos = 0;
+
+    int len = 0;
+    int len_last = 0;
+    int errCount = 0;
+
+    printf("\n\n-----------------------------------------------\n");
+    printf("rs_encode_data_onlyParity test\n");
+    printf("-----------------------------------------------\n");
+
+
+    while(testCount--) {
+        pos = 0;
+
+        printf("\n\n ----------------- ITERATION: %d ----------------------- \n", testCount);
+
+        len = rand() % (256 - RSCODE_NPAR - 1);
+        while(len == 0 || len_last == len) {
+            len = rand() % (256 - RSCODE_NPAR - 1);
+        }
+        len_last = len;
+
+
+
+        while(len--) {
+            rnd_msg[len] = rand() % 256;
+            ++pos;
+        }
+
+        for(int i = 0; i < len_last; ++i) {
+            rnd_msg_CHK[i] = rnd_msg[i];
+        }
+
+        /* Encode data into codeword, adding NPAR parity bytes */
+        rs_encode_data_onlyParity(drv, rnd_msg, len_last, &pos);
+        rscodePrintArray((unsigned char *)"Encoded -->", rnd_msg, len_last/* + RSCODE_NPAR*/);
+
+        int nErrors = rand() % (RSCODE_NPAR / 2);
+        while(nErrors == 0) {
+            nErrors = rand() % (RSCODE_NPAR / 2);
+        }
+
+        printf("Make Error: %d\n", nErrors);
+        while(nErrors--) {
+            int pos_in = rand() % len_last;
+            rnd_msg[pos_in] = rand() % 256;
+        }
+
+        rscodePrintArray((unsigned char *)"WITH ERRORS -->", rnd_msg, len_last/* + RSCODE_NPAR*/);
+
+        /* Now decode -- encoded codeword size must be passed */
+        rscode_decode(drv, rnd_msg, len_last + RSCODE_NPAR);
+
+        rscodePrintArray((unsigned char *)"Decoded -->", rnd_msg, len_last);
+
+        errCount += rscodeDataCmp(len_last, rnd_msg, rnd_msg_CHK);
+        printf("COMPLEATE ERROR: %d\n", errCount);
+    }
+
+    return errCount;
+}
+
+
+static int rs_code_only_continious_func_test(rscode_driver * drv, int testCount)
+{
+    unsigned char rnd_msg[256] = {};
+    unsigned char rnd_msg_CHK[256] = {};
+    int pos = 0;
+
+    int len = 0;
+    int len_last = 0;
+    int errCount = 0;
+
+    printf("\n\n-----------------------------------------------\n");
+    printf("rs_encode continious test\n");
+    printf("-----------------------------------------------\n");
+
+
+    while(testCount--) {
+        pos = 0;
+
+        printf("\n\n ----------------- ITERATION: %d ----------------------- \n", testCount);
+
+        len = rand() % (256 - RSCODE_NPAR - 1);
+        while(len == 0 || len_last == len) {
+            len = rand() % (256 - RSCODE_NPAR - 1);
+        }
+        len_last = len;
+
+
+
+        while(len--) {
+            rnd_msg[len] = rand() % 256;
+            ++pos;
+        }
+
+        for(int i = 0; i < len_last; ++i) {
+            rnd_msg_CHK[i] = rnd_msg[i];
+        }
+
+        /* Encode data into codeword, adding NPAR parity bytes */
+        rs_encode_data_continious_start(drv);
+        for(int i = 0; i < len_last; ++i) {
+            rs_encode_data_continious_proceed(drv, rnd_msg[i]);
+        }
+        rs_encode_data_continious_end(drv, rnd_msg, &pos);
+
+        rscodePrintArray((unsigned char *)"Encoded -->", rnd_msg, len_last/* + RSCODE_NPAR*/);
+
+        int nErrors = rand() % (RSCODE_NPAR / 2);
+        while(nErrors == 0) {
+            nErrors = rand() % (RSCODE_NPAR / 2);
+        }
+
+        printf("Make Error: %d\n", nErrors);
+        while(nErrors--) {
+            int pos_in = rand() % len_last;
+            rnd_msg[pos_in] = rand() % 256;
+        }
+
+        rscodePrintArray((unsigned char *)"WITH ERRORS -->", rnd_msg, len_last/* + RSCODE_NPAR*/);
+
+        /* Now decode -- encoded codeword size must be passed */
+        rscode_decode(drv, rnd_msg, len_last + RSCODE_NPAR);
+
+        rscodePrintArray((unsigned char *)"Decoded -->", rnd_msg, len_last);
+
+        errCount += rscodeDataCmp(len_last, rnd_msg, rnd_msg_CHK);
+        printf("COMPLEATE ERROR: %d\n", errCount);
+    }
+
+    return errCount;
+}
+
+
+
+
 
 
 int rs_code_test(int randomSeed, int testCount)
@@ -71,16 +270,16 @@ int rs_code_test(int randomSeed, int testCount)
     int nerasures = 0;
     int errCount = 0;
 
-    /* Initialization the ECC library */
+    /* Initialization the RS ECC library */
     rscode_driver drv;
-    initialize_ecc (&drv);
+    rs_initialize_ecc (&drv);
 
 
     //--------------------------SIMPLE MSG TEST---------------------------------------------------------------------
     /* ************** */
 
     /* Encode data into codeword, adding NPAR parity bytes */
-    encode_data(&drv, msg, sizeof(msg), codeword);
+    rscode_encode(&drv, msg, sizeof(msg), codeword);
 
     printf("Encoded data is: \"%s\"\n", codeword);
 
@@ -104,22 +303,16 @@ int rs_code_test(int randomSeed, int testCount)
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
     erasures[nerasures++] = ML-17;
     erasures[nerasures++] = ML-19;
-#endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
-
 
     /* Now decode -- encoded codeword size must be passed */
-    decode_data(&drv, codeword, ML);
-
-    /* check if syndrome is all zeros */
-    if (check_syndrome (&drv) != 0) {
-#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-        correct_errors_erasures (&drv, codeword, ML, nerasures, erasures);
+    rscode_decode_with_erasures(&drv, codeword, ML, nerasures, erasures);
 #else
-        correct_errors_erasures (&drv, codeword, ML);
+    rscode_decode(&drv, codeword, ML);
+    (void)nerasures;
+    (void)erasures;
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
-        printf("Corrected codeword: \"%s\"\n", codeword);
-    }
+    printf("Corrected codeword: \"%s\"\n", codeword);
 
     errCount += rscodeDataCmp(sizeof(msg), msg, codeword);
     printf("TEXT COMPLEATE ERROR: %d\n", errCount);
@@ -133,70 +326,25 @@ int rs_code_test(int randomSeed, int testCount)
     fflush(stdout);
     fflush(stderr);
     printf("\n -----------------RS CODE RAND TEST ----------------------- \n");
-
-    unsigned char rnd_msg[256] = {};
-    int len = 0;
-    int len_last = 0;
-
     srand(randomSeed); // use current time as seed for random generator
-    while(testCount--) {
 
-        printf("\n\n ----------------- ITERATION: %d ----------------------- \n", testCount);
+    errCount += rs_code_copy_func_test(&drv, testCount);
+    errCount += rs_code_only_par_func_test(&drv, testCount);
+    errCount += rs_code_only_continious_func_test(&drv, testCount);
 
-        len = rand() % (256 - RSCODE_NPAR - 1);
-        while(len == 0 || len_last == len) {
-            len = rand() % (256 - RSCODE_NPAR - 1);
-        }
-        len_last = len;
-
-
-
-        while(len--) {
-            rnd_msg[len] = rand() % 256;
-        }
-
-        /* Encode data into codeword, adding NPAR parity bytes */
-        encode_data(&drv, rnd_msg, len_last, codeword);
-        rscodePrintArray((unsigned char *)"Encoded -->", codeword, len_last/* + RSCODE_NPAR*/);
-
-        int nErrors = rand() % (RSCODE_NPAR / 2);
-        while(nErrors == 0) {
-            nErrors = rand() % (RSCODE_NPAR / 2);
-        }
-
-        printf("Make Error: %d\n", nErrors);
-        while(nErrors--) {
-            int pos = rand() % len_last;
-            codeword[pos] = rand() % 256;
-        }
-
-        rscodePrintArray((unsigned char *)"WITH ERRORS -->", codeword, len_last/* + RSCODE_NPAR*/);
-
-
-        /* Now decode -- encoded codeword size must be passed */
-        decode_data(&drv, codeword,  len_last + RSCODE_NPAR);
-
-        /* check if syndrome is all zeros */
-        if (check_syndrome (&drv) != 0) {
-
-#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-            correct_errors_erasures (&drv, codeword, len_last + RSCODE_NPAR, 0, erasures);
-#else
-            correct_errors_erasures (&drv, codeword, len_last + RSCODE_NPAR);
-#endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
-
-        }
-        rscodePrintArray((unsigned char *)"Decoded -->", codeword, len_last);
-
-        errCount += rscodeDataCmp(len_last, rnd_msg, codeword);
-        printf("COMPLEATE ERROR: %d\n", errCount);
-    }
 
     printf("\n\n-----------------------------------------------\n");
     printf("RS CODECOMPLEATE ERROR: %d\n", errCount);
     printf("-----------------------------------------------\n");
 
-    return 0;
+    fflush(stdout);
+    fflush(stderr);
+
+    return errCount;
 }
+
+
+
+
 
 #endif /* RSCODE_TEST_DISABLE */

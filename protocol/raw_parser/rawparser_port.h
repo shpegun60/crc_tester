@@ -10,7 +10,7 @@
 
 /*
 ***************************************************************************************************
-    INTERNAL BUFFER SIZE (number of rawP_data_t values)
+    INTERNAL BUFFER SIZE
 ***************************************************************************************************
 */
 #define D_RAW_P_RX_BUF_SIZE 512U // rx buffer must be is power of 2, else error

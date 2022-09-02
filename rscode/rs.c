@@ -36,16 +36,16 @@
 
 #include "rs.h"
 
-static void compute_genpoly (rscode_driver * driver, int nbytes, int * genpoly);
+static void rs_compute_genpoly (rscode_driver * driver, int nbytes, int * genpoly);
 
 /* Initialize lookup tables, polynomials, etc. */
-void initialize_ecc (rscode_driver * driver)
+void rs_initialize_ecc (rscode_driver * driver)
 {
     /* Compute the encoder generator polynomial */
-    compute_genpoly(driver, RSCODE_NPAR, driver->genPoly);
+    rs_compute_genpoly(driver, RSCODE_NPAR, driver->genPoly);
 }
 
-void zero_fill_from (unsigned char * buf, int from, int to)
+void rs_zero_fill_from (unsigned char * buf, int from, int to)
 {
     int i;
     for (i = from; i < to; ++i) {
@@ -56,7 +56,7 @@ void zero_fill_from (unsigned char * buf, int from, int to)
 #ifdef RSCODE_DEBUG
 
 /* debuging routines */
-void print_parity (rscode_driver * driver)
+void rs_print_parity (rscode_driver * driver)
 {
     int i;
     printf("Parity Bytes: ");
@@ -67,7 +67,7 @@ void print_parity (rscode_driver * driver)
 }
 
 
-void print_syndrome (rscode_driver * driver)
+void rs_print_syndrome (rscode_driver * driver)
 {
     int i;
     printf("Syndrome Bytes: ");
@@ -80,7 +80,7 @@ void print_syndrome (rscode_driver * driver)
 #endif /* RSCODE_DEBUG */
 
 /* Append the parity bytes onto the end of the message */
-void build_codeword (rscode_driver * driver, unsigned char * msg, int nbytes, unsigned char * dst)
+void rs_build_codeword (rscode_driver * driver, unsigned char * msg, int nbytes, unsigned char * dst)
 {
     int i;
     for (i = 0; i < nbytes; ++i) {
@@ -99,7 +99,7 @@ void build_codeword (rscode_driver * driver, unsigned char * msg, int nbytes, un
  * into the synBytes[] array.
  */
 
-void decode_data(rscode_driver * driver, unsigned char * data, int nbytes)
+void rs_decode_data(rscode_driver * driver, unsigned char * data, int nbytes)
 {
     int i, j, sum;
     for (j = 0; j < RSCODE_NPAR; ++j) {
@@ -113,7 +113,7 @@ void decode_data(rscode_driver * driver, unsigned char * data, int nbytes)
 
 
 /* Check if the syndrome is zero */
-int check_syndrome (rscode_driver * driver)
+int rs_check_syndrome (rscode_driver * driver)
 {
     int i, nz = 0;
     for (i = 0 ; i < RSCODE_NPAR; ++i) {
@@ -131,7 +131,7 @@ int check_syndrome (rscode_driver * driver)
  * at least n+1 bytes long.
  */
 
-static void compute_genpoly (rscode_driver * driver, int nbytes, int * genpoly)
+static void rs_compute_genpoly (rscode_driver * driver, int nbytes, int * genpoly)
 {
     int i, tp[256], tp1[256];
 
@@ -158,25 +158,82 @@ static void compute_genpoly (rscode_driver * driver, int nbytes, int * genpoly)
  *
  */
 
-void encode_data (rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst)
+/* RS code encode continious---------------------------------------------------------------
+ *
+ */
+void rs_encode_data_continious_start(rscode_driver * driver)
 {
-    int i, LFSR[RSCODE_NPAR+1] = {},dbyte, j;
+    int i;
+    for(i = 0; i < RSCODE_NPAR+1; ++i) {
+        driver->pBytes[i] = 0;
+    }
+}
 
-    /*for(i=0; i < RSCODE_NPAR+1; i++) LFSR[i]=0;*/
+void rs_encode_data_continious_proceed(rscode_driver * driver, unsigned char byte)
+{
+    int dbyte, j;
+
+    dbyte = byte ^ driver->pBytes[RSCODE_NPAR-1];
+
+    for (j = RSCODE_NPAR-1; j > 0; --j) {
+        driver->pBytes[j] = driver->pBytes[j-1] ^ gmult(driver, driver->genPoly[j], dbyte);
+    }
+    driver->pBytes[0] = gmult(driver, driver->genPoly[0], dbyte);
+}
+
+void rs_encode_data_continious_end(rscode_driver * driver, unsigned char *dst, int *pos)
+{
+    int i;
+    for (i = 0; i < RSCODE_NPAR; ++i) {
+        dst[i+(*pos)] = driver->pBytes[RSCODE_NPAR-1-i];
+    }
+    (*pos) += RSCODE_NPAR;
+}
+
+/* RS code encode all to one funtions---------------------------------------------------------------
+ *
+ */
+void rs_encode_data(rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst)
+{
+    int i,dbyte, j;
+
+    for(i = 0; i < RSCODE_NPAR+1; ++i) {
+        driver->pBytes[i] = 0;
+    }
 
     for (i = 0; i < nbytes; ++i) {
-        dbyte = msg[i] ^ LFSR[RSCODE_NPAR-1];
+        dbyte = msg[i] ^ driver->pBytes[RSCODE_NPAR-1];
 
         for (j = RSCODE_NPAR-1; j > 0; --j) {
-            LFSR[j] = LFSR[j-1] ^ gmult(driver, driver->genPoly[j], dbyte);
+            driver->pBytes[j] = driver->pBytes[j-1] ^ gmult(driver, driver->genPoly[j], dbyte);
         }
-        LFSR[0] = gmult(driver, driver->genPoly[0], dbyte);
+        driver->pBytes[0] = gmult(driver, driver->genPoly[0], dbyte);
     }
 
-    for (i = 0; i < RSCODE_NPAR; ++i) {
-        driver->pBytes[i] = LFSR[i];
-    }
-
-    build_codeword(driver, msg, nbytes, dst);
+    rs_build_codeword(driver, msg, nbytes, dst);
 }
+
+void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int nbytes, int* pos)
+{
+    int i,dbyte, j;
+
+    for(i = 0; i < RSCODE_NPAR+1; ++i) {
+        driver->pBytes[i] = 0;
+    }
+
+    for (i = 0; i < nbytes; ++i) {
+        dbyte = msg[i] ^ driver->pBytes[RSCODE_NPAR-1];
+
+        for (j = RSCODE_NPAR-1; j > 0; --j) {
+            driver->pBytes[j] = driver->pBytes[j-1] ^ gmult(driver, driver->genPoly[j], dbyte);
+        }
+        driver->pBytes[0] = gmult(driver, driver->genPoly[0], dbyte);
+    }
+
+    rs_encode_data_continious_end(driver, msg, pos);
+}
+
+
+
+
 

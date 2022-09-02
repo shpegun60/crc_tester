@@ -318,7 +318,7 @@ int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, in
 
 
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-    if (((driver->NErrors <= RSCODE_NPAR) && (driver->NErrors > 0)) && (driver->NErasures<=(2*RSCODE_NPAR))) {
+    if (((driver->NErrors <= RSCODE_NPAR) && (driver->NErrors > 0)) && (driver->NErasures <= (2*RSCODE_NPAR))) {
 #else
     if ((driver->NErrors <= RSCODE_NPAR) && (driver->NErrors > 0)) {
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
