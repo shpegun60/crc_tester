@@ -71,7 +71,7 @@ typedef struct {
 ***************************************************************************************************
 */
 
-//#define D_RAW_P_CRC_ENA
+#define D_RAW_P_CRC_ENA
 
 #ifdef D_RAW_P_CRC_ENA
 
