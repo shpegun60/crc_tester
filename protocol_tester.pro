@@ -14,11 +14,11 @@ include(rscode/rscode.pri)
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp \
+    mainwindow.cpp
 
 
 HEADERS += \
-    mainwindow.h \
+    mainwindow.h
 
 
 FORMS += \

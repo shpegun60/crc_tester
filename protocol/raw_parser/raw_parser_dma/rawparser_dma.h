@@ -50,6 +50,7 @@ typedef struct {
 
 // new / delete functions----------------------------------------------
 RawParser_dma_t* rawParser_dma_new(const u8 packStart);
+void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart);
 int rawParser_dma_delete(RawParser_dma_t** data);
 
 

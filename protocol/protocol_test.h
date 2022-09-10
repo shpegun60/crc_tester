@@ -10,6 +10,7 @@ extern "C" {
 #define TESTER_CONVERT              0x00000004UL
 #define TESTER_RAW_P_DMA            0x00000008UL
 #define TESTER_REED_SOLOMON_ECC     0x00000010UL
+#define TESTER_CALLBACK_MANAGER     0x00000020UL
 
 
 int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags);

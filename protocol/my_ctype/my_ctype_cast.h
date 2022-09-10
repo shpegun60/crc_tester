@@ -3,6 +3,7 @@
 
 #include "my_ctypes.h"
 
+// type literals ------------------------------------------
 #define S8_C(x)  x
 #define U8_C(x)  x ## U
 #define S16_C(x) x

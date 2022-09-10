@@ -61,6 +61,13 @@ extern "C" {
 #include "raw_parser_dma_test.h"
 
 
+/****************************************************************************************
+ * CALLBACK MANAGER LIB
+ */
+
+#include "callback_manager.h"
+#include "callback_manager_test.h"
+
 
 /****************************************************************************************
  * REED - SOLOMON ECC LIB

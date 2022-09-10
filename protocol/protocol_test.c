@@ -107,6 +107,23 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
 
+    printf("\n***************************************************************************************\n");
+    printf("----------->>CALLBACK MANAGER TEST<<--------------------\n");
+    printf("***************************************************************************************\n");
+
+    int CallbackManager_Test = 0;
+#ifndef CALL_B_MAN_TEST_DISABLE
+    if(testFlags & TESTER_CALLBACK_MANAGER) {
+        CallbackManager_Test = callbackManagerTest();
+    } else {
+        printf("...FLAGS: CALLBACK MANAGER TEST DISABLED\n");
+    }
+#else
+    printf("...DEFINE: CALLBACK MANAGER TEST DISABLED\n");
+#endif /* CALL_B_MAN_TEST_DISABLE */
+
+
+
 
 
     printf("\n***************************************************************************************\n");
@@ -118,8 +135,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("CONVERT TEST EXIT WITH ERROR: %d\n", ConvertTest);
     printf("RAWPARSER DMA TEST EXIT WITH ERROR: %d\n", RawP_DMA_Test);
     printf("REED-SOLOMON TEST EXIT WITH ERROR: %d\n", Reed_Solomon_Test);
-
-
+    printf("CALLBACK MANAGER TEST EXIT WITH ERROR: %d\n", CallbackManager_Test);
 
 
     fflush(stdout);

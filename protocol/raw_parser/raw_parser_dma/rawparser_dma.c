@@ -67,6 +67,20 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
     RawParser_dma_t* self = (RawParser_dma_t *)calloc(1, sizeof(RawParser_dma_t));
     M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return self, "rawParser_dma_new: No memory for allocation ");
 
+
+    rawParser_dma_init(self, packStart);
+    return self;
+}
+
+void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
+{
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    M_Assert_BreakSaveCheck(packStart == RECEIVE_EXTENDED_LEN_CMD, M_EMPTY, return, "rawParser_dma_init: start byte: %d must be not equal RECEIVE_EXTENDED_LEN_CMD: %d", packStart, RECEIVE_EXTENDED_LEN_CMD);
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+    M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return, "rawParser_dma_init: No input data valid ");
+
+
     self->m_startByte = packStart;
     self->m_receivePackLen = (rawP_size_t)0;
 
@@ -79,7 +93,7 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
     #endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
 
 #endif /* D_RAW_P_CRC_ENA */
-    
+
     self->m_triggerSB = 0;
     self->m_receivePos = 0;
     self->m_receiveReadPos = 0;
@@ -100,8 +114,6 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     rs_initialize_ecc(&self->rs_ecc);
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
-
-    return self;
 }
 
 
