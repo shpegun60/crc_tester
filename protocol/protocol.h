@@ -62,14 +62,6 @@ extern "C" {
 
 
 /****************************************************************************************
- * CALLBACK MANAGER LIB
- */
-
-#include "callback_manager.h"
-#include "callback_manager_test.h"
-
-
-/****************************************************************************************
  * REED - SOLOMON ECC LIB
  */
 
@@ -84,6 +76,18 @@ extern "C" {
 #include "berlekamp.h"
 
 #include "rscode_test.h"
+
+
+/****************************************************************************************
+ * CALLBACK MANAGER LIB
+ */
+
+#ifndef CALL_B_MAN_TEST_DISABLE
+    //#define CALL_B_MAN_TEST_DISABLE
+#endif /* CALL_B_MAN_TEST_DISABLE */
+
+#include "callback_manager.h"
+#include "callback_manager_test.h"
 
 
 #ifdef __cplusplus

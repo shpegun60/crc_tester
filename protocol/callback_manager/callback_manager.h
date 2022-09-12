@@ -32,10 +32,10 @@ typedef struct {
 
 CallbackManager_t * CallbackManager_new(void * const parser);
 void CallbackManager_init(CallbackManager_t * const self, void * const parser);
-void CallbackManager_addWorker(CallbackManager_t * const self, u8 id, CallbackWorker worker, void * const context);
+void CallbackManager_addWorker(CallbackManager_t * const self, u8 const id, CallbackWorker const worker, void * const context);
 int CallbackManager_delete(CallbackManager_t ** self);
 
 //**********************************************************************************************************************************************************************
-void CallbackManager_proceed(CallbackManager_t * const self, u8 id, u32 time);
+void CallbackManager_proceed(CallbackManager_t * const self, u8 const id, u32 time);
 
 #endif /* __INC_CALLBACK_MANAGER_H__ */

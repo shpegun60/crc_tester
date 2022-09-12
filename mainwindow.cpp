@@ -31,7 +31,15 @@ MainWindow::MainWindow(QWidget *parent)
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
-    callbackManagerTest();
+    //callbackManagerTest();
+
+    if(PREPROCESSOR_KEYWORD_EQ(return, case)) {
+        qDebug() << "return equal to case";
+    } else {
+        qDebug() << "return not equal to case";
+    }
+
+    MY_CTYPE_GET_TYPE(UINT8_TYPE) my_val = 0;
 }
 
 MainWindow::~MainWindow()
