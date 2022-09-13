@@ -57,7 +57,7 @@ u8 slow_crc8_maxim_array(u8 * data, unsigned int len)
     while (len--) {
         crc ^= *data++;
 
-        for (unsigned int bit = 0; bit < 8; ++bit) {
+        for (int bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x80U) ? ((crc << 1U) ^ CRC8POLY) : (crc << 1U);
 		}
     }
@@ -69,7 +69,7 @@ u8 slow_crc8_maxim_byte(u8 crc, const u8 data)
 {
     crc ^= data;
 
-    for (unsigned int bit = 0; bit < 8; ++bit) {
+    for (int bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x80U) ? ((crc << 1U) ^ CRC8POLY) : (crc << 1U);
 	}
 	

@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD	
 
 include($$PWD/raw_parser_dma/raw_parser_dma.pri)
+include($$PWD/raw_parser_it/raw_parser_it.pri)
 
 SOURCES += \
     $$PWD/rawparser_macro.c

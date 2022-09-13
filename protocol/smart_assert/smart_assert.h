@@ -51,7 +51,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         if (Expr) {\
             beforeExpr;\
             __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
-            afterExpr;/* ignored if NDEBUG because programm is break, but compiler not known it*/\
+            afterExpr;/* ignored if NDEBUG because programm is break, but compiler not known it */\
         }\
     }while(0L)
 
@@ -60,7 +60,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         if (Expr) {\
             beforeExpr;\
             __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
-            afterExpr;/* ignored if NDEBUG because programm is break, but compiler not known it*/\
+            afterExpr;/* ignored if NDEBUG because programm is break, but compiler not known it */\
         }\
     }while(0L)
 
@@ -102,7 +102,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         } else {\
             __M_Warning((#foo), (0), (__FILE__), (__LINE__), ("NO exists function"));\
         }\
-    }while(0L);
+    }while(0L)
 
 #else
 /*
@@ -156,7 +156,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         if(foo) {\
             true_expression;\
         }\
-    }while(0L);
+    }while(0L)
 
 
 

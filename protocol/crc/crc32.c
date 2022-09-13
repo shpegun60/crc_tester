@@ -74,7 +74,7 @@ u32 fast_crc32b_byte(const u32 crc, const u8 data) // must ~crc if last byte
 //------------------------------------------------------------------------------------------------------------------------------
 u32 slow_crc32b_array(const u8 * data, reg len)
 {
-    unsigned int crc = CRC32INIT;
+    u32 crc = CRC32INIT;
 
     while(len--) {
         crc = crc ^ (*data++);

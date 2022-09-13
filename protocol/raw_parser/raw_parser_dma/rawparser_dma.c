@@ -127,7 +127,7 @@ int rawParser_dma_delete(RawParser_dma_t** data)
 }
 
 
-static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, const unsigned char newFrame)
+static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, const u8 newFrame)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_proceedByte: No valid input");
 
