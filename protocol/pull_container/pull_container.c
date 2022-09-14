@@ -8,6 +8,7 @@ pull_container_t *pullContainer_new(const u16 columns, const u16 rows)
     M_Assert_BreakSaveCheck((columns == 0 || rows == 0), M_EMPTY, return NULL, "pullContainer_new: Give me positive values for dimensions genius");
     M_Assert_BreakSaveCheck((columns & (columns - 1)), M_EMPTY, return NULL, "pullContainer_new: columns is not power of 2, val: %d", columns);
     M_Assert_BreakSaveCheck((rows & (rows - 1)), M_EMPTY, return NULL, "pullContainer_new: rows is not power of 2, val: %d", rows);
+    M_Assert_BreakSaveCheck((rows  > 16384 || columns > 16384), M_EMPTY, return NULL, "pullContainer_new: rows or calls is too long, RAW: %d, COL: %d", rows, columns);
 
     pull_container_t* self = (pull_container_t *)calloc(1, sizeof(pull_container_t));
     M_Assert_BreakSaveCheck(self == (pull_container_t *)NULL, M_EMPTY, return self, "pullContainer_new: No memory for allocation ");
@@ -22,6 +23,7 @@ void pullContainer_init(pull_container_t * const self, const u16 columns, const 
     M_Assert_BreakSaveCheck((columns == 0 || rows == 0), M_EMPTY, return, "pullContainer_init: Give me positive values for dimensions genius");
     M_Assert_BreakSaveCheck((columns & (columns - 1)), M_EMPTY, return, "pullContainer_init: columns is not power of 2, val: %d", columns);
     M_Assert_BreakSaveCheck((rows & (rows - 1)), M_EMPTY, return, "pullContainer_init: rows is not power of 2, val: %d", rows);
+    M_Assert_BreakSaveCheck((rows  > 16384 || columns > 16384), M_EMPTY, return, "pullContainer_init: rows or calls is too long, RAW: %d, COL: %d", rows, columns);
 
     self->pull = (u8**)malloc(rows * sizeof(u8*));
     M_Assert_BreakSaveCheck((self->pull == NULL), M_EMPTY, return, "pullContainer_init: no memories for allocation data");

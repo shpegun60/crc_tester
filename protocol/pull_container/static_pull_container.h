@@ -50,14 +50,26 @@ void pullContainer_nextReadPos(static_pull_container_t * const self);
 
 
 
-// USER DEFINES CHECK ----------------------------------------------------------------------------------------------------------------------------------------
-#if ((STATIC_PULL_CONTAINER_COLUMNS - 1) & STATIC_PULL_CONTAINER_COLUMNS) || (STATIC_PULL_CONTAINER_COLUMNS == 0) // columns buffer is power of 2 size check
+/* USER DEFINES CHECK ----------------------------------------------------------------------------------------------------------------------------------------
+ */
+#if ((STATIC_PULL_CONTAINER_COLUMNS - 1) & STATIC_PULL_CONTAINER_COLUMNS) || (STATIC_PULL_CONTAINER_COLUMNS == 0) || (STATIC_PULL_CONTAINER_COLUMNS > 16384) // columns buffer is power of 2 size check
     #error STATIC_PULL_CONTAINER_COLUMNS must be is power of 2
 #endif //check if power of 2 STATIC_PULL_CONTAINER_COLUMNS
 
-#if ((STATIC_PULL_CONTAINER_RAWS - 1) & STATIC_PULL_CONTAINER_RAWS) || (STATIC_PULL_CONTAINER_RAWS == 0) // raws buffer is power of 2 size check
+#if ((STATIC_PULL_CONTAINER_RAWS - 1) & STATIC_PULL_CONTAINER_RAWS) || (STATIC_PULL_CONTAINER_RAWS == 0) || (STATIC_PULL_CONTAINER_RAWS > 16384) // raws buffer is power of 2 size check
     #error STATIC_PULL_CONTAINER_RAWS must be is power of 2
 #endif //check if power of 2 STATIC_PULL_CONTAINER_RAWS
+
+
+
+
+#if (STATIC_PULL_CONTAINER_COLUMNS > 16384) // columns buffer if too long check
+    #error STATIC_PULL_CONTAINER_COLUMNS is too long
+#endif //check STATIC_PULL_CONTAINER_COLUMNS
+
+#if (STATIC_PULL_CONTAINER_RAWS > 16384) // raws buffer if too long check
+    #error STATIC_PULL_CONTAINER_RAWS is too long
+#endif //check STATIC_PULL_CONTAINER_RAWS
 
 
 #endif /* STATIC_PULL_CONTAINER_H */
