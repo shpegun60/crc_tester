@@ -38,17 +38,14 @@ void staticPullContainer_init(static_pull_container_t * const self);
 int staticPullContainer_delete(static_pull_container_t **self);
 
 
-
 //------------------------------------ WRITE FUNCTIONS-------------------------------------------------------------------------------------------------------------------------
 int staticPullContainer_writeArr(static_pull_container_t * const self, u8 * const data, const u16 len);
 void staticPullContainer_getWriteMeta(static_pull_container_t * const self, u8 ** const data, u16 ** const size);
 void staticPullContainer_nextWritePos(static_pull_container_t * const self);
 
 //------------------------------------ READ FUNCTIONS-------------------------------------------------------------------------------------------------------------------------
-u16 pullContainer_readArr(static_pull_container_t * const self, u8 ** const data);
-void pullContainer_nextReadPos(static_pull_container_t * const self);
-
-
+u16 staticPullContainer_readArr(static_pull_container_t * const self, u8 ** const data);
+void staticPullContainer_nextReadPos(static_pull_container_t * const self);
 
 /* USER DEFINES CHECK ----------------------------------------------------------------------------------------------------------------------------------------
  */

@@ -1,5 +1,6 @@
 #include "static_pull_container.h"
 #include "smart_assert.h"
+#include "inline.h"
 #include <stdlib.h>
 
 
@@ -35,6 +36,11 @@ int staticPullContainer_delete(static_pull_container_t **self)
     return 0;
 }
 
+STATIC_INLINE void staticPullContainer_proceedSignalls(static_pull_container_t * const self)
+{
+    self->rdEmpty = (self->wr_raw == self->rd_raw);
+    self->wrFull  = ((self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1)) == (self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1))) && (!self->rdEmpty);
+}
 
 
 //------------------------------------ WRITE FUNCTIONS-------------------------------------------------------------------------------------------------------------------------
@@ -42,9 +48,9 @@ int staticPullContainer_writeArr(static_pull_container_t * const self, u8 * cons
 {
     M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return 0, "staticPullContainer_writeArr: incorrect input values");
     M_Assert_BreakSaveCheck((len > STATIC_PULL_CONTAINER_COLUMNS), M_EMPTY, return 0, "staticPullContainer_writeArr: len more than buffer");
+    M_Assert_WarningSaveCheck(STATIC_PULL_CONTAINER_IS_FULL(self), M_EMPTY, return 0, "staticPullContainer_writeArr: buffer is full!!!");
 
     reg wr_pos = self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
-    reg rd_pos = self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
 
     for(int i = 0; i < len; ++i) {
         self->pull[wr_pos][i] = data[i];
@@ -52,7 +58,7 @@ int staticPullContainer_writeArr(static_pull_container_t * const self, u8 * cons
     self->size[wr_pos] = len;
 
     ++self->wr_raw;
-    self->wrFull = (wr_pos == rd_pos) && ((self->wr_raw & STATIC_PULL_CONTAINER_RAWS) != (self->rd_raw & STATIC_PULL_CONTAINER_RAWS));
+    staticPullContainer_proceedSignalls(self);
     return len;
 }
 
@@ -68,10 +74,9 @@ void staticPullContainer_getWriteMeta(static_pull_container_t * const self, u8 *
 void staticPullContainer_nextWritePos(static_pull_container_t * const self)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "staticPullContainer_nextWritePos: incorrect input values");
-    reg wr_pos = self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
-    reg rd_pos = self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
+    M_Assert_WarningSaveCheck(STATIC_PULL_CONTAINER_IS_FULL(self), M_EMPTY, return, "staticPullContainer_nextWritePos: buffer is full!!!");
     ++self->wr_raw;
-    self->wrFull = (wr_pos == rd_pos) && ((self->wr_raw & STATIC_PULL_CONTAINER_RAWS) != (self->rd_raw & STATIC_PULL_CONTAINER_RAWS));
+    staticPullContainer_proceedSignalls(self);
 }
 
 //------------------------------------ READ FUNCTIONS-------------------------------------------------------------------------------------------------------------------------
@@ -86,9 +91,8 @@ u16 staticPullContainer_readArr(static_pull_container_t * const self, u8 ** cons
 void staticPullContainer_nextReadPos(static_pull_container_t * const self)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "staticPullContainer_nextReadPos: incorrect input values");
-    reg wr_pos = self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
-    reg rd_pos = self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
+    M_Assert_WarningSaveCheck(STATIC_PULL_CONTAINER_IS_EMPTY(self), M_EMPTY, return, "staticPullContainer_nextReadPos: buffer is empty!!!");
     ++self->rd_raw;
-    self->rdEmpty = (wr_pos == rd_pos) && ((self->wr_raw & STATIC_PULL_CONTAINER_RAWS) == (self->rd_raw & STATIC_PULL_CONTAINER_RAWS));
+    staticPullContainer_proceedSignalls(self);
 }
 
