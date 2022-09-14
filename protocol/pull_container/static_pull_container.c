@@ -6,7 +6,7 @@
 static_pull_container_t* staticPullContainer_new(void)
 {
     static_pull_container_t* self = (static_pull_container_t *)calloc(1, sizeof(static_pull_container_t));
-    M_Assert_BreakSaveCheck(self == (static_pull_container_t *)NULL, M_EMPTY, return self, "static_pull_container_new: No memory for allocation ");
+    M_Assert_BreakSaveCheck(self == (static_pull_container_t *)NULL, M_EMPTY, return self, "staticPullContainer_new: No memory for allocation ");
 
     staticPullContainer_init(self);
     return self;
@@ -14,7 +14,7 @@ static_pull_container_t* staticPullContainer_new(void)
 
 void staticPullContainer_init(static_pull_container_t * const self)
 {
-    M_Assert_BreakSaveCheck(self == (static_pull_container_t *)NULL, M_EMPTY, return, "static_pull_container_init: No valid input");
+    M_Assert_BreakSaveCheck(self == (static_pull_container_t *)NULL, M_EMPTY, return, "staticPullContainer_init: No valid input");
     self->rd_raw = 0;
     self->wr_raw = 0;
     self->wrFull = 0;
@@ -25,7 +25,7 @@ void staticPullContainer_init(static_pull_container_t * const self)
 /* free memory associated with the static_pull_container_t  */
 int staticPullContainer_delete(static_pull_container_t **self)
 {
-    M_Assert_BreakSaveCheck(((*self) == NULL || self == NULL), M_EMPTY, return 1, "pullContainer_delete: incorrect input values");
+    M_Assert_BreakSaveCheck(((*self) == NULL || self == NULL), M_EMPTY, return 1, "staticPullContainer_delete: incorrect input values");
 
     /* Code for further processing and free the
        dynamically allocated memory */
@@ -59,9 +59,7 @@ int staticPullContainer_writeArr(static_pull_container_t * const self, u8 * cons
 
 void staticPullContainer_getWriteMeta(static_pull_container_t * const self, u8 ** const data, u16 ** const size)
 {
-    M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return, "pullContainer_writeArr: incorrect input values");
-    M_Assert_Break((self->pull == NULL || self->size == NULL || self->pull[self->wr_raw] == NULL), M_EMPTY, return, "pullContainer_writeArr: no allocated memory");
-
+    M_Assert_Break((self == NULL || data == NULL || size == NULL), M_EMPTY, return, "staticPullContainer_getWriteMeta: incorrect input values");
     reg wr_pos = self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
     (*data) = &self->pull[wr_pos][0];
     (*size) = &self->size[wr_pos];
@@ -69,9 +67,7 @@ void staticPullContainer_getWriteMeta(static_pull_container_t * const self, u8 *
 
 void staticPullContainer_nextWritePos(static_pull_container_t * const self)
 {
-    M_Assert_Break((self == NULL), M_EMPTY, return, "pullContainer_nextReadPos: incorrect input values");
-    M_Assert_Break((self->pull == NULL || self->size == NULL || self->pull[self->wr_raw] == NULL), M_EMPTY, return, "pullContainer_nextReadPos: no allocated memory");
-
+    M_Assert_Break((self == NULL), M_EMPTY, return, "staticPullContainer_nextWritePos: incorrect input values");
     reg wr_pos = self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
     reg rd_pos = self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
     ++self->wr_raw;
@@ -81,9 +77,7 @@ void staticPullContainer_nextWritePos(static_pull_container_t * const self)
 //------------------------------------ READ FUNCTIONS-------------------------------------------------------------------------------------------------------------------------
 u16 staticPullContainer_readArr(static_pull_container_t * const self, u8 ** const data)
 {
-    M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return 0, "pullContainer_readArr: incorrect input values");
-    M_Assert_Break((self->pull == NULL || self->size == NULL || self->pull[self->wr_raw] == NULL), M_EMPTY, return 0, "pullContainer_readArr: no allocated memory");
-
+    M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return 0, "staticPullContainer_readArr: incorrect input values");
     reg rd_pos = self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
     (*data) = &self->pull[rd_pos][0];
     return self->size[rd_pos];
@@ -91,9 +85,7 @@ u16 staticPullContainer_readArr(static_pull_container_t * const self, u8 ** cons
 
 void staticPullContainer_nextReadPos(static_pull_container_t * const self)
 {
-    M_Assert_Break((self == NULL), M_EMPTY, return, "pullContainer_nextReadPos: incorrect input values");
-    M_Assert_Break((self->pull == NULL || self->size == NULL || self->pull[self->wr_raw] == NULL), M_EMPTY, return, "pullContainer_nextReadPos: no allocated memory");
-
+    M_Assert_Break((self == NULL), M_EMPTY, return, "staticPullContainer_nextReadPos: incorrect input values");
     reg wr_pos = self->wr_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
     reg rd_pos = self->rd_raw & (STATIC_PULL_CONTAINER_RAWS - 1);
     ++self->rd_raw;
