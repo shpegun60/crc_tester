@@ -14,6 +14,16 @@ void __M_SEND_DEBUG_INFO(const char* const msg, ...)
     va_end(args);
 }
 
+void __M_SEND_DEBUG_ERROR(const char* const msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(stderr, msg, args);
+    fprintf(stderr, "\n");
+    fflush(stderr);
+    va_end(args);
+}
+
 #ifndef NDEBUG
 static inline void __M_SEND_MSG(const char* const header, const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, const va_list args)
 {
