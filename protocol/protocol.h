@@ -90,16 +90,16 @@ extern "C" {
 #include "callback_manager_test.h"
 
 /****************************************************************************************
- * PULL CONTAINER LIB
+ * POOL CONTAINER LIB
  */
 
-#ifndef PULL_CONTAINER_TEST_DISABLE
-    #define PULL_CONTAINER_TEST_DISABLE 1
-#endif /* PULL_CONTAINER_TEST_DISABLE */
+#ifndef POOL_CONTAINER_TEST_DISABLE
+    //#define POOL_CONTAINER_TEST_DISABLE 1
+#endif /* POOL_CONTAINER_TEST_DISABLE */
 
-#include "pull_container.h"
-#include "static_pull_container.h"
-#include "pull_container_test.h"
+#include "pool_container.h"
+#include "static_pool_container.h"
+#include "pool_container_test.h"
 
 
 #ifdef __cplusplus

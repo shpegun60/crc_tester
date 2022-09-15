@@ -123,19 +123,19 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 #endif /* CALL_B_MAN_TEST_DISABLE */
 
     printf("\n***************************************************************************************\n");
-    printf("----------->>PULL CONTAINER TEST<<--------------------\n");
+    printf("----------->>POOL CONTAINER TEST<<--------------------\n");
     printf("***************************************************************************************\n");
 
-    int Pull_Container_Test = 0;
+    int Pool_Container_Test = 0;
 
-#ifdef PULL_CONTAINER_TEST_DISABLE
+#ifndef POOL_CONTAINER_TEST_DISABLE
     if(testFlags & TESTER_PULL_CONTAINER) {
-        Pull_Container_Test = pullContainerTest(randomSeed, testCnt);
+        Pool_Container_Test = poolContainerTest(randomSeed, testCnt);
     } else {
-        printf("...FLAGS: PULL CONTAINER TEST DISABLED\n");
+        printf("...FLAGS: POOL CONTAINER TEST DISABLED\n");
     }
 #else
-    printf("...DEFINE: PULL CONTAINER TEST DISABLED\n");
+    printf("...DEFINE: POOL CONTAINER TEST DISABLED\n");
 #endif /* CALL_B_MAN_TEST_DISABLE */
 
 
@@ -152,7 +152,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("RAWPARSER DMA TEST EXIT WITH ERROR: %d\n", RawP_DMA_Test);
     printf("REED-SOLOMON TEST EXIT WITH ERROR: %d\n", Reed_Solomon_Test);
     printf("CALLBACK MANAGER TEST EXIT WITH ERROR: %d\n", CallbackManager_Test);
-    printf("PULL CONTAINER TEST EXIT WITH ERROR: %d\n", Pull_Container_Test);
+    printf("POOL CONTAINER TEST EXIT WITH ERROR: %d\n", Pool_Container_Test);
 
 
     fflush(stdout);

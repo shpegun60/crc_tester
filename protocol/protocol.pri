@@ -9,7 +9,7 @@ include($$PWD/raw_parser/raw_parser.pri)
 include($$PWD/smart_assert/smart_assert.pri)
 include($$PWD/preprocessor/preprocessor.pri)
 include($$PWD/callback_manager/callback_manager.pri)
-include($$PWD/pull_container/pull_container.pri)
+include($$PWD/pool_container/pool_container.pri)
 
 
 SOURCES +=  \
