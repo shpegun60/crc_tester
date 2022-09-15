@@ -371,6 +371,7 @@ int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTe
 
     RawParser_dma_t * prot = rawParser_dma_new(0x1A);
 
+
 #if defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) && defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
  // if disabled internal rx & tx buffers than set external
     rawParser_dma_setUserBuffers(prot, m_receiveFrameBuffer_external, m_sendBuffer_external);
