@@ -10,7 +10,7 @@
 #include <time.h>       /* time */
 
 extern "C" {
-#include "pull_container_test.h"
+
 }
 
 #include "smart_assert.h"
@@ -24,15 +24,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    //protocolAllTest(time(NULL), 500, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER));
-    //protocolAllTest(time(NULL), 500, (TESTER_RAW_P_DMA));
+    protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER));
+    //protocolAllTest(time(NULL), 500, (TESTER_PULL_CONTAINER));
     //__M_assert_test();
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
 
     //callbackManagerTest();
-    qDebug() << "test: "<<pullContainerTest(123);
+    //qDebug() << "test: "<<pullContainerTest(123, 100);
 
     if(PREPROCESSOR_KEYWORD_EQ(return, case)) {
         qDebug() << "return equal to case";

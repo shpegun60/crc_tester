@@ -1,6 +1,17 @@
 #ifndef PULL_CONTAINER_TEST_H
 #define PULL_CONTAINER_TEST_H
 
-int pullContainerTest(int randomSeed);
+#ifndef PULL_CONTAINER_TEST_DISABLE
+    //#define PULL_CONTAINER_TEST_DISABLE 1
+#endif /* PULL_CONTAINER_TEST_DISABLE */
+
+
+#ifndef PULL_CONTAINER_TEST_DISABLE
+
+int pullContainerTest(int randomSeed, int testCnt);
+
+#endif /* PULL_CONTAINER_TEST_DISABLE */
+
+
 
 #endif /* PULL_CONTAINER_TEST_H */
