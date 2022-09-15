@@ -154,11 +154,11 @@ int poolContainerDynamic_readCheck(pool_container_t * container)
         poolContainer_nextReadPos(container);                     // next read pos (if buffer not empty)
 
         if(i < (STATIC_POOL_CONTAINER_RAWS - 1)) {
-            if(STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
+            if(POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
                 ++counterNotValid;
             }
         } else if(i == (STATIC_POOL_CONTAINER_RAWS - 1)) {
-            if(!STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
+            if(!POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
                 ++counterNotValid;
             }
         }
@@ -189,11 +189,11 @@ int testpoolContainerDynamic()
     // write to pull
     for(reg i = 0; i < STATIC_POOL_CONTAINER_RAWS; ++i) {
         if(i == 0) {
-            if(!STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
+            if(!POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
                 ++counterNotValid;
             }
         } else if(i < (STATIC_POOL_CONTAINER_RAWS - 1)) {
-            if(STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
+            if(POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
                 ++counterNotValid;
             }
         }
@@ -203,7 +203,7 @@ int testpoolContainerDynamic()
         }
 
         if(i == (STATIC_POOL_CONTAINER_RAWS - 1)) {
-            if(!STATIC_POOL_CONTAINER_IS_FULL(container) || STATIC_POOL_CONTAINER_IS_EMPTY(container)) {
+            if(!POOL_CONTAINER_IS_FULL(container) || POOL_CONTAINER_IS_EMPTY(container)) {
                 ++counterNotValid;
             }
         }
@@ -228,11 +228,11 @@ int testpoolContainerDynamic()
 
 
         if(i == 0) {
-            if(!STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
+            if(!POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
                 ++counterNotValid;
             }
         } else if(i < (STATIC_POOL_CONTAINER_RAWS - 1)) {
-            if(STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
+            if(POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
                 ++counterNotValid;
             }
         }
@@ -243,7 +243,7 @@ int testpoolContainerDynamic()
         poolContainer_nextWritePos(container);  // next pos
 
         if(i == (STATIC_POOL_CONTAINER_RAWS - 1)) {
-            if(!STATIC_POOL_CONTAINER_IS_FULL(container) || STATIC_POOL_CONTAINER_IS_EMPTY(container)) {
+            if(!POOL_CONTAINER_IS_FULL(container) || POOL_CONTAINER_IS_EMPTY(container)) {
                 ++counterNotValid;
             }
         }

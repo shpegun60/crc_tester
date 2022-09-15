@@ -25,6 +25,7 @@ extern "C" {
 
 
 void __M_SEND_DEBUG_INFO(const char* const msg, ...);
+void __M_SEND_DEBUG_ERROR(const char* const msg, ...);
 void __M_assert_test();
 
 #ifndef NDEBUG /* --------------------------------------------------------------------------------------------------------- */
