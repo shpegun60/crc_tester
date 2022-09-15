@@ -7,6 +7,10 @@
 #include "inline.h"
 #include "my_ctype_id.h"
 
+#ifndef NULL
+#define NULL (void *)0
+#endif /* NULL */
+
 
 
 // all types. Commit this if types defines upper--------------------------

@@ -8,11 +8,6 @@
 #include <stdlib.h>
 
 
-#ifndef NULL
-#define NULL (void *)0
-#endif /* NULL */
-
-
 // FSM data fusion -----------------------------
 #define RAW_P_DMA_RECEIVE_LEN_0           0x00U
 
@@ -57,7 +52,9 @@ C_INLINE void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte
 C_INLINE void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte);
 
 
-
+/* CREATE/DELETE FUNCTIONS *************************************************************************************************
+ *
+ */
 RawParser_dma_t* rawParser_dma_new(const u8 packStart)
 {
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
@@ -102,10 +99,21 @@ void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
     self->m_transmittPos = 0;
     self->receiveState = RAW_P_DMA_RECEIVE_LEN_0;
 
+
+#ifndef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
     self->TX.data = self->m_sendBuffer;
+#else
+    self->TX.data = NULL;
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
+
     self->TX.size = (rawP_size_t)0;
 
+#ifndef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
     self->RX.data = self->m_receiveFrameBuffer;
+#else
+     self->RX.data = NULL;
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
     self->RX.size = (rawP_size_t)0;
 
     self->uniRXPosition = 0;
@@ -117,6 +125,42 @@ void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
 }
 
 
+#ifdef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
+void rawParser_dma_setUserBufferTX(RawParser_dma_t * const self, u8 * const txBuffer)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input object");
+    M_Assert_Break((txBuffer == NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input TX buffer");
+
+    self->TX.data = txBuffer;
+    self->TX.size = (rawP_size_t)0;
+}
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
+
+#ifdef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
+void rawParser_dma_setUserBufferRX(RawParser_dma_t * const self, u8 * const rxBuffer)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input object");
+    M_Assert_Break((rxBuffer == NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input RX buffer");
+
+    self->RX.data = rxBuffer;
+    self->RX.size = (rawP_size_t)0;
+}
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
+#if defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) && defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
+void rawParser_dma_setUserBuffers(RawParser_dma_t * const self, u8 * const rxBuffer, u8 * const txBuffer)
+{
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input object");
+    M_Assert_Break((rxBuffer == NULL || txBuffer == NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input buffers");
+
+    self->TX.data = txBuffer;
+    self->TX.size = (rawP_size_t)0;
+
+    self->RX.data = rxBuffer;
+    self->RX.size = (rawP_size_t)0;
+}
+#endif /* defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) || defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER) */
+
 int rawParser_dma_delete(RawParser_dma_t** data)
 {
     M_Assert_BreakSaveCheck((data == NULL) || (*data == NULL), M_EMPTY, return 1, "rawParser_dma_delete: No allocated memory");
@@ -126,10 +170,15 @@ int rawParser_dma_delete(RawParser_dma_t** data)
     return 0;
 }
 
+/* PROCEED FUNCTIONS *************************************************************************************************
+ *
+ */
+
 
 static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, const u8 newFrame)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_proceedByte: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_proceedByte: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
 
     if (newFrame) {
 
@@ -209,7 +258,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #endif /* D_RAW_P_CRC_ENA */
 
-        self->m_receiveFrameBuffer[self->m_receiveHandlePos++] = ch;
+        self->RX.data[self->m_receiveHandlePos++] = ch;
 
         if (self->m_receiveHandlePos == self->m_receivePackLen) {
 
@@ -351,6 +400,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return (RawParser_Frame_t*)NULL, "RawParser_dma_proceed: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return(RawParser_Frame_t*)NULL, "RawParser_dma_proceed: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
     self->RX.size = 0;
 
     while ((self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)) != (self->m_receiveReadPos & (D_RAW_P_RX_BUF_SIZE - 1U))) {
@@ -425,6 +475,7 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* da
 void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t predictedLen)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
 
 #if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
     M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_MAX_PROTOCOL_LEN - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, maxTxLen: %d", predictedLen, D_RAW_P_MAX_PROTOCOL_LEN);
@@ -442,7 +493,7 @@ void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t
 #endif /* D_RAW_P_CRC_ENA */
 
     self->m_transmittPos = 0;
-    self->m_sendBuffer[self->m_transmittPos++] = self->m_startByte;
+    self->TX.data[self->m_transmittPos++] = self->m_startByte;
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     if(predictedLen > D_RAW_P_LEN_SEPARATOR) {
@@ -544,6 +595,7 @@ void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByt
 void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte, reg typelenInByte, u8 *data)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL || data == NULL), M_EMPTY, return, "RawParser_dma_universalRead: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_universalRead: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
     M_Assert_BreakSaveCheck(((self->uniRXPosition + totalLenInByte) > self->RX.size), M_EMPTY, return, "RawParser_dma_universalRead: no length for reading");
 
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN

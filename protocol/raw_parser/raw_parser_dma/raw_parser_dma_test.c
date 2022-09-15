@@ -12,6 +12,14 @@
 #include <stdlib.h>
 
 
+#ifdef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
+static u8           m_receiveFrameBuffer_external[D_RAW_P_RX_BUF_SIZE];
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
+#ifdef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
+static u8           m_sendBuffer_external[D_RAW_P_TX_BUF_SIZE];    // array for save tx buffer
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
+
 
 /**********************************************************************************************
  *
@@ -362,6 +370,19 @@ int rawParserDmaTest(unsigned int randomSeed, int randTestCount, int collisionTe
     }
 
     RawParser_dma_t * prot = rawParser_dma_new(0x1A);
+
+#if defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) && defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
+ // if disabled internal rx & tx buffers than set external
+    rawParser_dma_setUserBuffers(prot, m_receiveFrameBuffer_external, m_sendBuffer_external);
+#elif defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
+    // if disabled internal rx buffer than set external
+    rawParser_dma_setUserBufferRX(prot, m_receiveFrameBuffer_external);
+
+#elif defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER)
+    // if disabled internal tx buffer than set external
+    rawParser_dma_setUserBufferTX(prot, m_sendBuffer_external);
+
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
 
 
     errorCounter += receiveTransmittSimpleDmaTest(prot, data, 30);
