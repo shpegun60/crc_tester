@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// pull test global data
+// pool test global data
 static u8 data[STATIC_POOL_CONTAINER_RAWS][STATIC_POOL_CONTAINER_COLUMNS];
 static u16 size[STATIC_POOL_CONTAINER_RAWS];
 
@@ -20,10 +20,10 @@ static void initArr()
     }
 }
 
-/* STATIC PULL CONTAINER TESTS -----------------------------------------------------------------------------------
+/* STATIC pool CONTAINER TESTS -----------------------------------------------------------------------------------
  *
  */
-// read from static pull and check
+// read from static pool and check
 int poolContainerStatic_readCheck(static_pool_container_t * container)
 {
     int counterNotValid = 0;
@@ -64,7 +64,7 @@ int testpoolContainerStatic()
 
     /* test array writing function ------------------------------------------------------------------------------------------
      */
-    // write to pull
+    // write to pool
     for(reg i = 0; i < STATIC_POOL_CONTAINER_RAWS; ++i) {
         if(i == 0) {
             if(!STATIC_POOL_CONTAINER_IS_EMPTY(container) || STATIC_POOL_CONTAINER_IS_FULL(container)) {
@@ -76,7 +76,7 @@ int testpoolContainerStatic()
             }
         }
 
-        if(staticPoolContainer_writeArr(container, &data[i][0], size[i]) != size[i]) { // write data to pull container
+        if(staticPoolContainer_writeArr(container, &data[i][0], size[i]) != size[i]) { // write data to pool container
             ++counterNotValid;
         }
 
@@ -87,7 +87,7 @@ int testpoolContainerStatic()
         }
     }
 
-    // read from pull
+    // read from pool
     counterNotValid += poolContainerStatic_readCheck(container);
 
 
@@ -116,8 +116,8 @@ int testpoolContainerStatic()
         }
 
 
-        memcpy(wrdata, &data[i][0], size[i]);   // copy to pull buffer
-        *wrsize = size[i];                      // copy len to pull buffer
+        memcpy(wrdata, &data[i][0], size[i]);   // copy to pool buffer
+        *wrsize = size[i];                      // copy len to pool buffer
         staticPoolContainer_nextWritePos(container);    // next pos
 
         if(i == (STATIC_POOL_CONTAINER_RAWS - 1)) {
@@ -128,7 +128,7 @@ int testpoolContainerStatic()
     }
     staticPoolContainer_nextWritePos(container);    // generate warning
 
-    // read from pull
+    // read from pool
     counterNotValid += poolContainerStatic_readCheck(container);
 
 
@@ -140,11 +140,11 @@ int testpoolContainerStatic()
     return counterNotValid;
 }
 
-/* DYNAMIC PULL CONTAINER TESTS -----------------------------------------------------------------------------------
+/* DYNAMIC pool CONTAINER TESTS -----------------------------------------------------------------------------------
  *
  */
 
-// read from static pull and check
+// read from static pool and check
 int poolContainerDynamic_readCheck(pool_container_t * container)
 {
     int counterNotValid = 0;
@@ -186,7 +186,7 @@ int testpoolContainerDynamic()
 
     /* test array writing function ------------------------------------------------------------------------------------------
      */
-    // write to pull
+    // write to pool
     for(reg i = 0; i < STATIC_POOL_CONTAINER_RAWS; ++i) {
         if(i == 0) {
             if(!POOL_CONTAINER_IS_EMPTY(container) || POOL_CONTAINER_IS_FULL(container)) {
@@ -198,7 +198,7 @@ int testpoolContainerDynamic()
             }
         }
 
-        if(poolContainer_writeArr(container, &data[i][0], size[i]) != size[i]) { // write data to pull container
+        if(poolContainer_writeArr(container, &data[i][0], size[i]) != size[i]) { // write data to pool container
             ++counterNotValid;
         }
 
@@ -209,7 +209,7 @@ int testpoolContainerDynamic()
         }
     }
 
-    // read from pull
+    // read from pool
     counterNotValid += poolContainerDynamic_readCheck(container);
 
 
@@ -238,8 +238,8 @@ int testpoolContainerDynamic()
         }
 
 
-        memcpy(wrdata, &data[i][0], size[i]);   // copy to pull buffer
-        *wrsize = size[i];                      // copy len to pull buffer
+        memcpy(wrdata, &data[i][0], size[i]);   // copy to pool buffer
+        *wrsize = size[i];                      // copy len to pool buffer
         poolContainer_nextWritePos(container);  // next pos
 
         if(i == (STATIC_POOL_CONTAINER_RAWS - 1)) {
@@ -250,7 +250,7 @@ int testpoolContainerDynamic()
     }
     poolContainer_nextWritePos(container);    // generate warning
 
-    // read from pull
+    // read from pool
     counterNotValid += poolContainerDynamic_readCheck(container);
 
 
