@@ -1,4 +1,3 @@
-#pragma once
 #ifndef __RAW_PARSER_DMA_TEST_H__
 #define __RAW_PARSER_DMA_TEST_H__ 1
 
