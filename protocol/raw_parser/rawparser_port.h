@@ -14,8 +14,8 @@
 ***************************************************************************************************
 */
 
-#define D_RAW_P_RX_BUF_SIZE 512U // rx buffer must be is power of 2, else error
-#define D_RAW_P_TX_BUF_SIZE 512U // tx buffer must be is power of 2, else error
+#define D_RAW_P_RX_BUF_SIZE 1024U // rx buffer must be is power of 2, else error
+#define D_RAW_P_TX_BUF_SIZE 1024U // tx buffer must be is power of 2, else error
 
 //#define D_RAW_P_DISABLE_INTERNAL_RX_BUFFER 1
 //#define D_RAW_P_DISABLE_INTERNAL_TX_BUFFER 1
@@ -26,7 +26,7 @@
 ***************************************************************************************************
 */
 
-//#define D_RAW_P_TWO_BYTES_LEN_SUPPORT
+#define D_RAW_P_TWO_BYTES_LEN_SUPPORT
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     typedef u16 rawP_size_t;
@@ -79,8 +79,8 @@ typedef struct {
 
 #ifdef D_RAW_P_CRC_ENA
 
-    #define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
-    //#define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
+    //#define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
+    #define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC64               // enable crc64, check if multiple use crc then error
 

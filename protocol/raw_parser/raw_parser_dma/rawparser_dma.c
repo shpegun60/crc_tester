@@ -204,18 +204,13 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
             self->receiveState = RAW_P_DMA_RECEIVE_LEN_LOW;
         } else {
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-            if (ch > self->m_startByte) {
-                self->m_receivePackLen = (ch - 1U);
-            } else {
-                self->m_receivePackLen = ch;
-            }
-
+            self->m_receivePackLen = (ch > self->m_startByte) ? (ch - 1U) : ch;
+            self->m_receiveHandlePos = 0;
             self->receiveState = RAW_P_DMA_RECEIVE_DATA;
+
             M_Assert_WarningSaveCheck(((u32)self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
                                               self->receiveState = RAW_P_DMA_RECEIVE_ERR;
                                           }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
-
-            self->m_receiveHandlePos = 0;
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
         }
@@ -243,12 +238,11 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         self->m_receivePackLen |= (rawP_size_t)((((rawP_size_t)ch) << 8U) & 0x0000FF00UL); // read high byte
         self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen);
 
+        self->m_receiveHandlePos = 0;
         self->receiveState = RAW_P_DMA_RECEIVE_DATA;
         M_Assert_WarningSaveCheck((self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
                                           self->receiveState = RAW_P_DMA_RECEIVE_ERR;
                                       }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
-
-        self->m_receiveHandlePos = 0;
         break;
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
@@ -424,13 +418,15 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
 
         if(self->RX.size != 0) {
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-            if(self->RX.size > RSCODE_NPAR) {
-                /* Now decode -- encoded codeword size must be passed */
-                rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);
-                self->RX.size -= RSCODE_NPAR;
-            } else {
-                self->RX.size = 0;
-            }
+    if(self->RX.size < (RSCODE_NPAR + 1)) {
+        self->RX.size = 0U;
+        return &self->RX;
+    }
+
+    /* Now decode -- encoded codeword size must be passed */
+    rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);
+    self->RX.size -= RSCODE_NPAR;
+
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
             return &self->RX;
         }

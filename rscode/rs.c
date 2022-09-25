@@ -215,7 +215,7 @@ void rs_encode_data(rscode_driver * driver, unsigned char *msg, int nbytes, unsi
 
 void rs_encode_data_onlyParity(rscode_driver * driver, unsigned char *msg, int nbytes)
 {
-    int i,dbyte, j;
+    int i, dbyte, j;
 
     for(i = 0; i < RSCODE_NPAR+1; ++i) {
         driver->pBytes[i] = 0;
