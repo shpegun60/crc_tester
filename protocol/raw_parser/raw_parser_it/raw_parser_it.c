@@ -48,10 +48,10 @@ RawParser_it_t* rawParser_it_new(const u8 packStart)
     RawParser_it_t* self = (RawParser_it_t *)calloc(1, sizeof(RawParser_it_t));
     M_Assert_BreakSaveCheck(self == (RawParser_it_t *)NULL, M_EMPTY, return self, "RawParser_it_t: No memory for allocation ");
 
-
     rawParser_it_init(self, packStart);
     return self;
 }
+
 
 void rawParser_it_init(RawParser_it_t * const self, const u8 packStart)
 {
@@ -80,17 +80,67 @@ void rawParser_it_init(RawParser_it_t * const self, const u8 packStart)
     self->m_transmittPackLen = 0;
 
 
+#ifndef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
     self->TX.data = self->m_sendBuffer;
+#else
+    self->TX.data = NULL;
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
+
     self->TX.size = (rawP_size_t)0;
 
+
+#ifndef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
     self->RX.data = self->m_receiveFrameBuffer;
-    self->RX.size = (rawP_size_t)0;
+#else
+     self->RX.data = NULL;
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
+     self->RX.size = (rawP_size_t)0;
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     rs_initialize_ecc(&self->rs_ecc);
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 }
+
+
+
+#ifdef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
+void rawParser_it_setUserBufferTX(RawParser_it_t * const self, u8 * const txBuffer)
+{
+    M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return, "rawParser_it_setUserBufferTX: No valid input object");
+    M_Assert_Break((txBuffer == NULL), M_EMPTY, return, "rawParser_it_setUserBufferTX: No valid input TX buffer");
+
+    self->TX.data = txBuffer;
+    self->TX.size = (rawP_size_t)0;
+}
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
+
+#ifdef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
+void rawParser_it_setUserBufferRX(RawParser_it_t * const self, u8 * const rxBuffer)
+{
+    M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return, "rawParser_it_setUserBufferRX: No valid input object");
+    M_Assert_Break((rxBuffer == NULL), M_EMPTY, return, "rawParser_it_setUserBufferRX: No valid input RX buffer");
+
+    self->RX.data = rxBuffer;
+    self->RX.size = (rawP_size_t)0;
+}
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
+#if defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) && defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
+void rawParser_it_setUserBuffers(RawParser_it_t * const self, u8 * const rxBuffer, u8 * const txBuffer)
+{
+    M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return, "rawParser_it_setUserBuffers: No valid input object");
+    M_Assert_Break((rxBuffer == NULL || txBuffer == NULL), M_EMPTY, return, "rawParser_it_setUserBuffers: No valid input buffers");
+
+    self->TX.data = txBuffer;
+    self->TX.size = (rawP_size_t)0;
+
+    self->RX.data = rxBuffer;
+    self->RX.size = (rawP_size_t)0;
+}
+#endif /* defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) || defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER) */
+
 
 int rawParser_it_delete(RawParser_it_t** data)
 {
@@ -234,6 +284,9 @@ RawParser_Frame_t* RawParser_it_RXproceedIt(RawParser_it_t* const self, const u8
 
 RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 {
+    M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return NULL, "RawParser_it_RXproceedLoop: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return &self->RX, "RawParser_it_RXproceedLoop: No valid RX or/and TX buffer , call function before: -->  rawParser_it_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
+
 #ifdef D_RAW_P_CRC_ENA
     if(self->RX.size < (sizeof(rawP_crc_t) + 1U)) { // ignore packet because len less than 1 byte + crc size
         self->RX.size = 0U;
@@ -295,10 +348,24 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
 
 // -------------------------------TX----------------------------------------------------------------
-int RawParser_it_TXpush(RawParser_it_t* const self, int len)
+int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 {
+    M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return 0, "RawParser_it_TXpush: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return 0, "RawParser_it_TXpush: No valid RX or/and TX buffer , call function before: -->  rawParser_it_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
+
+#if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+    M_Assert_BreakSaveCheck((len + RSCODE_NPAR + sizeof(rawP_crc_t)) > D_RAW_P_TX_BUF_SIZE, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len + rs_code + crc--> %d, buffer--> %d", (len + RSCODE_NPAR + sizeof(rawP_crc_t)), D_RAW_P_TX_BUF_SIZE);
+#elif defined(D_RAW_P_CRC_ENA)
+    M_Assert_BreakSaveCheck((len + sizeof(rawP_crc_t)) > D_RAW_P_TX_BUF_SIZE, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len + crc--> %d, buffer--> %d", (len + sizeof(rawP_crc_t)), D_RAW_P_TX_BUF_SIZE);
+#else
+    M_Assert_BreakSaveCheck((len > D_RAW_P_TX_BUF_SIZE), M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len--> %d, buffer--> %d", len, D_RAW_P_TX_BUF_SIZE);
+#endif /* D_RAW_P_CRC_ENA */
+
+
+
+
 #if defined(D_RAW_P_CRC_ENA) || defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
-    int i;
+    reg i;
 #endif /* defined(D_RAW_P_CRC_ENA) || defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) */
 
 
@@ -374,6 +441,9 @@ int RawParser_it_TXpush(RawParser_it_t* const self, int len)
 
 int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch)
 {
+    M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return 0, "RawParser_it_TXproceedIt: No valid input");
+    M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return 0, "RawParser_it_TXproceedIt: No valid RX or/and TX buffer , call function before: -->  rawParser_it_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
+
     if(self->TX.size == 0) { // ignore packet because len equal 0
         return 0;
     }

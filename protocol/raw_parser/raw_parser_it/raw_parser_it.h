@@ -10,8 +10,14 @@ typedef struct {
     // packet form -----------------------------------------
     u8           m_startByte;                                   // Specifies the value of start-byte.
     u32          m_receivePackLen;
-    u8           m_receiveFrameBuffer[D_RAW_P_RX_BUF_SIZE];     // frame buffer to proceed into user logic`s
-    u8           m_sendBuffer[D_RAW_P_TX_BUF_SIZE];             // array for save tx buffer
+
+#ifndef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
+    u8           m_receiveFrameBuffer[D_RAW_P_RX_BUF_SIZE];   // frame buffer to proceed into user logic`s
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
+#ifndef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
+    u8           m_sendBuffer[D_RAW_P_TX_BUF_SIZE];    // array for save tx buffer
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
 
     // if crc enable -> crc data variable
 #ifdef D_RAW_P_CRC_ENA
@@ -41,6 +47,21 @@ typedef struct {
 
 RawParser_it_t* rawParser_it_new(const u8 packStart);
 void rawParser_it_init(RawParser_it_t * const self, const u8 packStart);
+
+// set external buffers
+#ifdef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER
+void rawParser_it_setUserBufferTX(RawParser_it_t * const self, u8 * const txBuffer);
+#endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
+
+#ifdef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
+void rawParser_it_setUserBufferRX(RawParser_it_t * const self, u8 * const rxBuffer);
+#endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
+
+#if defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) && defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
+void rawParser_it_setUserBuffers(RawParser_it_t * const self, u8 * const rxBuffer, u8 * const txBuffer);
+#endif /* defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) || defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER) */
+
+
 int rawParser_it_delete(RawParser_it_t** data);
 
 //------------------------------RX------------------------------------------------------------------------------------------
@@ -48,7 +69,7 @@ RawParser_Frame_t* RawParser_it_RXproceedIt(RawParser_it_t* const self, const u8
 RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self);
 
 // -------------------------------TX----------------------------------------------------------------
-int RawParser_it_TXpush(RawParser_it_t* const self, int len);
+int RawParser_it_TXpush(RawParser_it_t* const self, reg len);
 int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch);
 
 

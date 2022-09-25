@@ -235,7 +235,7 @@ typedef struct {
             #error you must enable CRC64 in CRC library first (uncommit _MY_CRC64_ENA)
         #endif /* defined(D_RAW_P_USE_CRC64) && !defined(_MY_CRC64_ENA) */
 
-    #endif
+    #endif /* crc check selection */
 
 #endif /* D_RAW_P_CRC_ENA */
 
