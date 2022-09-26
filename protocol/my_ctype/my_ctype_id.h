@@ -31,35 +31,6 @@
 #define TYPE_ARRAY_LENGTH   ((u8)(SREG_TYPE + 1))
 
 
-// all types. Commit this if types defines upper--------------------------
-
-
-
-typedef uint16_t        ;
-typedef uint32_t        ;
-typedef uint32_t        ;
-typedef uint64_t        ;
-
-typedef char            ;
-typedef int8_t          ;
-typedef int16_t         ;
-typedef int32_t         ;
-typedef int32_t         ;
-typedef int64_t         ;
-
-typedef float           ;
-typedef double          ;
-typedef long double     ; // platform depend type
-
-// bool type -------------------------
-typedef unsigned char   ;
-
-// bus types defining (platform depend) ----------------------------------------------
-typedef size_t      ;    // platform depend type
-typedef ptrdiff_t   ;   // platform depend type
-//------------------------------------------------------------------
-
-
 /* ***************************************************************************
  * PREPROCESSOR MACRO FOR GETTING ID WHEN IS KNOWN TYPE
  *

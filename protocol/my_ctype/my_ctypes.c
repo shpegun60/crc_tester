@@ -70,6 +70,14 @@ void pointerInit(reg n, u8* ptr)
     }
 }
 
+// fill data sizeof ---------------------------------------
+void pointerFill(reg n, u8* ptr, u8 data)
+{
+    while(n--) {
+        *ptr++ = data;
+    }
+}
+
 
 // string compleate------------------------------------------
 u8 cTypeStrnCmp(reg n, const c8* str1, const c8* str2)
