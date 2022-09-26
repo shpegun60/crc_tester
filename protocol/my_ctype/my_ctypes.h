@@ -72,9 +72,18 @@ forceinline void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
  * and platform dependent
  * *************************************************
  */
-forceinline void MY_CTYPE_USER_DATA_COPY_REGISTER(u8* from, u8* to)
+forceinline void MY_CTYPE_COPY_REGISTERS(reg* from, reg* to)
 {
     *(to) = *(from);
+}
+
+forceinline void MY_CTYPE_REVCOPY_REGISTERS(reg* from, reg* to)
+{
+    volatile reg rev;
+    volatile reg cpy = *(from);
+
+    MY_CTYPE_USER_DATA_REVCPY(sizeof(reg), (u8*)&cpy, (u8*)&rev);
+    *(to) = rev;
 }
 
 /*
@@ -103,7 +112,7 @@ forceinline u8 getMYCTypeLen(u8 type) {
     if(type < TYPE_ARRAY_LENGTH) {
         return typeLengthMappingArray[type];
     }
-    return ((u8)0);
+    return 0;
 }
 
 
@@ -117,6 +126,8 @@ void cTypePointerInit(u8 type, u8* ptr);
 
 // init data sizeof ---------------------------------------
 void pointerInit(reg n, u8* ptr);
+// fill data sizeof ---------------------------------------
+void pointerFill(reg n, u8* ptr, u8 data);
 
 // string compleate------------------------------------------
 u8 cTypeStrnCmp(reg n, const c8* str1, const c8* str2);

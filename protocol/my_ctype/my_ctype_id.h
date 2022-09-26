@@ -6,29 +6,58 @@
 #include "preprocessor_nat_eq.h"
 
 // types mapping ------------------------------------------
-#define VOID_TYPE 			0
+#define VOID_TYPE 			0   // uni
 // unsigned type
-#define UINT8_TYPE  		1
-#define UINT16_TYPE 		2
-#define UINT32_TYPE 		3
-#define UINT64_TYPE 		4
+#define UINT8_TYPE  		1   // u8
+#define UINT16_TYPE 		2   // u16
+#define UINT32_TYPE 		3   // u32
+#define UINT64_TYPE 		4   // u64
 //signed type
-#define CHAR_TYPE 			5
-#define INT8_TYPE 			6
-#define INT16_TYPE 			7
-#define INT32_TYPE 			8
-#define INT64_TYPE 			9
+#define CHAR_TYPE 			5   // c8
+#define INT8_TYPE 			6   // i8
+#define INT16_TYPE 			7   // i16
+#define INT32_TYPE 			8   // i32
+#define INT64_TYPE 			9   // i64
 // floating point type
-#define FLOAT_TYPE 			10
-#define DOUBLE_TYPE 		11
-#define LONG_DOUBLE_TYPE 	12 // platform depend type
+#define FLOAT_TYPE 			10  // f32
+#define DOUBLE_TYPE 		11  // f64
+#define LONG_DOUBLE_TYPE 	12  // f128     platform depend type
 // other types
-#define BOOL_TYPE 			13
-#define UINT24_TYPE 		14
-#define INT24_TYPE 			15
-#define REG_TYPE 			16 // platform depend type
-#define SREG_TYPE 			17 // platform depend type
+#define BOOL_TYPE 			13  // b
+#define UINT24_TYPE 		14  // u24
+#define INT24_TYPE 			15  // i24
+#define REG_TYPE 			16  // reg      platform depend type
+#define SREG_TYPE 			17  // sreg     platform depend type
 #define TYPE_ARRAY_LENGTH   ((u8)(SREG_TYPE + 1))
+
+
+// all types. Commit this if types defines upper--------------------------
+
+
+
+typedef uint16_t        ;
+typedef uint32_t        ;
+typedef uint32_t        ;
+typedef uint64_t        ;
+
+typedef char            ;
+typedef int8_t          ;
+typedef int16_t         ;
+typedef int32_t         ;
+typedef int32_t         ;
+typedef int64_t         ;
+
+typedef float           ;
+typedef double          ;
+typedef long double     ; // platform depend type
+
+// bool type -------------------------
+typedef unsigned char   ;
+
+// bus types defining (platform depend) ----------------------------------------------
+typedef size_t      ;    // platform depend type
+typedef ptrdiff_t   ;   // platform depend type
+//------------------------------------------------------------------
 
 
 /* ***************************************************************************

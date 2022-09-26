@@ -8,6 +8,7 @@ f32 getDynamicCastToFloat(void* data, u8 type)
 
     switch(type) {
 
+    // unsigned type---------------------------------------------------------------------------------------------
     case UINT8_TYPE:
         value = FLOAT_TYPE_C( *UINT8_TYPE_DC(data) );
         break;
@@ -24,6 +25,7 @@ f32 getDynamicCastToFloat(void* data, u8 type)
         value = FLOAT_TYPE_C( *UINT64_TYPE_DC(data) );
         break;
 
+    // signed type-----------------------------------------------------------------------------------------------
     case CHAR_TYPE:
         value = FLOAT_TYPE_C( *CHAR_TYPE_DC(data) );
         break;
@@ -44,6 +46,7 @@ f32 getDynamicCastToFloat(void* data, u8 type)
         value = FLOAT_TYPE_C( *INT64_TYPE_DC(data) );
         break;
 
+    // floating point type-------------------------------------------------------------------------------------
     case FLOAT_TYPE:
         value = FLOAT_TYPE_C( *FLOAT_TYPE_DC(data) );
         break;
@@ -54,6 +57,11 @@ f32 getDynamicCastToFloat(void* data, u8 type)
 
     case LONG_DOUBLE_TYPE:
         value = FLOAT_TYPE_C( *LONG_DOUBLE_TYPE_DC(data) );
+        break;
+
+    // other types --------------------------------------------------------------------------------------------
+    case BOOL_TYPE:
+        value = FLOAT_TYPE_C( *BOOL_TYPE_DC(data) );
         break;
 
     case UINT24_TYPE:
@@ -72,10 +80,6 @@ f32 getDynamicCastToFloat(void* data, u8 type)
         value = FLOAT_TYPE_C( *SREG_TYPE_DC(data) );
         break;
 
-    case BOOL_TYPE:
-        value = FLOAT_TYPE_C( *BOOL_TYPE_DC(data) );
-        break;
-
     default:
         value = FLOAT_TYPE_C(0.0f);
         break;
@@ -92,6 +96,7 @@ f64 getDynamicCastToDouble(void* data, u8 type)
 
     switch(type) {
 
+    // unsigned type---------------------------------------------------------------------------------------------
     case UINT8_TYPE:
         value = DOUBLE_TYPE_C( *UINT8_TYPE_DC(data) );
         break;
@@ -108,6 +113,7 @@ f64 getDynamicCastToDouble(void* data, u8 type)
         value = DOUBLE_TYPE_C( *UINT64_TYPE_DC(data) );
         break;
 
+    // signed type-----------------------------------------------------------------------------------------------
     case CHAR_TYPE:
         value = DOUBLE_TYPE_C( *CHAR_TYPE_DC(data) );
         break;
@@ -128,6 +134,7 @@ f64 getDynamicCastToDouble(void* data, u8 type)
         value = DOUBLE_TYPE_C( *INT64_TYPE_DC(data) );
         break;
 
+    // floating point type-------------------------------------------------------------------------------------
     case FLOAT_TYPE:
         value = DOUBLE_TYPE_C( *FLOAT_TYPE_DC(data) );
         break;
@@ -138,6 +145,11 @@ f64 getDynamicCastToDouble(void* data, u8 type)
 
     case LONG_DOUBLE_TYPE:
         value = DOUBLE_TYPE_C( *LONG_DOUBLE_TYPE_DC(data) );
+        break;
+
+    // other types --------------------------------------------------------------------------------------------
+    case BOOL_TYPE:
+        value = DOUBLE_TYPE_C( *BOOL_TYPE_DC(data) );
         break;
 
     case UINT24_TYPE:
@@ -156,10 +168,6 @@ f64 getDynamicCastToDouble(void* data, u8 type)
         value = DOUBLE_TYPE_C( *SREG_TYPE_DC(data) );
         break;
 
-    case BOOL_TYPE:
-        value = DOUBLE_TYPE_C( *BOOL_TYPE_DC(data) );
-        break;
-
     default:
         value = DOUBLE_TYPE_C(0.0);
         break;
@@ -173,6 +181,7 @@ void writeFloatToDynamicCast(void* data, u8 type, f32 value)
 {
     switch(type) {
 
+    // unsigned type---------------------------------------------------------------------------------------------
     case UINT8_TYPE:
         *UINT8_TYPE_DC(data) = UINT8_TYPE_C(value);
         break;
@@ -189,6 +198,7 @@ void writeFloatToDynamicCast(void* data, u8 type, f32 value)
         *UINT64_TYPE_DC(data) = UINT64_TYPE_C(value);
         break;
 
+    // signed type-----------------------------------------------------------------------------------------------
     case CHAR_TYPE:
         *CHAR_TYPE_DC(data) = CHAR_TYPE_C(value);
         break;
@@ -209,6 +219,7 @@ void writeFloatToDynamicCast(void* data, u8 type, f32 value)
         *INT64_TYPE_DC(data) = INT64_TYPE_C(value);
         break;
 
+    // floating point type-------------------------------------------------------------------------------------
     case FLOAT_TYPE:
         *FLOAT_TYPE_DC(data) = FLOAT_TYPE_C(value);
         break;
@@ -219,6 +230,11 @@ void writeFloatToDynamicCast(void* data, u8 type, f32 value)
 
     case LONG_DOUBLE_TYPE:
         *LONG_DOUBLE_TYPE_DC(data) = LONG_DOUBLE_TYPE_C(value);
+        break;
+
+    // other types --------------------------------------------------------------------------------------------
+    case BOOL_TYPE:
+        *BOOL_TYPE_DC(data) = BOOL_TYPE_C(value);
         break;
 
     case UINT24_TYPE:
@@ -235,10 +251,6 @@ void writeFloatToDynamicCast(void* data, u8 type, f32 value)
 
     case SREG_TYPE:
         *SREG_TYPE_DC(data) = SREG_TYPE_C(value);
-        break;
-
-    case BOOL_TYPE:
-        *BOOL_TYPE_DC(data) = SREG_TYPE_C(value);
         break;
 
     default:
@@ -250,6 +262,7 @@ void writeDoubleToDynamicCast(void* data, u8 type, f64 value)
 {
     switch(type) {
 
+    // unsigned type---------------------------------------------------------------------------------------------
     case UINT8_TYPE:
         *UINT8_TYPE_DC(data) = UINT8_TYPE_C(value);
         break;
@@ -266,6 +279,7 @@ void writeDoubleToDynamicCast(void* data, u8 type, f64 value)
         *UINT64_TYPE_DC(data) = UINT64_TYPE_C(value);
         break;
 
+    // signed type-----------------------------------------------------------------------------------------------
     case CHAR_TYPE:
         *CHAR_TYPE_DC(data) = CHAR_TYPE_C(value);
         break;
@@ -286,6 +300,7 @@ void writeDoubleToDynamicCast(void* data, u8 type, f64 value)
         *INT64_TYPE_DC(data) = INT64_TYPE_C(value);
         break;
 
+    // floating point type-------------------------------------------------------------------------------------
     case FLOAT_TYPE:
         *FLOAT_TYPE_DC(data) = FLOAT_TYPE_C(value);
         break;
@@ -296,6 +311,11 @@ void writeDoubleToDynamicCast(void* data, u8 type, f64 value)
 
     case LONG_DOUBLE_TYPE:
         *LONG_DOUBLE_TYPE_DC(data) = LONG_DOUBLE_TYPE_C(value);
+        break;
+
+    // other types --------------------------------------------------------------------------------------------
+    case BOOL_TYPE:
+        *BOOL_TYPE_DC(data) = BOOL_TYPE_C(value);
         break;
 
     case UINT24_TYPE:
@@ -312,10 +332,6 @@ void writeDoubleToDynamicCast(void* data, u8 type, f64 value)
 
     case SREG_TYPE:
         *SREG_TYPE_DC(data) = SREG_TYPE_C(value);
-        break;
-
-    case BOOL_TYPE:
-        *BOOL_TYPE_DC(data) = SREG_TYPE_C(value);
         break;
 
     default:

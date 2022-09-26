@@ -7,7 +7,8 @@
  */
 C_INLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to);
 C_INLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to);
-C_INLINE void MY_CTYPE_USER_DATA_COPY_REGISTER(u8* from, u8* to);
+C_INLINE void MY_CTYPE_COPY_REGISTERS(reg* from, reg* to);
+C_INLINE void MY_CTYPE_REVCOPY_REGISTERS(reg* from, reg* to);
 
 C_INLINE const u8* myCTypeGetTablePointer();
 C_INLINE u8 getMYCTypeLen(u8 type);
@@ -57,7 +58,7 @@ void cTypePointerInit(u8 type, u8* ptr)
     u8 len = getMYCTypeLen(type);
 
     while(len--) {
-        *ptr++ = ((u8)0);
+        *ptr++ = 0;
     }
 }
 
@@ -65,7 +66,7 @@ void cTypePointerInit(u8 type, u8* ptr)
 void pointerInit(reg n, u8* ptr)
 {
     while(n--) {
-        *ptr++ = ((u8)0);
+        *ptr++ = 0;
     }
 }
 
@@ -75,20 +76,20 @@ u8 cTypeStrnCmp(reg n, const c8* str1, const c8* str2)
 {
     while(n--) {
         if(*str1++ != *str2++) {
-            return ((u8)1);
+            return 1;
         }
     }
-    return ((u8)0);
+    return 0;
 }
 
 u8 cTypeStrnRevCmp(reg n, const c8* str1, const c8* str2)
 {
     while(n--) {
         if(*str1++ != *(str2 + n)) {
-            return ((u8)1);
+            return 1;
         }
     }
-    return ((u8)0);
+    return 0;
 }
 
 

@@ -28,7 +28,7 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_si
 
     while(it < D_RAW_P_IT_TEST_TRYING) {
         for(reg i = 0; i < size; ++i) {
-            data[i] += it;
+            data[i] += it;                  // shake data
             desc->TX.data[i] = data[i];
         }
 
@@ -101,12 +101,9 @@ int rawParserItTest(unsigned int randomSeed, int randTestCount)
         data[i] = i;
     }
 
-
-    conterNotvalid += receiveTransmittSimpleItTest(prot, data, 300);
-
-
-
-
+    while(randTestCount--) {
+        conterNotvalid += receiveTransmittSimpleItTest(prot, data, 300);
+    }
 
     free(data);
     conterNotvalid += rawParser_it_delete(&prot);
