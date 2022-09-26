@@ -418,10 +418,11 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
 
         if(self->RX.size != 0) {
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-    if(self->RX.size < (RSCODE_NPAR + 1)) {
-        self->RX.size = 0U;
-        return &self->RX;
-    }
+    M_Assert_WarningSaveCheck((self->RX.size < (RSCODE_NPAR + 1U)), M_EMPTY, {
+                                  self->RX.size = 0U;
+                                  return &self->RX;
+                              }, "RawParser_dma_proceed: not compleate len with ECC-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
+
 
     /* Now decode -- encoded codeword size must be passed */
     rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);

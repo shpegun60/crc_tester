@@ -92,4 +92,10 @@
 #define INLINE inline
 #endif /* INLINE */
 
+
+/* If using non-GNU C, then ignore __attribute__ */
+#ifndef __GNUC__
+# define __attribute__(x) /* NOTHING */
+#endif /* __GNUC__ */
+
 #endif /* __INLINE_H__ */

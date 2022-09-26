@@ -39,7 +39,7 @@
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     #define RECEIVE_EXTENDED_LEN_CMD (u8)(0xFFU)
-    #define D_RAW_P_LEN_SEPARATOR (u8)(0xFBU)
+    #define D_RAW_P_LEN_SEPARATOR 0xFBU
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
 /*
@@ -257,5 +257,13 @@ typedef struct {
 #if ((D_RAW_P_RX_BUF_SIZE > 16384U) || (D_RAW_P_TX_BUF_SIZE > 16384U))
     #error BUFFER`s must be less or equal than 16384U bytes per one packet (MTU)
 #endif // two bytes len support buffer check
+
+
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    #if D_RAW_P_LEN_SEPARATOR >= 0xFEU
+        #error D_RAW_P_LEN_SEPARATOR must be less than 254
+    #endif /* len separator check */
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
 #endif /* __RAW_PARSER_PORT_H__*/

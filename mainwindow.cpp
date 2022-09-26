@@ -10,7 +10,7 @@
 #include <time.h>       /* time */
 
 extern "C" {
-
+    #include "raw_parser_it_test.h"
 }
 
 #include "smart_assert.h"
@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER));
-    //protocolAllTest(time(NULL), 500, (TESTER_PULL_CONTAINER));
+    //protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER));
+    protocolAllTest(time(NULL), 500, (TESTER_RAW_P_DMA));
     //__M_assert_test();
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
@@ -33,6 +33,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     //callbackManagerTest();
     //qDebug() << "test: "<<pullContainerTest(123, 100);
+
+    qDebug() << "test: "<<rawParserItTest(1,2);
+
+    qDebug() << "crc: "<<fast_crc16_t10_dif_byte(0, 2);
 
     if(PREPROCESSOR_KEYWORD_EQ(return, case)) {
         qDebug() << "return equal to case";

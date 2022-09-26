@@ -304,26 +304,52 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
     rawP_crc_t m_calcCrc = D_RAW_P_CRC_INIT;
     D_RAW_P_CRC_START(m_calcCrc);
-    D_RAW_P_CRC_UPDATE(m_calcCrc, m_sizeWithoutCRC);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    if(m_sizeWithoutCRC > D_RAW_P_LEN_SEPARATOR) {
+        rawP_size_t tmp_len = LittleEndianU16(m_sizeWithoutCRC);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, RECEIVE_EXTENDED_LEN_CMD);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)( tmp_len         & 0x000000FFUL));
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)((tmp_len >> 8U)  & 0x000000FFUL));
+    } else {
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, m_sizeWithoutCRC);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    }
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
     for(reg i = 0; i < m_sizeWithoutCRC; ++i) {
-        D_RAW_P_CRC_UPDATE(m_calcCrc, self->RX.data[i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->RX.data[i]);
     }
     D_RAW_P_CRC_FINAL(m_calcCrc);
 
 #if defined(D_RAW_P_USE_CRC8)
     rawP_crc_t m_receiveCrc = self->RX.data[m_sizeWithoutCRC];
+    M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
+                                  self->RX.size = 0U;
+                                  return &self->RX;
+                              }, "RawParser_it_RXproceedLoop: not compleate CRC8, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC16)
     rawP_crc_t m_receiveCrc = LittleEndianU16( *UINT16_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
+    M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
+                                  self->RX.size = 0U;
+                                  return &self->RX;
+                              }, "RawParser_it_RXproceedLoop: not compleate CRC16, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC32)
     rawP_crc_t m_receiveCrc = LittleEndianU32( *UINT32_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
+    M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
+                                  self->RX.size = 0U;
+                                  return &self->RX;
+                              }, "RawParser_it_RXproceedLoop: not compleate CRC32, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC64)
     rawP_crc_t m_receiveCrc = LittleEndianU64( *UINT64_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
+    M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
+                                  self->RX.size = 0U;
+                                  return &self->RX;
+                              }, "RawParser_it_RXproceedLoop: not compleate CRC64, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #endif /* byte order selection */
-
-    if(m_calcCrc != m_receiveCrc) {
-        self->RX.size = 0U;
-        return &self->RX;
-    }
 
     self->RX.size = m_sizeWithoutCRC;
 
@@ -332,10 +358,10 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-    if(self->RX.size < (RSCODE_NPAR + 1U)) {
-        self->RX.size = 0U;
-        return &self->RX;
-    }
+    M_Assert_WarningSaveCheck((self->RX.size < (RSCODE_NPAR + 1U)), M_EMPTY, {
+                                  self->RX.size = 0U;
+                                  return &self->RX;
+                              }, "RawParser_it_RXproceedLoop: not compleate len with ECC-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
 
     /* Now decode -- encoded codeword size must be passed */
     rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);
@@ -381,22 +407,55 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 
 
 #if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) // add len to crc
-    D_RAW_P_CRC_UPDATE(m_calcCrc, (len + RSCODE_NPAR));
+    rawP_size_t tmp_len = (len + RSCODE_NPAR);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+
+    if(tmp_len > D_RAW_P_LEN_SEPARATOR) {
+        tmp_len = LittleEndianU16(tmp_len);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, RECEIVE_EXTENDED_LEN_CMD);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)( tmp_len         & 0x000000FFUL));
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)((tmp_len >> 8U)  & 0x000000FFUL));
+    } else {
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, tmp_len);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    }
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
 #elif defined(D_RAW_P_CRC_ENA)
-    D_RAW_P_CRC_UPDATE(m_calcCrc, len);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+
+    if(len > D_RAW_P_LEN_SEPARATOR) {
+        rawP_size_t tmp_len = LittleEndianU16(len);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, RECEIVE_EXTENDED_LEN_CMD);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)( tmp_len         & 0x000000FFUL));
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)((tmp_len >> 8U)  & 0x000000FFUL));
+    } else {
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, len);
+
+#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
+    }
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+
 #endif /* D_RAW_P_CRC_ENA */
 
 
 #ifdef D_RAW_P_CRC_ENA // calc crc data
     for (i = 0; i < len; ++i) {
-        D_RAW_P_CRC_UPDATE(m_calcCrc, self->TX.data[i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->TX.data[i]);
     }
 #endif /* D_RAW_P_CRC_ENA */
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA // add reed-solomon parity to crc and write to data
     for (i = 0; i < RSCODE_NPAR; ++i) {
-        D_RAW_P_CRC_UPDATE(m_calcCrc, self->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
         self->TX.data[len++] = self->rs_ecc.pBytes[RSCODE_NPAR-1-i];
     }
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
