@@ -24,7 +24,7 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_si
     int conterNotvalid = 0;
     int it = 0;
     //--------------------------------------------------------------------------------------------------
-
+    RawParser_it_RXproceedLoop(desc);
 
     while(it < D_RAW_P_IT_TEST_TRYING) {
         for(reg i = 0; i < size; ++i) {
@@ -101,8 +101,44 @@ int rawParserItTest(unsigned int randomSeed, int randTestCount)
         data[i] = i;
     }
 
+    conterNotvalid += receiveTransmittSimpleItTest(prot, data, 30);
+
     while(randTestCount--) {
-        conterNotvalid += receiveTransmittSimpleItTest(prot, data, 300);
+        reg len = 0;
+
+        while(len == 0) {
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+
+    #if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+            len = rand() % (D_RAW_P_MAX_PROTOCOL_LEN - RSCODE_NPAR - sizeof(rawP_crc_t));
+    #elif defined(D_RAW_P_CRC_ENA)
+            len = rand() % (D_RAW_P_MAX_PROTOCOL_LEN - sizeof(rawP_crc_t));
+    #elif defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+            len = rand() % (D_RAW_P_MAX_PROTOCOL_LEN - RSCODE_NPAR);
+    #else
+            len = rand() % D_RAW_P_MAX_PROTOCOL_LEN;
+    #endif /* defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) */
+
+#else
+
+    #if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+            len = rand() % (D_RAW_P_TX_BUF_SIZE - RSCODE_NPAR - sizeof(rawP_crc_t));
+    #elif defined(D_RAW_P_CRC_ENA)
+            len = rand() % (D_RAW_P_TX_BUF_SIZE - sizeof(rawP_crc_t));
+    #elif defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+            len = rand() % (D_RAW_P_TX_BUF_SIZE - RSCODE_NPAR);
+    #else
+            len = rand() % D_RAW_P_TX_BUF_SIZE;
+    #endif /* defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) */
+
+#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
+        }
+
+        for(reg j = 0; j < len; ++j) {
+            data[j] = rand() % 256;
+        }
+
+        conterNotvalid += receiveTransmittSimpleItTest(prot, data, len);
     }
 
     free(data);

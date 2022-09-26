@@ -45,7 +45,7 @@
 
 // receive functions-----------------------------------------------------------------------------------------
 C_INLINE void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte);
-C_INLINE void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, rawP_size_t len);
+C_INLINE void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, reg len);
 
 // elementary byte adding functions ----------------------------------------------------------------------------
 C_INLINE void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte);
@@ -64,7 +64,6 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
     RawParser_dma_t* self = (RawParser_dma_t *)calloc(1, sizeof(RawParser_dma_t));
     M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return self, "rawParser_dma_new: No memory for allocation ");
 
-
     rawParser_dma_init(self, packStart);
     return self;
 }
@@ -77,9 +76,8 @@ void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
 
     M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return, "rawParser_dma_init: No input data valid ");
 
-
     self->m_startByte = packStart;
-    self->m_receivePackLen = (rawP_size_t)0;
+    self->m_receivePackLen = 0;
 
 #ifdef D_RAW_P_CRC_ENA
     self->m_receiveCalcCRC = D_RAW_P_CRC_INIT;
@@ -106,7 +104,7 @@ void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
     self->TX.data = NULL;
 #endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
 
-    self->TX.size = (rawP_size_t)0;
+    self->TX.size = 0;
 
 #ifndef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
     self->RX.data = self->m_receiveFrameBuffer;
@@ -114,7 +112,7 @@ void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
      self->RX.data = NULL;
 #endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
 
-    self->RX.size = (rawP_size_t)0;
+    self->RX.size = 0;
 
     self->uniRXPosition = 0;
 
@@ -132,7 +130,7 @@ void rawParser_dma_setUserBufferTX(RawParser_dma_t * const self, u8 * const txBu
     M_Assert_Break((txBuffer == NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input TX buffer");
 
     self->TX.data = txBuffer;
-    self->TX.size = (rawP_size_t)0;
+    self->TX.size = 0;
 }
 #endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
 
@@ -143,7 +141,7 @@ void rawParser_dma_setUserBufferRX(RawParser_dma_t * const self, u8 * const rxBu
     M_Assert_Break((rxBuffer == NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input RX buffer");
 
     self->RX.data = rxBuffer;
-    self->RX.size = (rawP_size_t)0;
+    self->RX.size = 0;
 }
 #endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
 
@@ -154,10 +152,10 @@ void rawParser_dma_setUserBuffers(RawParser_dma_t * const self, u8 * const rxBuf
     M_Assert_Break((rxBuffer == NULL || txBuffer == NULL), M_EMPTY, return, "rawParser_dma_setUserBuffer: No valid input buffers");
 
     self->TX.data = txBuffer;
-    self->TX.size = (rawP_size_t)0;
+    self->TX.size = 0;
 
     self->RX.data = rxBuffer;
-    self->RX.size = (rawP_size_t)0;
+    self->RX.size = 0;
 }
 #endif /* defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) || defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER) */
 
@@ -187,7 +185,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         D_RAW_P_CRC_START(self->m_receiveCalcCRC);
 #endif /* D_RAW_P_CRC_ENA */
 
-        self->m_receiveHandlePos = 0U;
+        self->m_receiveHandlePos = 0;
         self->receiveState = RAW_P_DMA_RECEIVE_LEN_0;
     }
 
@@ -196,7 +194,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
     case RAW_P_DMA_RECEIVE_LEN_0:
 
 #ifdef D_RAW_P_CRC_ENA
-    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+        self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #endif /* D_RAW_P_CRC_ENA */
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
@@ -208,7 +206,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
             self->m_receiveHandlePos = 0;
             self->receiveState = RAW_P_DMA_RECEIVE_DATA;
 
-            M_Assert_WarningSaveCheck(((u32)self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
+            M_Assert_WarningSaveCheck((self->m_receivePackLen > D_RAW_P_RX_BUF_SIZE || self->m_receivePackLen == 0), M_EMPTY, {
                                               self->receiveState = RAW_P_DMA_RECEIVE_ERR;
                                           }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
 
@@ -222,7 +220,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
     case RAW_P_DMA_RECEIVE_LEN_LOW:
 
 #ifdef D_RAW_P_CRC_ENA
-    self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
+        self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #endif /* D_RAW_P_CRC_ENA */
 
         self->m_receivePackLen = (rawP_size_t)(ch & 0x000000FFUL);    // read low byte
@@ -421,7 +419,7 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
     M_Assert_WarningSaveCheck((self->RX.size < (RSCODE_NPAR + 1U)), M_EMPTY, {
                                   self->RX.size = 0U;
                                   return &self->RX;
-                              }, "RawParser_dma_proceed: not compleate len with ECC-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
+                              }, "RawParser_dma_proceed: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
 
 
     /* Now decode -- encoded codeword size must be passed */
@@ -437,10 +435,10 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
 }
 
 // slow shield functions (slow & more copy)-----------------------------------------------------------------------------------------
-RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* data, rawP_size_t len)
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* data, reg len)
 {
-    M_Assert_Break((self == (RawParser_dma_t*)NULL || len == 0), M_EMPTY, return (RawParser_Frame_t*)NULL, "RawParser_dma_shieldFrame: No valid input");
-    M_Assert_Break((data == (u8*)NULL), M_EMPTY, {
+    M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return (RawParser_Frame_t*)NULL, "RawParser_dma_shieldFrame: No valid input");
+    M_Assert_Break((data == (u8*)NULL) || len == 0, M_EMPTY, {
                        self->TX.size = 0;
                        return &self->TX;
                    }, "RawParser_dma_shieldFrame: No valid input");
@@ -448,7 +446,6 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* da
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     RawParser_dma_startTransmittPacket(self, (len + RSCODE_NPAR));
-
     rs_encode_data_onlyParity(&self->rs_ecc, data, len);
 #else
     RawParser_dma_startTransmittPacket(self, len);
@@ -469,19 +466,19 @@ RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* da
 }
 
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
-void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, rawP_size_t predictedLen)
+void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, reg predictedLen) /////////////////////////////////////////////////////
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input");
     M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
+    M_Assert_Break((predictedLen == 0), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length");
 
-#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
-    M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_MAX_PROTOCOL_LEN - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, maxTxLen: %d", predictedLen, D_RAW_P_MAX_PROTOCOL_LEN);
-    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_MAX_PROTOCOL_LEN >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: UNDEFINED BEHAVIOR!!! recomended packet length must be less than half - maximun protocol size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_MAX_PROTOCOL_LEN >> 1));
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE // control undefined behavior
+    M_Assert_Break( ((predictedLen + 4) > (D_RAW_P_MAX_PROTOCOL_LEN - 1)), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, maxTxLen: %d", predictedLen, D_RAW_P_MAX_PROTOCOL_LEN);
+    M_Assert_Warning((predictedLen > (D_RAW_P_MAX_PROTOCOL_LEN >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: UNDEFINED BEHAVIOR!!! recomended packet length must be less than half - maximun protocol size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_MAX_PROTOCOL_LEN >> 1));
 #else
-    M_Assert_Break(( (predictedLen == 0) || ( ((u32)predictedLen + 2) > (D_RAW_P_TX_BUF_SIZE - 1)) ), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, buffer: %d", predictedLen, D_RAW_P_TX_BUF_SIZE);
-    M_Assert_Warning(((u32)predictedLen > (D_RAW_P_TX_BUF_SIZE >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: UNDEFINED BEHAVIOR!!! recomended packet length must be less than half - buffer size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_TX_BUF_SIZE >> 1));
+    M_Assert_Break( (predictedLen + 4) > (D_RAW_P_TX_BUF_SIZE - 1), M_EMPTY, return, "RawParser_dma_startTransmittPacket: No valid input length: %d, buffer: %d", predictedLen, D_RAW_P_TX_BUF_SIZE);
+    M_Assert_Warning((predictedLen > (D_RAW_P_TX_BUF_SIZE >> 1)), M_EMPTY, M_EMPTY, "RawParser_dma_startTransmittPacket: UNDEFINED BEHAVIOR!!! recomended packet length must be less than half - buffer size !!!, Txlen: %d, recomendedLen: %d", predictedLen, (D_RAW_P_TX_BUF_SIZE >> 1));
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-
 
 
 #ifdef D_RAW_P_CRC_ENA
