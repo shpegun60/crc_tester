@@ -1,4 +1,5 @@
 #include "raw_parser_it_test.h"
+#include <stdio.h>
 
 #ifndef D_RAW_P_TEST_DISABLE
 
@@ -36,6 +37,8 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_si
 
         if(desc->TX.size == 0) {
             ++conterNotvalid;
+            desc->RX.size = 0;
+            desc->TX.size = 0;
             return conterNotvalid;
         }
 
@@ -51,10 +54,14 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_si
 
              if(RX == NULL) {
                  ++conterNotvalid;
+                 desc->RX.size = 0;
+                 desc->TX.size = 0;
                  return conterNotvalid;
              } else if(RX->size) {
                 if(RX->size != size) {
                     ++conterNotvalid;
+                    desc->RX.size = 0;
+                    desc->TX.size = 0;
                     return conterNotvalid;
                 }
             }
@@ -73,11 +80,76 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_si
     return conterNotvalid;
 }
 
+static int receiveTransmittCollisionItTest(RawParser_it_t* desc, u8 * data, rawP_size_t size)
+{
+    if(desc == NULL || data == NULL) {
+        return 1;
+    }
+
+    int conterNotvalid = 0;
+    //-----------------------------------------------------------------------------------------------------------------------------
+    RawParser_it_RXproceedLoop(desc);
+    for(reg i = 0; i < size; ++i) {
+        desc->TX.data[i] = data[i];
+    }
+    RawParser_it_TXpush(desc, size);
+
+    if(desc->TX.size == 0) {
+        ++conterNotvalid;
+        desc->RX.size = 0;
+        desc->TX.size = 0;
+        return conterNotvalid;
+    }
+
+    // get pos to crash byte
+    reg pos = 0;
+    while(pos == 0) {
+         pos = rand() % desc->TX.size;
+    }
+
+    u8 randdata = desc->TX.data[pos];
+    while(randdata == desc->TX.data[pos]) {
+        randdata = rand() % 256;
+    }
+    desc->TX.data[pos] = randdata;
 
 
-int rawParserItTest(unsigned int randomSeed, int randTestCount)
+    RawParser_Frame_t* RX = NULL;
+    u8 ch;
+    while(desc->TX.size) {
+        if(RawParser_it_TXproceedIt(desc, &ch)) {
+            RawParser_it_RXproceedIt(desc, ch);
+        }
+
+        RX = RawParser_it_RXproceedLoop(desc);
+
+         if(RX == NULL) {
+             ++conterNotvalid;
+             desc->RX.size = 0;
+             desc->TX.size = 0;
+             return conterNotvalid;
+         } else if(RX->size) {
+            printf("RAW PARSER IT: collision\n");
+            ++conterNotvalid;
+            desc->RX.size = 0;
+            desc->TX.size = 0;
+            return conterNotvalid;
+        }
+    }
+
+    desc->RX.size = 0;
+    desc->TX.size = 0;
+
+    //-----------------------------------------------------------------------------------------------------------------------------
+    return conterNotvalid;
+}
+
+
+
+int rawParserItTest(unsigned int randomSeed, int randTestCount, int collisionTestEna)
 {
     int conterNotvalid = 0;
+    int collisionsCounter = 0;
     srand(randomSeed); // use current time as seed for random generator
 
     //--------------------------------------------------------------------------------------------------
@@ -139,8 +211,16 @@ int rawParserItTest(unsigned int randomSeed, int randTestCount)
         }
 
         conterNotvalid += receiveTransmittSimpleItTest(prot, data, len);
+        if(collisionTestEna) {
+            collisionsCounter += receiveTransmittCollisionItTest(prot, data, len);
+        }
     }
 
+    printf("\n------------------->RAW PARSER IT RESULT<--------------------------------------------------------------\n");
+    printf("RAW PARSER IT: collisions: %d, %s\n", collisionsCounter, collisionTestEna ? "ENABLE" : "DISABLE");
+    printf("RAW PARSER IT: errors: %d\n", conterNotvalid);
+    printf("---------------------------------------------------------------------------------\n");
+    fflush(stdout);
     free(data);
     conterNotvalid += rawParser_it_delete(&prot);
     //--------------------------------------------------------------------------------------------------

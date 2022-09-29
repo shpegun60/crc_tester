@@ -1,5 +1,6 @@
 #include "protocol_test.h"
 #include "protocol.h"
+#include "raw_parser_it_test.h"
 
 #include <stdio.h>
 
@@ -141,6 +142,25 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
 
+    printf("\n***************************************************************************************\n");
+    printf("----------->>RAWPARSER IT TEST<<--------------------\n");
+    printf("***************************************************************************************\n");
+
+    int RawParserItTest = 0;
+
+#ifndef D_RAW_P_TEST_DISABLE
+    if(testFlags & TESTER_RAW_P_IT) {
+        RawParserItTest = rawParserItTest(randomSeed, testCnt, 1);
+    } else {
+        printf("...FLAGS: RAWPARSER IT TEST DISABLED\n");
+    }
+#else
+    printf("...DEFINE: RAWPARSER IT TEST TEST DISABLED\n");
+#endif /* CALL_B_MAN_TEST_DISABLE */
+
+
+
+
 
     printf("\n***************************************************************************************\n");
     printf("----------->>RESULTS<<--------------------\n");
@@ -153,6 +173,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("REED-SOLOMON TEST EXIT WITH ERROR: %d\n", Reed_Solomon_Test);
     printf("CALLBACK MANAGER TEST EXIT WITH ERROR: %d\n", CallbackManager_Test);
     printf("POOL CONTAINER TEST EXIT WITH ERROR: %d\n", Pool_Container_Test);
+    printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
 
 
     fflush(stdout);

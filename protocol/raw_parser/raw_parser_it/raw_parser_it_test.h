@@ -5,7 +5,7 @@
 
 #ifndef D_RAW_P_TEST_DISABLE
 
-int rawParserItTest(unsigned int randomSeed, int randTestCount);
+int rawParserItTest(unsigned int randomSeed, int randTestCount, int collisionTestEna);
 
 #endif /* D_RAW_P_TEST_DISABLE */
 
