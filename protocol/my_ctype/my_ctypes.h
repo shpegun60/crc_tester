@@ -11,6 +11,10 @@
 #define NULL (void *)0
 #endif /* NULL */
 
+#ifndef SIZEOF // macro for find sizeof struct-field without declare object
+    #define SIZEOF(structName, field) ((size_t) sizeof(((structName *)0)->field))
+#endif /* SIZEOF */
+
 
 
 // all types. Commit this if types defines upper--------------------------

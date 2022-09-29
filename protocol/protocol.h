@@ -88,8 +88,16 @@ extern "C" {
  */
 
 #ifndef CALL_B_MAN_TEST_DISABLE
-    //#define CALL_B_MAN_TEST_DISABLE
+    //#define CALL_B_MAN_TEST_DISABLE 1
 #endif /* CALL_B_MAN_TEST_DISABLE */
+
+#ifndef CALL_B_MAN_MAX_COMMAND_FUNCTIONS
+    #define CALL_B_MAN_MAX_COMMAND_FUNCTIONS 256
+#endif /* CALL_B_MAN_MAX_COMMAND_FUNCTIONS */
+
+#ifndef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
+    //#define CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT 1
+#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
 
 #include "callback_manager.h"
 #include "callback_manager_test.h"
