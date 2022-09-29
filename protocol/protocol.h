@@ -61,6 +61,11 @@ extern "C" {
 #include "raw_parser_dma_test.h"
 
 
+// RAW PARSER IT LIB--------------------------------------
+#include "raw_parser_it.h"
+#include "raw_parser_it_test.h"
+
+
 /****************************************************************************************
  * REED - SOLOMON ECC LIB
  */
