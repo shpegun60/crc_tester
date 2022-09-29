@@ -8,8 +8,12 @@
 #include "my_ctype_id.h"
 
 #ifndef NULL
-#define NULL (void *)0
+#define NULL ((void *)0)
 #endif /* NULL */
+
+#ifndef NULLPTR
+    #define NULLPTR(type) ((type *)NULL)
+#endif /* NULLPTR */
 
 #ifndef SIZEOF // macro for find sizeof struct-field without declare object
     #define SIZEOF(structName, field) ((size_t) sizeof(((structName *)0)->field))
