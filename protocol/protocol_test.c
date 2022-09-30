@@ -176,6 +176,14 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
 
 
+//    u32 data;
+//    if (__builtin_types_compatible_p(int, MY_CTYPE_GET_TYPE(INT32_TYPE))) {
+//        printf("TYPE YES---------------------------------id: %d\n", MY_CTYPE_GET_TYPE_ID(int));
+//    } else {
+//        printf("TYPE NOT---------------------------------\n");
+//    }
+
+
     fflush(stdout);
     fflush(stderr);
     return 0;

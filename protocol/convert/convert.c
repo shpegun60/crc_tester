@@ -282,7 +282,7 @@ int TEMPLATE(convertTest_WRITE_READ_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8
 
     // write function check
     ok = CTYPE_TRUE;
-    for(typeof(sizeof(u64)) i = 0; i < sizeof(u64); ++i) {
+    for(reg i = 0; i < sizeof(u64); ++i) {
         write_ptr(sizeof(u64), buff, &pos, (u8*)&value, i, &ok);
         if(ok == CTYPE_TRUE || pos != 0) {
             ++notValidcnt;
@@ -307,7 +307,7 @@ int TEMPLATE(convertTest_WRITE_READ_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8
 
     // read functions check
     ok = CTYPE_TRUE;
-    for(typeof(sizeof(u64)) i = 0; i < sizeof(u64); ++i) {
+    for(reg i = 0; i < sizeof(u64); ++i) {
         read_ptr(sizeof(u64), buff, &pos, (u8*)&value_check, i, &ok);
         if(ok == CTYPE_TRUE || pos != 0) {
             ++notValidcnt;
@@ -342,7 +342,7 @@ int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, uni) (void (*read_ptr)(reg 
 
     // write function check
     ok = CTYPE_TRUE;
-    for(typeof(sizeof(u64)) i = 0; i < sizeof(u64); ++i) {
+    for(reg i = 0; i < sizeof(u64); ++i) {
         write_ptr(sizeof(u64), buff, pos, (u8*)&value, i, &ok);
         if(ok == CTYPE_TRUE) {
             ++notValidcnt;
@@ -367,7 +367,7 @@ int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, uni) (void (*read_ptr)(reg 
 
     // read functions check
     ok = CTYPE_TRUE;
-    for(typeof(sizeof(u64)) i = 0; i < sizeof(u64); ++i) {
+    for(reg i = 0; i < sizeof(u64); ++i) {
         read_ptr(sizeof(u64), buff, pos, (u8*)&value_check, i, &ok);
         if(ok == CTYPE_TRUE) {
             ++notValidcnt;
