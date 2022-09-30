@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+// COMPILER PREDEFINES ------------------------------------------
+#include "compiler_predef.h"
+
 // PREPROCESSOR LIB--------------------------------------
 #include "preprocessor.h"
 

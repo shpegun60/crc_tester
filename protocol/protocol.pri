@@ -10,12 +10,14 @@ include($$PWD/smart_assert/smart_assert.pri)
 include($$PWD/preprocessor/preprocessor.pri)
 include($$PWD/callback_manager/callback_manager.pri)
 include($$PWD/pool_container/pool_container.pri)
+include($$PWD/entityframework/entityframework.pri)
 
 
 SOURCES +=  \
     $$PWD/protocol_test.c
 
 HEADERS += \
+    $$PWD/compiler_predef.h \
     $$PWD/inline.h \
     $$PWD/protocol.h \
     $$PWD/protocol_test.h

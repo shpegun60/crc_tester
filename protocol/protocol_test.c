@@ -174,6 +174,8 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("CALLBACK MANAGER TEST EXIT WITH ERROR: %d\n", CallbackManager_Test);
     printf("POOL CONTAINER TEST EXIT WITH ERROR: %d\n", Pool_Container_Test);
     printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
+    printf("COMPILER VERSION: %s %ld\n", PREDEF_COMPILER_NAME, __STDC_VERSION__);
+
 
 
 //    u32 data;
