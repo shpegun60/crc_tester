@@ -30,7 +30,6 @@ typedef struct Entity       Entity;
   * @param  context     - pointer to context for callback (programmer must cast to other last defined value).
   * @retval None
   */
-
 typedef struct {
     void (*entityCallback)(Entity* entity, EntityField* field, void* context); // callback function
     void* context;                                                             // callback context
@@ -77,7 +76,6 @@ struct EntityField {
 struct Entity {
     void*           pointer;
     u8              isHeap;
-
     char            descr[ENTITY_DECRIPTION_SIZE];
     u16             fields_count;
     EntityField*    fields;
@@ -93,11 +91,31 @@ typedef struct {
     Entity** entities;
 } EntityInfo;
 
-extern EntityInfo entityInfo; // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+extern EntityInfo entityInfo;  // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
 
 
+/*
+ * **********************************************************************************************************************************
+ * entity new/delete functions
+ * **********************************************************************************************************************************
+ */
 
-void clearEntities(void);
+// delete all entities and deallocation all memory
+void deleteEntities(void);
+// delete some entity
+void deleteEntitityFields(int entityNumber);
+
+// allocation new entities pointers
+int newEntities(int nomberOfEntities);
+// allocation entitites pointer & fields
+int initEntity(int NumberOfFields, reg pointerSize, char * descr, b isCustomSpace, b isHeap, void* arg);
+
+/*
+ * **********************************************************************************************************************************
+ *  field functions
+ * **********************************************************************************************************************************
+ */
+
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */
 

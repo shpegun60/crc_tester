@@ -7,21 +7,44 @@
 #include "inline.h"
 #include "my_ctype_id.h"
 
+/************************************************************************************
+ *  null pointer macro if not declarated upper
+ */
 #ifndef NULL
 #define NULL ((void *)0)
 #endif /* NULL */
 
+/************************************************************************************
+ *  macro for cast null pointer to user type
+ */
 #ifndef NULLPTR
     #define NULLPTR(type) ((type)NULL)
 #endif /* NULLPTR */
 
-#ifndef SIZEOF_STRUCT // macro for find sizeof struct-field without declare object
+/************************************************************************************
+ *  macro for find sizeof struct-field without declare object
+ */
+#ifndef SIZEOF_STRUCT
     #define SIZEOF_STRUCT(structName, field) ((size_t) sizeof(((structName *)0)->field))
 #endif /* SIZEOF_STRUCT */
 
-#ifndef TYPEOF_STRUCT // macro for find typeof struct-field without declare object
-    #define TYPEOF_STRUCT(structName, field) typeof(((structName *)0)->field)
+/************************************************************************************
+ *  macro for find typeof struct-field without declare object
+ *  WARNING!!! Do not change this macro if you use GNU-C compiler, change operator typeof to __typeof__ if you use ISO-C compiler!!!
+ *  OR use only __typeof__ operator because it supported on GNU and ISO compilers
+ */
+#ifndef TYPEOF_STRUCT
+    #define TYPEOF_STRUCT(structName, field) __typeof__(((structName *)0)->field)
 #endif /* TYPEOF_STRUCT */
+
+/************************************************************************************
+ *  macro for find typeof from user value
+ *  WARNING!!! Do not change this macro if you use GNU-C compiler, change operator typeof to __typeof__ if you use ISO-C compiler!!!
+ *  OR use only __typeof__ operator because it supported on GNU and ISO
+ */
+#ifndef TYPEOF_DATA
+    #define TYPEOF_DATA(data) __typeof__(data)
+#endif /* TYPEOF_DATA */
 
 
 
@@ -54,7 +77,7 @@ typedef unsigned char   b;
 // bus types defining (platform depend) ----------------------------------------------
 typedef size_t      reg;    // platform depend type
 typedef ptrdiff_t   sreg;   // platform depend type
-//------------------------------------------------------------------
+//------------------------------------------------------------------------------------
 
 
 /*
