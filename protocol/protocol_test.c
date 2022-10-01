@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "entity_port.h"
+#include "entity_manager.h"
 
 
 int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
@@ -178,8 +179,6 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
     printf("COMPILER VERSION: %s %ld\n", PREDEF_COMPILER_NAME, __STDC_VERSION__);
     printf("ENTITY VERSION: %d, %s\n", C_ENTITY_FRAMEWORK_LIB_VERSION, C_ENTITY_FRAMEWORK_LIB_VERSION_INFO);
-
-
 
 //    u32 data;
 //    if (__builtin_types_compatible_p(int, MY_CTYPE_GET_TYPE(INT32_TYPE))) {

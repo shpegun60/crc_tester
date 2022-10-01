@@ -76,6 +76,8 @@ struct EntityField {
 
 struct Entity {
     void*           pointer;
+    u8              isHeap;
+
     char            descr[ENTITY_DECRIPTION_SIZE];
     u16             fields_count;
     EntityField*    fields;

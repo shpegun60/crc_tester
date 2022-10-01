@@ -30,6 +30,18 @@
 #endif /* ENTITY_DECRIPTION_SIZE */
 
 /* **********************************************************************************************************************************
+ * Maximum number o entity
+ */
+#ifndef MAX_NUBER_OF_ENTITIES
+#   define MAX_NUBER_OF_ENTITIES 255
+#endif /* MAX_NUBER_OF_ENTITIES */
+
+/* **********************************************************************************************************************************
+ * USE USER custom space (not allocation for ENTITY POINTER)
+ */
+
+
+/* **********************************************************************************************************************************
  *  ENTITY use callbacks
  *
  *  if you want use read or write callbacks uncommit this defines

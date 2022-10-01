@@ -12,12 +12,16 @@
 #endif /* NULL */
 
 #ifndef NULLPTR
-    #define NULLPTR(type) ((type *)NULL)
+    #define NULLPTR(type) ((type)NULL)
 #endif /* NULLPTR */
 
-#ifndef SIZEOF // macro for find sizeof struct-field without declare object
-    #define SIZEOF(structName, field) ((size_t) sizeof(((structName *)0)->field))
-#endif /* SIZEOF */
+#ifndef SIZEOF_STRUCT // macro for find sizeof struct-field without declare object
+    #define SIZEOF_STRUCT(structName, field) ((size_t) sizeof(((structName *)0)->field))
+#endif /* SIZEOF_STRUCT */
+
+#ifndef TYPEOF_STRUCT // macro for find typeof struct-field without declare object
+    #define TYPEOF_STRUCT(structName, field) typeof(((structName *)0)->field)
+#endif /* TYPEOF_STRUCT */
 
 
 
