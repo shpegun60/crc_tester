@@ -65,6 +65,30 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         }\
     }while(0L)
 
+
+// else breaking asserts
+#   define M_Assert_BreakElse(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        if(Expr) {\
+            trueExpr;\
+        } else {\
+            falseBeforeExpr;\
+            __M_Error("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            falseAfterExpr;\
+        }\
+    }while(0L)
+
+#   define M_Assert_BreakElseSaveCheck(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        if(Expr) {\
+            trueExpr;\
+        } else {\
+            falseBeforeExpr;\
+            __M_Error("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            falseAfterExpr;\
+        }\
+    }while(0L)
+
 /*
  * ***********************************************************************************************************************************************
  *  defines no break program
@@ -86,6 +110,30 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
             beforeExpr;\
             __M_Warning((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
             afterExpr;\
+        }\
+    }while(0L)
+
+
+// else warning asserts
+#   define M_Assert_WarningElse(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        if(Expr) {\
+            trueExpr;\
+        } else {\
+            falseBeforeExpr;\
+            __M_Warning("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            falseAfterExpr;\
+        }\
+    }while(0L)
+
+#   define M_Assert_WarningElseSaveCheck(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        if(Expr) {\
+            trueExpr;\
+        } else {\
+            falseBeforeExpr;\
+            __M_Warning("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);\
+            falseAfterExpr;\
         }\
     }while(0L)
 
@@ -129,6 +177,19 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         }\
     }while(0L)
 
+// else breaking asserts
+#   define M_Assert_BreakElse(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        trueExpr;\
+    }while(0L)
+
+#   define M_Assert_BreakElseSaveCheck(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        if(Expr) {\
+            trueExpr;\
+        }\
+    }while(0L)
+
 /*
  * ***********************************************************************************************************************************************
  *  defines no break program
@@ -142,6 +203,19 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
         if (Expr) {\
             beforeExpr;\
             afterExpr;\
+        }\
+    }while(0L)
+
+// else warning asserts
+#   define M_Assert_WarningElse(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        trueExpr;\
+    }while(0L)
+
+#   define M_Assert_WarningElseSaveCheck(Expr, trueExpr, falseBeforeExpr, falseAfterExpr, Msg, arg...)\
+    do{\
+        if(Expr) {\
+            trueExpr;\
         }\
     }while(0L)
 

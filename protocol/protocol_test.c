@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 
+#include "entity_port.h"
+
 
 int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 {
@@ -175,6 +177,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("POOL CONTAINER TEST EXIT WITH ERROR: %d\n", Pool_Container_Test);
     printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
     printf("COMPILER VERSION: %s %ld\n", PREDEF_COMPILER_NAME, __STDC_VERSION__);
+    printf("ENTITY VERSION: %d, %s\n", C_ENTITY_FRAMEWORK_LIB_VERSION, C_ENTITY_FRAMEWORK_LIB_VERSION_INFO);
 
 
 

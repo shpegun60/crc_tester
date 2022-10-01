@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER | TESTER_RAW_P_IT));
+    //protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER | TESTER_RAW_P_IT));
     //protocolAllTest(time(NULL), 1000, (TESTER_RAW_P_DMA));
     //protocolAllTest(time(NULL), 1000, (TESTER_RAW_P_IT));
 
@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
     M_Assert_disableExpr({
                              __M_SEND_DEBUG_INFO("debug: %d", 123);
                          });
+    int i = 0;
+    M_Assert_WarningElseSaveCheck((i != 0), tmpFuncTrue(), tmpFuncFalse(), M_EMPTY, "Msg: aaaaaaaaaaaaaaa");
+    //M_Assert_BreakSaveCheck((i == 0), M_EMPTY, M_EMPTY, "Msg: aaaaaaaaaaaaaaa");
 
     //callbackManagerTest();
     //qDebug() << "test: "<<pullContainerTest(123, 100);
@@ -44,11 +47,25 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "return not equal to case";
     }
 
-    MY_CTYPE_GET_TYPE(UINT8_TYPE) my_val = 0;
+    //MY_CTYPE_GET_TYPE(UINT8_TYPE) my_val = 0;
 }
+
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::tmpFuncTrue()
+{
+    int i = 0;
+    return;
+}
+
+void MainWindow::tmpFuncFalse()
+{
+    int i = 0;
+    return;
 }
 

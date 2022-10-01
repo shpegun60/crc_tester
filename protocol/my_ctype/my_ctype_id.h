@@ -28,7 +28,7 @@
 #define INT24_TYPE 			15  // i24
 #define REG_TYPE 			16  // reg      platform depend type
 #define SREG_TYPE 			17  // sreg     platform depend type
-#define TYPE_ARRAY_LENGTH   ((u8)(SREG_TYPE + 1))
+#define TYPE_ARRAY_LENGTH   (SREG_TYPE + 1)
 
 
 /* ***************************************************************************

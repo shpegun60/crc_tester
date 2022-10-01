@@ -15,7 +15,7 @@ C_INLINE u8 getMYCTypeLen(u8 type);
 
 
 const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH] = {
-    (u8)0x00U,                   //VOID_TYPE          ((u8) 0)
+    (u8)0x00U,                  //VOID_TYPE           ((u8) 0)
     // unsigned type
     (u8)sizeof(u8),             //UINT8_TYPE          ((u8) 1)
     (u8)sizeof(u16),            //UINT16_TYPE         ((u8) 2)

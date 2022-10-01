@@ -27,13 +27,12 @@ void __M_SEND_DEBUG_ERROR(const char* const msg, ...)
 #ifndef NDEBUG
 static inline void __M_SEND_MSG(const char* const header, const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, const va_list args)
 {
-    (void)expr;
     fprintf(stderr, "\n%s\n", header);
     fprintf(stderr, "Assert failed:\t");
     vfprintf(stderr, msg, args);
     fprintf(stderr, "\n");
 
-    fprintf(stderr, "Expression:\t %s \n", expr_str);
+    fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
     fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
     fflush(stderr);
 }
