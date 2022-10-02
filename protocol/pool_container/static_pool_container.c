@@ -38,6 +38,14 @@ int staticPoolContainer_delete(static_pool_container_t **self)
 
 STATIC_INLINE void staticPoolContainer_proceedSignalls(static_pool_container_t * const self)
 {
+    /*
+     *  Borrowed from Synchronous FIFO systemVerilog code (AW --> is fifo size, power of 2):
+     *
+     *  assign ptr_match   = (wr_addr[AW-1:0] == rd_addr[AW-1:0]);
+     *  assign wr_full     = ptr_match & (wr_addr[AW]==!rd_addr[AW]);
+     *  assign fifo_empty  = ptr_match & (wr_addr[AW]==rd_addr[AW]);
+     *
+     */
     self->rdEmpty = (self->wr_raw == self->rd_raw);
     self->wrFull  = ((self->wr_raw & (STATIC_POOL_CONTAINER_RAWS - 1)) == (self->rd_raw & (STATIC_POOL_CONTAINER_RAWS - 1))) && (!self->rdEmpty);
 }
