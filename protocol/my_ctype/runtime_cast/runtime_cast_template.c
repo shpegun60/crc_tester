@@ -1,5 +1,6 @@
 #include "preprocessor_template.h"
-#include "my_ctypes.h"
+#include "my_ctype_cast.h"
+
 
 
 #ifndef T
@@ -16,74 +17,74 @@ T TEMPLATE(reedRuntimeCast, T)(void* data, u8 type)
 
     // unsigned type---------------------------------------------------------------------------------------------
     case UINT8_TYPE:
-        value = (T)( *((u8*)data) );
+        value = (T)( *UINT8_TYPE_DC(data) );
         break;
 
     case UINT16_TYPE:
-        value = (T)( *((u16*)data) );
+        value = (T)( *UINT16_TYPE_DC(data) );
         break;
 
     case UINT32_TYPE:
-        value = (T)( *((u32*)data) );
+        value = (T)( *UINT32_TYPE_DC(data) );
         break;
 
     case UINT64_TYPE:
-        value = (T)( *((u64*)data) );
+        value = (T)( *UINT64_TYPE_DC(data) );
         break;
 
     // signed type-----------------------------------------------------------------------------------------------
     case CHAR_TYPE:
-        value = (T)( *((c8*)data) );
+        value = (T)( *CHAR_TYPE_DC(data) );
         break;
 
     case INT8_TYPE:
-        value = (T)( *((i8*)data) );
+        value = (T)( *INT8_TYPE_DC(data) );
         break;
 
     case INT16_TYPE:
-        value = (T)( *((i16*)data) );
+        value = (T)( *INT16_TYPE_DC(data) );
         break;
 
     case INT32_TYPE:
-        value = (T)( *((i32*)data) );
+        value = (T)( *INT32_TYPE_DC(data) );
         break;
 
     case INT64_TYPE:
-        value = (T)( *((i64*)data) );
+        value = (T)( *INT64_TYPE_DC(data) );
         break;
 
     // floating point type-------------------------------------------------------------------------------------
     case FLOAT_TYPE:
-        value = (T)( *((f32*)data) );
+        value = (T)( *FLOAT_TYPE_DC(data) );
         break;
 
     case DOUBLE_TYPE:
-        value = (T)( *((f64*)data) );
+        value = (T)( *DOUBLE_TYPE_DC(data) );
         break;
 
     case LONG_DOUBLE_TYPE:
-        value = (T)( *((f128*)data) );
+        value = (T)( *LONG_DOUBLE_TYPE_DC(data) );
         break;
 
     // other types --------------------------------------------------------------------------------------------
     case BOOL_TYPE:
-        value = (T)( *((b*)data) );
+        value = (T)( *BOOL_TYPE_DC(data) );
         break;
 
     case UINT24_TYPE:
-        value = (T)( *((u24*)data) );
+        value = (T)( *UINT24_TYPE_DC(data) );
         break;
 
     case INT24_TYPE:
-        value = (T)( *((i24*)data) );
+        value = (T)( *INT24_TYPE_DC(data) );
         break;
 
     case REG_TYPE:
-        value = (T)( *((reg*)data) );
+        value = (T)( *REG_TYPE_DC(data) );
         break;
 
     case SREG_TYPE:
-        value = (T)( *((sreg*)data) );
+        value = (T)( *SREG_TYPE_DC(data) );
         break;
 
     default:
@@ -103,74 +104,74 @@ int TEMPLATE(writeRuntimeCast, T)(void* data, u8 type, T value)
 
     // unsigned type---------------------------------------------------------------------------------------------
     case UINT8_TYPE:
-        *((u8 *)data) = (u8)(value);
+        *UINT8_TYPE_DC(data) = UINT8_TYPE_C(value);
         break;
 
     case UINT16_TYPE:
-        *((u16 *)data) = (u16)(value);
+        *UINT16_TYPE_DC(data) = UINT16_TYPE_C(value);
         break;
 
     case UINT32_TYPE:
-        *((u32 *)data) = (u32)(value);
+        *UINT32_TYPE_DC(data) = UINT32_TYPE_C(value);
         break;
 
     case UINT64_TYPE:
-        *((u64 *)data) = (u64)(value);
+        *UINT64_TYPE_DC(data) = UINT64_TYPE_C(value);
         break;
 
     // signed type-----------------------------------------------------------------------------------------------
     case CHAR_TYPE:
-        *((c8 *)data) = (c8)(value);
+        *CHAR_TYPE_DC(data) = CHAR_TYPE_C(value);
         break;
 
     case INT8_TYPE:
-        *((i8 *)data) = (i8)(value);
+        *INT8_TYPE_DC(data) = INT8_TYPE_C(value);
         break;
 
     case INT16_TYPE:
-        *((i16 *)data) = (i16)(value);
+        *INT16_TYPE_DC(data) = INT16_TYPE_C(value);
         break;
 
     case INT32_TYPE:
-        *((i32 *)data) = (i32)(value);
+        *INT32_TYPE_DC(data) = INT32_TYPE_C(value);
         break;
 
     case INT64_TYPE:
-        *((i64 *)data) = (i64)(value);
+        *INT64_TYPE_DC(data) = INT64_TYPE_C(value);
         break;
 
     // floating point type-------------------------------------------------------------------------------------
     case FLOAT_TYPE:
-        *((f32 *)data) = (f32)(value);
+        *FLOAT_TYPE_DC(data) = FLOAT_TYPE_C(value);
         break;
 
     case DOUBLE_TYPE:
-        *((f64 *)data) = (f64)(value);
+        *DOUBLE_TYPE_DC(data) = DOUBLE_TYPE_C(value);
         break;
 
     case LONG_DOUBLE_TYPE:
-        *((f128 *)data) = (f128)(value);
+        *LONG_DOUBLE_TYPE_DC(data) = LONG_DOUBLE_TYPE_C(value);
         break;
 
     // other types --------------------------------------------------------------------------------------------
     case BOOL_TYPE:
-        *((b *)data) = (b)(value);
+        *BOOL_TYPE_DC(data) = BOOL_TYPE_C(value);
         break;
 
     case UINT24_TYPE:
-        *((u24 *)data) = (u24)(value);
+        *UINT24_TYPE_DC(data) = UINT24_TYPE_C(value);
         break;
 
     case INT24_TYPE:
-        *((i24 *)data) = (i24)(value);
+        *INT24_TYPE_DC(data) = INT24_TYPE_C(value);
         break;
 
     case REG_TYPE:
-        *((reg *)data) = (reg)(value);
+        *REG_TYPE_DC(data) = REG_TYPE_C(value);
         break;
 
     case SREG_TYPE:
-        *((sreg *)data) = (sreg)(value);
+        *SREG_TYPE_DC(data) = SREG_TYPE_C(value);
         break;
 
     default:
