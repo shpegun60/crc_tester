@@ -30,7 +30,7 @@
 #endif /* ENTITY_DECRIPTION_SIZE */
 
 /* **********************************************************************************************************************************
- * Maximum number o entity
+ * Maximum number of entity
  */
 #ifndef MAX_NUBER_OF_ENTITIES
 #   define MAX_NUBER_OF_ENTITIES 255
@@ -46,10 +46,10 @@
  *
  *  if you want use read or write callbacks uncommit this defines
  *  WARNING!!!! This feature adds some bytes to each EntityField ==>
- *  =>  2 * sizeof(void*)  if defined USE_ENTITY_READ_CALLBACK +
- *      2 * sizeof(void*)  if defined USE_ENTITY_WRITE_CALLBACK
+ *  =>  sizeof(entityCallbackContainer)  if defined USE_ENTITY_READ_CALLBACK +
+ *      sizeof(entityCallbackContainer)  if defined USE_ENTITY_WRITE_CALLBACK
  * **********************************************************************************************************************************
-*/
+ */
 
 #ifndef USE_ENTITY_CALLBACKS
 #   define USE_ENTITY_CALLBACKS
@@ -75,5 +75,16 @@
 #define ENTITY_ERROR 0x00
 #define ENTITY_OK 	 0x01
 //------------------------------------
+
+
+
+/* **********************************************************************************************************************************
+ *  USER INPUT CHECK MACRO (do not edit this section!!!!)
+ */
+
+#if ENTITY_DECRIPTION_SIZE > 0xFFU
+    #error ENTITY_DECRIPTION_SIZE is too long
+#endif /* ENTITY_DECRIPTION_SIZE check*/
+
 
 #endif /* ENTITY_PORT_H */

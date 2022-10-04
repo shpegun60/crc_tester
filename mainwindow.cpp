@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+
 #include "my_ctype_cast.h"
 #include "ui_mainwindow.h"
 #include "qdebug.h"
@@ -11,6 +12,7 @@
 
 extern "C" {
     #include "raw_parser_it_test.h"
+    #include "entity_manager.h"
 }
 
 #include "smart_assert.h"
@@ -24,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER | TESTER_RAW_P_IT));
+    //protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER | TESTER_RAW_P_IT));
     //protocolAllTest(time(NULL), 1000, (TESTER_RAW_P_DMA));
     //protocolAllTest(time(NULL), 1000, (TESTER_RAW_P_IT));
 
@@ -41,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     //qDebug() << "test: "<<rawParserItTest(time(NULL), 100, 1);
 
+
+
     if(PREPROCESSOR_KEYWORD_EQ(return, case)) {
         qDebug() << "return equal to case";
     } else {
@@ -48,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     //MY_CTYPE_GET_TYPE(UINT8_TYPE) my_val = 0;
+
+
 }
 
 

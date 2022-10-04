@@ -188,6 +188,9 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 //    }
 
 
+    fieldRename(NULL, 0, "add");
+
+
     fflush(stdout);
     fflush(stderr);
     return 0;

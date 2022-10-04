@@ -47,6 +47,15 @@
 #endif /* TYPEOF_DATA */
 
 
+/************************************************************************************
+ *  macro for declare unused variable in function
+ */
+#ifndef UNUSED
+    #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+#endif /* UNUSED */
+
+
+
 
 // all types. Commit this if types defines upper--------------------------
 
@@ -165,9 +174,9 @@ void pointerInit(reg n, u8* ptr);
 void pointerFill(reg n, u8* ptr, u8 data);
 
 // string compleate------------------------------------------
-u8 cTypeStrnCmp(reg n, const c8* str1, const c8* str2);
+int cTypeStrnCmp(reg n, const c8* str1, const c8* str2);
 // string reverse compleate------------------------------------------
-u8 cTypeStrnRevCmp(reg n, const c8* str1, const c8* str2);
+int cTypeStrnRevCmp(reg n, const c8* str1, const c8* str2);
 
 
 

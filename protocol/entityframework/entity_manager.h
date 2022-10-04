@@ -37,18 +37,18 @@ typedef struct {
 
 
 /**************************************************************************************************************************************************
- * bit flags mask for value name "u16 bitFlags" in EntityField
+ * bit flags mask for value name "bitFlags" in EntityField
  */
-#define ENTITY_EMPTY_FLAG    	0x0000U // nothing (ordinary field)
-#define ENTITY_READ_ONLY_MSK 	0x0001U // its read only field (write protected field)
-#define ENTITY_PARAM_MSK 		0x0002U // its parameter field (writed to flash once and read before start, must uncommitted USE_ENTITY_FLASH)
-#define ENTITY_LOG_MSK 			0x0004U // its log (writed to flash continious, must uncommitted USE_ENTITY_FLASH)
-#define ENTITY_POINTER_MSK 		0x0008U // its pointer, must specify reg in entity_types.h (reading and writing from addres which store in this field)
-#define ENTITY_REGISTER_MSK 	0x0010U // its register, must specify reg and ENTITY_PERIF_BUS_TYPE_IND in entity_types.h (bus aligned read and write, it happens for one insrtuction, must uncommitted USE_ENTITY_REGISTER)
-#define ENTITY_ATOMIC_MSK 		0x0020U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
-#define ENTITY_LOW_UPDATE_MSK 	0x0040U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
-#define ENTITY_READ_ONCE_MSK 	0x0080U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
-#define ENTITY_ALL_BIT_MSK 		0xFFFFU // its mask for counting all fields
+#define ENTITY_EMPTY_FLAG    	0x00000000U // nothing (ordinary field)
+#define ENTITY_READ_ONLY_MSK 	0x00000001U // its read only field (write protected field)
+#define ENTITY_PARAM_MSK 		0x00000002U // its parameter field (writed to flash once and read before start, must uncommitted USE_ENTITY_FLASH)
+#define ENTITY_LOG_MSK 			0x00000004U // its log (writed to flash continious, must uncommitted USE_ENTITY_FLASH)
+#define ENTITY_POINTER_MSK 		0x00000008U // its pointer, must specify reg in entity_types.h (reading and writing from addres which store in this field)
+#define ENTITY_REGISTER_MSK 	0x00000010U // its register, must specify reg and ENTITY_PERIF_BUS_TYPE_IND in entity_types.h (bus aligned read and write, it happens for one insrtuction, must uncommitted USE_ENTITY_REGISTER)
+#define ENTITY_ATOMIC_MSK 		0x00000020U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
+#define ENTITY_LOW_UPDATE_MSK 	0x00000040U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
+#define ENTITY_READ_ONCE_MSK 	0x00000080U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
+#define ENTITY_ALL_BIT_MSK 		0xFFFFFFFFU // its mask for counting all fields
 
 /**************************************************************************************************************************************************
  * main structs definition
@@ -67,8 +67,8 @@ struct EntityField {
 
 #endif /* USE_ENTITY_CALLBACKS */
 
-    u16     bitFlags; //bit[0] - read only, bit[1] - isParam, bit[2] - is log, bit[3] - is pointer ... see bit flags mask
-    u16     shift;
+    u32     bitFlags; //bit[0] - read only, bit[1] - isParam, bit[2] - is log, bit[3] - is pointer ... see bit flags mask
+    u32     shift;
     u8      type;
     char    descr[ENTITY_DECRIPTION_SIZE];
 };
@@ -86,8 +86,8 @@ struct Entity {
  */
 
 typedef struct {
-    u16 allocated_entity_pointers;
-    u16 entities_count;
+    u32 allocated_entity_pointers;
+    u32 entities_count;
     Entity** entities;
 } EntityInfo;
 
@@ -100,21 +100,71 @@ extern EntityInfo entityInfo;  // global variable entities for user projects (ad
  * **********************************************************************************************************************************
  */
 
-// delete all entities and deallocation all memory
+/// delete all entities and deallocation all memory
 void deleteEntities(void);
-// delete some entity
-void deleteEntitityFields(int entityNumber);
 
-// allocation new entities pointers
-int newEntities(int nomberOfEntities);
-// allocation entitites pointer & fields
-int initEntity(int NumberOfFields, reg pointerSize, char * descr, b isCustomSpace, b isHeap, void* arg);
+/// delete some entity
+void deleteEntitityFields(u32 entityNumber);
+
+/// allocation new entities pointers
+int newEntities(u32 nomberOfEntities);
+
+/// allocation entitites pointer & fields
+int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
 
 /*
  * **********************************************************************************************************************************
  *  field functions
  * **********************************************************************************************************************************
  */
+
+/// init field by field-number
+int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr);
+
+/// init field-array
+int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum);
+
+///init existing field by pointer
+int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE]);
+
+/// rename field by field number
+int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DECRIPTION_SIZE]);
+
+/*
+ * ****************************************************************************************************
+ * callBack functions
+ * ****************************************************************************************************
+ */
+
+#ifdef USE_ENTITY_CALLBACKS
+
+/// init field with callbacks by field-number
+int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr,
+                      TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
+
+/// init callback function by fieldNumber
+int entityInitCallback(Entity * entityInst, int filedNumber,
+                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
+
+/// init callback function by description
+int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DECRIPTION_SIZE],
+                     TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
+
+#endif /* USE_ENTITY_CALLBACKS */
+
+
+
+/*
+ * **********************************************************************************************************************************
+ *  foreach entities
+ * **********************************************************************************************************************************
+ */
+
+int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* context), void* context);
+
+/// string compleate for entities---------------------------------------------------------------------------------------------------
+int entityDescrNotCompleate(const c8* str1, const c8* str2);
+
 
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */
