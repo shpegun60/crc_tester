@@ -1,9 +1,9 @@
 /*
-* entity_manager.h
-*
-*  Created on: Oct 01, 2022
-*      Author: Shpegun60
-*/
+ * entity_manager.h
+ *
+ *  Created on: Oct 01, 2022
+ *      Author: Shpegun60
+ */
 #ifndef ENTITY_MANAGER_H
 #define ENTITY_MANAGER_H
 
@@ -75,7 +75,11 @@ struct EntityField {
 
 struct Entity {
     void*           pointer;
+
+#ifdef USE_ENTITY_USER_SPACE
     u8              isHeap;
+#endif /* USE_ENTITY_USER_SPACE */
+
     char            descr[ENTITY_DECRIPTION_SIZE];
     u16             fields_count;
     EntityField*    fields;
@@ -100,11 +104,11 @@ extern EntityInfo entityInfo;  // global variable entities for user projects (ad
  * **********************************************************************************************************************************
  */
 
+/// delete some entity for external using
+void deleteEntitityFieldsExternal(u32 entityNumber);
+
 /// delete all entities and deallocation all memory
 void deleteEntities(void);
-
-/// delete some entity
-void deleteEntitityFields(u32 entityNumber);
 
 /// allocation new entities pointers
 int newEntities(u32 nomberOfEntities);

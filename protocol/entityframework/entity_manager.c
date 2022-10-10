@@ -16,11 +16,58 @@ EntityInfo entityInfo = {0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};  /
  * **********************************************************************************************************************************
  */
 
+/// delete some entity for internal using
+static void deleteEntitityFieldsInternal(u32 entityNumber)
+{
+    M_Assert_BreakSaveCheck((entityNumber > entityInfo.entities_count), M_EMPTY, return, "deleteEntitityFieldsInternal: No entity for delete!!!");
+    M_Assert_BreakSaveCheck((entityInfo.entities[entityNumber] == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]))), M_EMPTY, return, "initEntity: entity number: %d is null", entityNumber);
+
+#ifdef USE_ENTITY_USER_SPACE
+    if(entityInfo.entities[entityNumber]->isHeap) {
+        free(entityInfo.entities[entityNumber]->pointer);
+        entityInfo.entities[entityNumber]->pointer = NULL;
+    }
+#else
+    free(entityInfo.entities[entityNumber]->pointer);
+    entityInfo.entities[entityNumber]->pointer = NULL;
+#endif /* USE_ENTITY_USER_SPACE */
+
+    free(entityInfo.entities[entityNumber]->fields);
+    entityInfo.entities[entityNumber]->fields = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]->fields));
+
+    free(entityInfo.entities[entityNumber]);
+    entityInfo.entities[entityNumber] = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]));
+}
+
+/// delete some entity for external using
+void deleteEntitityFieldsExternal(u32 entityNumber)
+{
+    M_Assert_BreakSaveCheck((entityNumber >= entityInfo.entities_count), M_EMPTY, return, "deleteEntitityFieldsInternal: No entity for delete!!!");
+    M_Assert_BreakSaveCheck((entityInfo.entities[entityNumber] == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]))), M_EMPTY, return, "initEntity: entity number: %d is null", entityNumber);
+
+#ifdef USE_ENTITY_USER_SPACE
+    if(entityInfo.entities[entityNumber]->isHeap) {
+        free(entityInfo.entities[entityNumber]->pointer);
+        entityInfo.entities[entityNumber]->pointer = NULL;
+    }
+#else
+    free(entityInfo.entities[entityNumber]->pointer);
+    entityInfo.entities[entityNumber]->pointer = NULL;
+#endif /* USE_ENTITY_USER_SPACE */
+
+    free(entityInfo.entities[entityNumber]->fields);
+    entityInfo.entities[entityNumber]->fields = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]->fields));
+
+    free(entityInfo.entities[entityNumber]);
+    entityInfo.entities[entityNumber] = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]));
+}
+
+
 /// delete all entities and deallocation all memory
 void deleteEntities(void)
 {
     for(u32 i = 0; i < entityInfo.entities_count; ++i) {
-        deleteEntitityFields(i);
+        deleteEntitityFieldsInternal(i);
     }
 
     free(entityInfo.entities);
@@ -29,23 +76,7 @@ void deleteEntities(void)
     entityInfo.entities                     = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities));
 }
 
-/// delete some entity
-void deleteEntitityFields(u32 entityNumber)
-{
-    M_Assert_BreakSaveCheck((entityNumber > entityInfo.entities_count), M_EMPTY, return, "deleteEntitityFields: No entity for delete!!!");
-    M_Assert_BreakSaveCheck((entityInfo.entities[entityNumber] == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]))), M_EMPTY, return, "initEntity: entity number: %d is null", entityNumber);
 
-    if(entityInfo.entities[entityNumber]->isHeap) {
-        free(entityInfo.entities[entityNumber]->pointer);
-        entityInfo.entities[entityNumber]->pointer = NULL;
-    }
-
-    free(entityInfo.entities[entityNumber]->fields);
-    entityInfo.entities[entityNumber]->fields = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]->fields));
-
-    free(entityInfo.entities[entityNumber]);
-    entityInfo.entities[entityNumber] = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]));
-}
 
 /// allocation new entities pointers
 int newEntities(u32 nomberOfEntities)
@@ -67,15 +98,16 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
 {
     M_Assert_BreakSaveCheck((entityInfo.entities_count == entityInfo.allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
 
-    // allocation pointer to Entity-------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // allocation pointer to Entity--------------------------------------------------------------------------------------------------------------------------------------------------------------
     entityInfo.entities[entityInfo.entities_count] = (Entity*) calloc(1, sizeof(Entity));
     M_Assert_BreakSaveCheck(entityInfo.entities[entityInfo.entities_count] == NULLPTR(Entity*), M_EMPTY, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
 
     // copy entity description-------------------------------------------------------------------------------------------------------------------------------------------------------------------
     MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)descr, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
 
-
     // allocation or initialization pointer to data----------------------------------------------------------------------------------------------------------------------------------------------
+#ifdef USE_ENTITY_USER_SPACE
+
     if(isCustomSpace) {
         entityInfo.entities[entityInfo.entities_count]->isHeap  = isHeap;
         entityInfo.entities[entityInfo.entities_count]->pointer = arg;
@@ -85,13 +117,27 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
     }
 
     M_Assert_BreakSaveCheck((entityInfo.entities[entityInfo.entities_count]->pointer == NULL), {
-        deleteEntitityFields(entityInfo.entities_count);
+        deleteEntitityFieldsInternal(entityInfo.entities_count);
     }, return ENTITY_ERROR, (isCustomSpace ? "newEntities: Invalid user input space" : "newEntities: No memory for allocation Entitity"));
+
+#else
+
+    entityInfo.entities[entityInfo.entities_count]->pointer = calloc(1, pointerSize);
+    UNUSED(isCustomSpace);
+    UNUSED(isHeap);
+    UNUSED(arg);
+
+    M_Assert_BreakSaveCheck((entityInfo.entities[entityInfo.entities_count]->pointer == NULL), {
+        deleteEntitityFieldsInternal(entityInfo.entities_count);
+    }, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
+
+#endif /* USE_ENTITY_USER_SPACE */
+
 
     // allocation pointer to Fields------------------------------------------------------------------------------------------------------------------------------------------------------------
     entityInfo.entities[entityInfo.entities_count]->fields = (EntityField*) calloc(NumberOfFields, sizeof(EntityField));
     M_Assert_BreakSaveCheck((entityInfo.entities[entityInfo.entities_count]->fields == NULLPTR(TYPEOF_STRUCT(Entity, fields))), {
-        deleteEntitityFields(entityInfo.entities_count);
+        deleteEntitityFieldsInternal(entityInfo.entities_count);
     }, return ENTITY_ERROR, "newEntities: No memory for allocation EntityField");
 
     entityInfo.entities[entityInfo.entities_count]->fields_count = NumberOfFields;
@@ -301,7 +347,7 @@ int entityInitCallback(Entity * entityInst, int filedNumber,
 
 /// init callback function by description
 int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DECRIPTION_SIZE],
-                     TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
+                           TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *)), M_EMPTY, return ENTITY_ERROR, "initCallback_txt: No valid input");
 
@@ -375,9 +421,8 @@ int entityDescrNotCompleate(const c8* str1, const c8* str2)
     }
     return 0;
 
-#endif /* description complemntation function selector */
+#endif /* description complementation function selector */
 }
-
 
 
 

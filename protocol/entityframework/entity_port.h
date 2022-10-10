@@ -38,7 +38,12 @@
 
 /* **********************************************************************************************************************************
  * USE USER custom space (not allocation for ENTITY POINTER)
+ * add`s sizeof(void*) bytes Entity struct, when this struct is aligned
  */
+
+#ifndef USE_ENTITY_USER_SPACE
+//#   define USE_ENTITY_USER_SPACE
+#endif /* USE_ENTITY_USER_SPACE */
 
 
 /* **********************************************************************************************************************************
