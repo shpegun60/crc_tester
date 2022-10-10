@@ -38,7 +38,7 @@
 
 /* **********************************************************************************************************************************
  * USE USER custom space (not allocation for ENTITY POINTER)
- * add`s sizeof(void*) bytes Entity struct, when this struct is aligned
+ * add`s some bytes to Entity struct, see USE_ENTITY_READ_CALLBACK and USE_ENTITY_WRITE_CALLBACK description
  */
 
 #ifndef USE_ENTITY_USER_SPACE

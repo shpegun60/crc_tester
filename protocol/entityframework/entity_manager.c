@@ -204,9 +204,9 @@ int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField,
 }
 
 /// init field-array
-int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum)
+int initFieldSequence(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum)
 {
-    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
+    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
 
                                     char str[(ENTITY_DECRIPTION_SIZE << 1) + 1] = {};
@@ -230,7 +230,7 @@ int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityF
                                     }
                                     return ENTITY_OK;
 
-                                }, M_EMPTY, M_EMPTY, "initFieldArray: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber) + arrayLen, entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initFieldSequence: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber) + arrayLen, entityInst->fields_count);
 
     return ENTITY_ERROR;
 }
@@ -278,7 +278,7 @@ int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DECRIPTI
 int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr,
                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
-    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULLPTR(int *)), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
+    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULLPTR(int *)), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
 
                                     entityInst->fields[(*fieldNumber)].bitFlags     = bitFlags;
@@ -311,7 +311,7 @@ int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(Enti
 
                                     ++(*fieldNumber);
                                     return ENTITY_OK;
-                                }, M_EMPTY, M_EMPTY, "initField: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber), entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initFieldCallback: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber), entityInst->fields_count);
 
     return ENTITY_ERROR;
 }
