@@ -204,12 +204,13 @@ int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField,
 }
 
 /// init field-array
-int initFieldSequence(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum)
+int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
 
                                     char str[(ENTITY_DECRIPTION_SIZE << 1) + 1] = {};
+                                    bitFlags |= ENTITY_ARRAY_MSK;
                                     for(int i = 0; i < arrayLen; ++i) {
 
                                         entityInst->fields[(*fieldNumber)].bitFlags   = bitFlags;

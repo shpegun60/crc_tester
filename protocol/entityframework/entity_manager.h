@@ -13,7 +13,7 @@
 #include "my_ctypes.h"
 
 /**************************************************************************************************************************************************
- * main struct types definition before (for type saving in entityCallback function)
+ * main struct types definition before (for type saving in entityCallback functions)
  */
 typedef struct EntityField  EntityField;
 typedef struct Entity       Entity;
@@ -126,7 +126,7 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
 int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr);
 
 /// init field-array
-int initFieldSequence(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum);
+int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum);
 
 ///init existing field by pointer
 int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE]);
