@@ -28,11 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     //protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER | TESTER_RAW_P_IT));
     //protocolAllTest(time(NULL), 1000, (TESTER_RAW_P_DMA));
-    //protocolAllTest(time(NULL), 1000, (TESTER_RAW_P_IT));
+    protocolAllTest(time(NULL), 100, (TESTER_RAW_P_IT));
 
     //__M_assert_test();
     M_Assert_disableExpr({
-                             __M_SEND_DEBUG_INFO("debug: %d", 123);
+                             __M_DEBUG_FILE(stdout, "debug: %d", 123);
                          });
     int i = 0;
     M_Assert_WarningElseSaveCheck((i != 0), tmpFuncTrue(), tmpFuncFalse(), M_EMPTY, "Msg: aaaaaaaaaaaaaaa");

@@ -7,6 +7,13 @@
 #include "entity_port.h"
 #include "entity_manager.h"
 
+#include "callback_container.h"
+
+void callback(void ** context)
+{
+    (void)(context);
+    return;
+}
 
 int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 {
@@ -188,11 +195,21 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 //    }
 
 
-    fieldRename(NULL, 0, "add");
+    //fieldRename(NULL, 0, "add");
+    //b ok = 0;
+    TEMPLATE(CallbackContainer, void, p2) callback_ibj;
+    TEMPLATE(initCallbackContainerUser, void, p2)(&callback_ibj, callback, NULL);
+    CC_CALL(&callback_ibj);
+
 
 
     fflush(stdout);
     fflush(stderr);
     return 0;
 }
+
+
+
+
+
 

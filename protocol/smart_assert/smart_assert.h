@@ -13,10 +13,12 @@
 // this library recomended include only .c or .cpp file!!!!!!!!!!!!!!!!
 
 //   C++ linking for mixed C++/C code
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdio.h>
 
 //#define NDEBUG
 
@@ -24,14 +26,17 @@ extern "C" {
 #define M_ALWAYS 1 /* always proceed expression */
 
 
-void __M_SEND_DEBUG_INFO(const char* const msg, ...);
-void __M_SEND_DEBUG_ERROR(const char* const msg, ...);
+void __M_DEBUG_INFO(const char* const msg, ...);
+void __M_DEBUG_ERROR(const char* const msg, ...);
+void __M_DEBUG_FILE(FILE * file, const char* const msg, ...);
+
 void __M_assert_test();
 
 #ifndef NDEBUG /* --------------------------------------------------------------------------------------------------------- */
 
 void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
 void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
+
 
 /*
  * ***********************************************************************************************************************************************

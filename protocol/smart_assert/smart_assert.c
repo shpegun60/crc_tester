@@ -1,10 +1,9 @@
 #include "smart_assert.h"
-#include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
 
 
-void __M_SEND_DEBUG_INFO(const char* const msg, ...)
+void __M_DEBUG_INFO(const char* const msg, ...)
 {
     va_list args;
     va_start(args, msg);
@@ -14,13 +13,23 @@ void __M_SEND_DEBUG_INFO(const char* const msg, ...)
     va_end(args);
 }
 
-void __M_SEND_DEBUG_ERROR(const char* const msg, ...)
+void __M_DEBUG_ERROR(const char* const msg, ...)
 {
     va_list args;
     va_start(args, msg);
     vfprintf(stderr, msg, args);
     fprintf(stderr, "\n");
     fflush(stderr);
+    va_end(args);
+}
+
+void __M_DEBUG_FILE(FILE * file, const char* const msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(file, msg, args);
+    fprintf(file, "\n");
+    fflush(file);
     va_end(args);
 }
 

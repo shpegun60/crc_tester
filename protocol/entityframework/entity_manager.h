@@ -48,6 +48,7 @@ typedef struct {
 #define ENTITY_ATOMIC_MSK 		0x00000020U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
 #define ENTITY_LOW_UPDATE_MSK 	0x00000040U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
 #define ENTITY_READ_ONCE_MSK 	0x00000080U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
+#define ENTITY_ARRAY_MSK        0x00000100U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
 #define ENTITY_ALL_BIT_MSK 		0xFFFFFFFFU // its mask for counting all fields
 
 /**************************************************************************************************************************************************
@@ -90,9 +91,9 @@ struct Entity {
  */
 
 typedef struct {
-    u32 allocated_entity_pointers;
-    u32 entities_count;
-    Entity** entities;
+    u32         allocated_entity_pointers;
+    u32         entities_count;
+    Entity**    entities;
 } EntityInfo;
 
 extern EntityInfo entityInfo;  // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
