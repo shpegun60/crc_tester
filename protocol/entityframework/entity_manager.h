@@ -115,7 +115,7 @@ void deleteEntitityFieldsExternal(u32 entityNumber);
 void deleteEntities(void);
 
 /// allocation new entities pointers
-int newEntities(u32 nomberOfEntities);
+int newEntities(u32 numberOfEntities);
 
 /// allocation entitites pointer & fields
 int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);

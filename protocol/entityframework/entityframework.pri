@@ -6,6 +6,7 @@ SOURCES += \
     $$PWD/entity_packet.c
 
 HEADERS += \
+    $$PWD/entity_atomic.h \
     $$PWD/entity_manager.h \
     $$PWD/entity_packet.h \
     $$PWD/entity_port.h

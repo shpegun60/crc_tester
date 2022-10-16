@@ -87,16 +87,16 @@ void deleteEntities(void)
 
 
 /// allocation new entities pointers
-int newEntities(u32 nomberOfEntities)
+int newEntities(u32 numberOfEntities)
 {
-    M_Assert_BreakSaveCheck((nomberOfEntities > MAX_NUBER_OF_ENTITIES), M_EMPTY, return ENTITY_ERROR, "newEntities: No valid input nomber of entities, value: %d, max: %d", nomberOfEntities, MAX_NUBER_OF_ENTITIES);
+    M_Assert_BreakSaveCheck((numberOfEntities > MAX_NUBER_OF_ENTITIES), M_EMPTY, return ENTITY_ERROR, "newEntities: No valid input number of entities, value: %d, max: %d", numberOfEntities, MAX_NUBER_OF_ENTITIES);
 
     deleteEntities(); // delete all entities
 
-    entityInfo.entities = (Entity**) calloc(nomberOfEntities, sizeof(Entity*)); // allocation & initialization all entity pointers
+    entityInfo.entities = (Entity**) calloc(numberOfEntities, sizeof(Entity*)); // allocation & initialization all entity pointers
     M_Assert_BreakSaveCheck((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))), M_EMPTY, return ENTITY_ERROR, "newEntities: No memory for allocation Entity pointers");
 
-    entityInfo.allocated_entity_pointers = nomberOfEntities;
+    entityInfo.allocated_entity_pointers = numberOfEntities;
     return ENTITY_OK;
 }
 

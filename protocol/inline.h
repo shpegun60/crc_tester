@@ -16,18 +16,13 @@
 
 /*
  * *********************************************************************
- * simple INLINE`s
+ * simple INLINE
  * *********************************************************************
  */
 
 #ifndef INLINE
 #define INLINE inline
 #endif /* INLINE */
-
-
-#ifndef STATIC_INLINE
-#define STATIC_INLINE static INLINE
-#endif /* STATIC_INLINE */
 
 
 /*
@@ -99,5 +94,19 @@
  * C_INLINE int max(int ​​a, int b);
  *
  */
+
+/*
+ * *********************************************************************
+ * static INLINE`s
+ * *********************************************************************
+ */
+
+#ifndef STATIC_INLINE
+#define STATIC_INLINE static INLINE
+#endif /* STATIC_INLINE */
+
+#ifndef STATIC_FORCEINLINE
+#define STATIC_FORCEINLINE static forceinline
+#endif /* STATIC_FORCEINLINE */
 
 #endif /* __INLINE_H__ */
