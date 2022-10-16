@@ -9,7 +9,6 @@
 #include "entity_port.h"
 
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
-#include "my_ctypes.h"
 
 
 

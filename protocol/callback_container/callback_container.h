@@ -5,9 +5,34 @@
 #include <stdlib.h>
 
 
-/* fast calling callback container WARNING!!! --> if callback is NULL, MAY BE SEGMENTATION FAULT!!!!!!!*/
+/* fast calling callback container WARNING!!! --> if callback is NULL, MAY BE SEGMENTATION FAULT!!!!!!! */
 #define CC_CALL(desc)\
     (desc)->callback((desc)->context)
+
+/* safe calling callback container */
+#define CC_SAFE_CALL(desc)                                  \
+    if((desc)->callback) {                                  \
+        (desc)->callback((desc)->context);                  \
+    }
+
+/* safe calling callback container with value getting */
+#define CC_SAFE_CALL_VAL(desc, value)                       \
+    if((desc)->callback) {                                  \
+        (value) = (desc)->callback((desc)->context);        \
+    }
+
+/* safe calling callback container with descriptor nullptr check */
+#define CC_SAFE_CALL_DESC(desc)                             \
+    if((desc) && (desc)->callback) {                        \
+        (desc)->callback((desc)->context);                  \
+    }
+
+/* safe calling callback container with value getting and descriptor nullptr check */
+#define CC_SAFE_CALL_DESC_VAL(desc, value)                  \
+    if((desc) && (desc)->callback) {                        \
+        (value) = (desc)->callback((desc)->context);        \
+    }
+
 
 /* fast get context macro */
 #define CC_GET_CONTEXT(desc)\

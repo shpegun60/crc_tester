@@ -7,8 +7,8 @@
  */
 C_INLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to);
 C_INLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to);
-C_INLINE void MY_CTYPE_COPY_REGISTERS(reg* from, reg* to);
-C_INLINE void MY_CTYPE_REVCOPY_REGISTERS(reg* from, reg* to);
+C_INLINE void MY_CTYPE_COPY_REGISTERS(volatile reg* from, volatile reg* to);
+C_INLINE void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile reg* to);
 
 C_INLINE const u8* myCTypeGetTablePointer();
 C_INLINE u8 getMYCTypeLen(u8 type);

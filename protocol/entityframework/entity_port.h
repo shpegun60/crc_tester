@@ -1,6 +1,9 @@
 #ifndef ENTITY_PORT_H
 #define ENTITY_PORT_H
 
+#include "my_ctypes.h"
+#include "byte_order.h"
+
 /* **********************************************************************************************************************************
  * Entity libraty enable & version info
  *
@@ -25,16 +28,20 @@
 /* **********************************************************************************************************************************
  * Entity description size in bytes
  */
-#ifndef ENTITY_DECRIPTION_SIZE
-#   define ENTITY_DECRIPTION_SIZE 	0x04U
-#endif /* ENTITY_DECRIPTION_SIZE */
+#ifndef ENTITY_DESCRIPTION_SIZE
+#   define ENTITY_DESCRIPTION_SIZE 	0x04U
+#endif /* ENTITY_DESCRIPTION_SIZE */
 
 /* **********************************************************************************************************************************
- * Maximum number of entity
+ * Maximum number of entities & fields
  */
 #ifndef MAX_NUBER_OF_ENTITIES
 #   define MAX_NUBER_OF_ENTITIES 255
 #endif /* MAX_NUBER_OF_ENTITIES */
+
+#ifndef MAX_NUBER_OF_FIELDS
+#   define MAX_NUBER_OF_FIELDS 255
+#endif /* MAX_NUBER_OF_FIELDS */
 
 /* **********************************************************************************************************************************
  * USE USER custom space (not allocation for ENTITY POINTER)
@@ -72,6 +79,33 @@
 
 #endif /* USE_ENTITY_CALLBACKS */
 
+/* **********************************************************************************************************************************
+ *  Macro for Defining Entity Copy function
+ * **********************************************************************************************************************************
+ */
+#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+#   define ENTITY_BYTE_CPY(n, from, to) MY_CTYPE_USER_DATA_MEMCPY((n), (from), (to))
+#   define ENTITY_TYPE_CPY(type, from, to) cTypeMemcpy((type), (from), (to))
+#elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
+#   define ENTITY_BYTE_CPY(n, from, to) MY_CTYPE_USER_DATA_REVCPY((n), (from), (to))
+#   define ENTITY_TYPE_CPY(type, from, to) cTypeRevcpy((type), (from), (to))
+#else
+#    error unsupported endianness
+#endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
+
+
+
+/* **********************************************************************************************************************************
+ *  ENTITY use ping
+ *  if you want use ping function & ready flag define this
+ *  WARNING!!! adds some bytes to EntityInfo struct
+ * **********************************************************************************************************************************
+ */
+
+#ifndef USE_ENTITY_PING
+//#   define USE_ENTITY_PING
+#endif /* USE_ENTITY_PING */
+
 
 /* **********************************************************************************************************************************
  *  ERROR / OK macro
@@ -87,9 +121,17 @@
  *  USER INPUT CHECK MACRO (do not edit this section!!!!)
  */
 
-#if ENTITY_DECRIPTION_SIZE > 0xFFU
-    #error ENTITY_DECRIPTION_SIZE is too long
-#endif /* ENTITY_DECRIPTION_SIZE check*/
+#if ENTITY_DESCRIPTION_SIZE > 0xFFU
+    #error ENTITY_DESCRIPTION_SIZE is too long
+#endif /* ENTITY_DESCRIPTION_SIZE check*/
+
+#if MAX_NUBER_OF_ENTITIES > 0xFFFFUL
+    #error MAX_NUBER_OF_ENTITIES is too long
+#endif /* MAX_NUBER_OF_ENTITIES check*/
+
+#if MAX_NUBER_OF_FIELDS > 0xFFFFUL
+    #error MAX_NUBER_OF_FIELDS is too long
+#endif /* MAX_NUBER_OF_FIELDS check*/
 
 
 #endif /* ENTITY_PORT_H */

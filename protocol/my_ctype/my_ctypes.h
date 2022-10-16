@@ -14,6 +14,18 @@
 #define NULL ((void *)0)
 #endif /* NULL */
 
+#ifndef MIN
+    #define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#endif /* MIN */
+
+#ifndef MAX
+    #define MAX(a,b) (((a) < (b)) ? (b) : (a))
+#endif /* MAX */
+
+#ifndef ABS
+    #define ABS(N) (((N) < 0.0) ? (-1.0 * (N)) : (N))
+#endif /* ABS */
+
 /************************************************************************************
  *  macro for cast null pointer to user type
  */
@@ -23,6 +35,8 @@
 
 /************************************************************************************
  *  macro for find sizeof struct-field without declare object
+ *  (evaluation at compile time)
+ *
  */
 #ifndef SIZEOF_STRUCT
     #define SIZEOF_STRUCT(structName, field) ((size_t) sizeof(((structName *)0)->field))
@@ -32,6 +46,8 @@
  *  macro for find typeof struct-field without declare object
  *  WARNING!!! Do not change this macro if you use GNU-C compiler, change operator typeof to __typeof__ if you use ISO-C compiler!!!
  *  OR use only __typeof__ operator because it supported on GNU and ISO compilers
+ *
+ *  Type evaluation at compile time for type abstraction in C
  */
 #ifndef TYPEOF_STRUCT
     #define TYPEOF_STRUCT(structName, field) __typeof__(((structName *)0)->field)
@@ -41,6 +57,8 @@
  *  macro for find typeof from user value
  *  WARNING!!! Do not change this macro if you use GNU-C compiler, change operator typeof to __typeof__ if you use ISO-C compiler!!!
  *  OR use only __typeof__ operator because it supported on GNU and ISO
+ *
+ *  Type evaluation at compile time
  */
 #ifndef TYPEOF_DATA
     #define TYPEOF_DATA(data) __typeof__(data)
@@ -53,8 +71,6 @@
 #ifndef UNUSED
     #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #endif /* UNUSED */
-
-
 
 
 // all types. Commit this if types defines upper--------------------------
@@ -89,10 +105,29 @@ typedef ptrdiff_t   sreg;   // platform depend type
 //------------------------------------------------------------------------------------
 
 
-/*
- * *************************************************
- * Define user copy
- * *************************************************
+/************************************************************************************
+ *  macro for user bit operations
+ */
+#define MY_CTYPE_SET_BIT(to, pos, type) (to) |= ((type)(1UL << (pos)))
+#define MY_CTYPE_RESET_BIT(to, pos, type) (to) &= ~((type)(1UL << (pos)))
+#define MY_CTYPE_TOGGLE_BIT(to, pos, type) (to) ^= (type)(1UL << (pos))
+#define MY_CTYPE_CHECK_BIT(from, pos) (((from) >> (pos)) & 1UL)
+#define MY_CTYPE_WRITE_BIT(to, pos, value, type) (to) = (type)(((to) & ~(1UL << (pos))) | ((value) << (pos)))
+// register operations
+#define MY_CTYPE_REG_SET_BIT(_r, _b)    (*((volatile reg*)(_r)) |=  (_b))
+#define MY_CTYPE_REG_CLR_BIT(_r, _b)    (*((volatile reg*)(_r)) &= ~(_b))
+#define MY_CTYPE_REG_SET(_r, _d)        (*((volatile reg*)(_r))  =  (_d))
+#define MY_CTYPE_REG_CPY(_r, _d)        (*((volatile reg*)(_r))  =  *((volatile reg*)(_d)))
+
+
+/************************************************************************************
+ *  Extern array which contain`s size for all types
+ */
+extern const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH];
+
+
+/************************************************************************************
+ *  Macro for user copy
  */
 forceinline void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to)
 {
@@ -116,35 +151,19 @@ forceinline void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
  * and platform dependent
  * *************************************************
  */
-forceinline void MY_CTYPE_COPY_REGISTERS(reg* from, reg* to)
+forceinline void MY_CTYPE_COPY_REGISTERS(volatile reg* from, volatile reg* to)
 {
-    *(to) = *(from);
+    MY_CTYPE_REG_CPY(to, from);
 }
 
-forceinline void MY_CTYPE_REVCOPY_REGISTERS(reg* from, reg* to)
+forceinline void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile reg* to)
 {
     volatile reg rev;
     volatile reg cpy = *(from);
 
     MY_CTYPE_USER_DATA_REVCPY(sizeof(reg), (u8*)&cpy, (u8*)&rev);
-    *(to) = rev;
+    MY_CTYPE_REG_CPY(to, rev);
 }
-
-/*
- * *************************************************
- * Define user bit operations
- * *************************************************
- */
-
-#define MY_CTYPE_SET_BIT(to, pos, type) (to) |= ((type)(1UL << (pos)))
-#define MY_CTYPE_RESET_BIT(to, pos, type) (to) &= ~((type)(1UL << (pos)))
-#define MY_CTYPE_TOGGLE_BIT(to, pos, type) (to) ^= (type)(1UL << (pos))
-#define MY_CTYPE_CHECK_BIT(from, pos) ((from) >> (pos)) & 1UL
-#define MY_CTYPE_WRITE_BIT(to, pos, value, type) (to) = (type)(((to) & ~(1UL << (pos))) | ((value) << (pos)))
-//*********************************************
-
-extern const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH];
-
 
 forceinline const u8* myCTypeGetTablePointer()
 {
@@ -152,7 +171,8 @@ forceinline const u8* myCTypeGetTablePointer()
 }
 
 
-forceinline u8 getMYCTypeLen(u8 type) {
+forceinline u8 getMYCTypeLen(u8 type)
+{
     if(type < TYPE_ARRAY_LENGTH) {
         return typeLengthMappingArray[type];
     }

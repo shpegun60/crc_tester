@@ -10,7 +10,6 @@
 #include "entity_port.h"
 
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
-#include "my_ctypes.h"
 
 /**************************************************************************************************************************************************
  * main struct types definition before (for type saving in entityCallback functions)
@@ -71,7 +70,7 @@ struct EntityField {
     u32     bitFlags; //bit[0] - read only, bit[1] - isParam, bit[2] - is log, bit[3] - is pointer ... see bit flags mask
     u32     shift;
     u8      type;
-    char    descr[ENTITY_DECRIPTION_SIZE];
+    char    descr[ENTITY_DESCRIPTION_SIZE];
 };
 
 struct Entity {
@@ -81,7 +80,7 @@ struct Entity {
     u8              isHeap;
 #endif /* USE_ENTITY_USER_SPACE */
 
-    char            descr[ENTITY_DECRIPTION_SIZE];
+    char            descr[ENTITY_DESCRIPTION_SIZE];
     u16             fields_count;
     EntityField*    fields;
 };
@@ -91,6 +90,10 @@ struct Entity {
  */
 
 typedef struct {
+#ifdef USE_ENTITY_PING
+    b           userInitReady;
+#endif /* USE_ENTITY_PING */
+
     u32         allocated_entity_pointers;
     u32         entities_count;
     Entity**    entities;
@@ -115,7 +118,7 @@ void deleteEntities(void);
 int newEntities(u32 nomberOfEntities);
 
 /// allocation entitites pointer & fields
-int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
+int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
 
 /*
  * **********************************************************************************************************************************
@@ -124,16 +127,16 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
  */
 
 /// init field by field-number
-int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr);
+int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr);
 
 /// init field-array
-int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum);
+int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum);
 
 ///init existing field by pointer
-int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE]);
+int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE]);
 
 /// rename field by field number
-int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DECRIPTION_SIZE]);
+int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE]);
 
 /*
  * ****************************************************************************************************
@@ -144,7 +147,7 @@ int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DECRIPTI
 #ifdef USE_ENTITY_CALLBACKS
 
 /// init field with callbacks by field-number
-int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr,
+int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 /// init callback function by fieldNumber
@@ -152,7 +155,7 @@ int entityInitCallback(Entity * entityInst, int filedNumber,
                        TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 /// init callback function by description
-int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DECRIPTION_SIZE],
+int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SIZE],
                      TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 #endif /* USE_ENTITY_CALLBACKS */
@@ -170,6 +173,18 @@ int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int field
 /// string compleate for entities---------------------------------------------------------------------------------------------------
 int entityDescrNotCompleate(const c8* str1, const c8* str2);
 
+
+
+
+#ifdef USE_ENTITY_PING
+/*
+ * **********************************************************************************************************************************
+ *  user Ready functions
+ * **********************************************************************************************************************************
+ */
+void setEntityReadyState(b state);
+
+#endif /* USE_ENTITY_PING */
 
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */

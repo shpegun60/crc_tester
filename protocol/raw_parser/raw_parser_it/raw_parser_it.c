@@ -473,7 +473,7 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA // add reed-solomon parity to crc and write to data
     for (i = 0; i < RSCODE_NPAR; ++i) {
 #ifdef D_RAW_P_CRC_ENA // crc init
-            m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
 #endif /* D_RAW_P_CRC_ENA */
         self->TX.data[len++] = self->rs_ecc.pBytes[RSCODE_NPAR-1-i];
     }

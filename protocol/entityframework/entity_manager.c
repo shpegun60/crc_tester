@@ -8,7 +8,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-EntityInfo entityInfo = {0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};  // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+#ifdef USE_ENTITY_PING
+EntityInfo entityInfo = {0, 0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};    // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+#else
+EntityInfo entityInfo = {0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};       // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+#endif /* USE_ENTITY_PING */
 
 /*
  * **********************************************************************************************************************************
@@ -71,6 +75,10 @@ void deleteEntities(void)
     }
 
     free(entityInfo.entities);
+#ifdef USE_ENTITY_PING
+    entityInfo.userInitReady                = 0;
+#endif /* USE_ENTITY_PING */
+
     entityInfo.entities_count               = 0;
     entityInfo.allocated_entity_pointers    = 0;
     entityInfo.entities                     = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities));
@@ -81,7 +89,7 @@ void deleteEntities(void)
 /// allocation new entities pointers
 int newEntities(u32 nomberOfEntities)
 {
-    M_Assert_BreakSaveCheck((nomberOfEntities > MAX_NUBER_OF_ENTITIES), M_EMPTY, return ENTITY_ERROR, "newEntities: No valid input");
+    M_Assert_BreakSaveCheck((nomberOfEntities > MAX_NUBER_OF_ENTITIES), M_EMPTY, return ENTITY_ERROR, "newEntities: No valid input nomber of entities, value: %d, max: %d", nomberOfEntities, MAX_NUBER_OF_ENTITIES);
 
     deleteEntities(); // delete all entities
 
@@ -94,8 +102,9 @@ int newEntities(u32 nomberOfEntities)
 
 
 /// allocation entitites pointer & fields
-int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg)
+int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg)
 {
+    M_Assert_BreakSaveCheck((NumberOfFields > MAX_NUBER_OF_FIELDS), M_EMPTY, return ENTITY_ERROR, "initEntity: No valid input number of fields, value: %d, max: %d", NumberOfFields, MAX_NUBER_OF_FIELDS);
     M_Assert_BreakSaveCheck((entityInfo.entities_count == entityInfo.allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
 
     // allocation pointer to Entity--------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,7 +112,7 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
     M_Assert_BreakSaveCheck(entityInfo.entities[entityInfo.entities_count] == NULLPTR(Entity*), M_EMPTY, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
 
     // copy entity description-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)descr, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
+    MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
 
     // allocation or initialization pointer to data----------------------------------------------------------------------------------------------------------------------------------------------
 #ifdef USE_ENTITY_USER_SPACE
@@ -143,8 +152,8 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
     entityInfo.entities[entityInfo.entities_count]->fields_count = NumberOfFields;
 
     // initialization Fields-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    char str[(ENTITY_DECRIPTION_SIZE << 1) + 1] = {};
-    for(int i = 0; i < NumberOfFields; ++i) {
+    char str[(ENTITY_DESCRIPTION_SIZE << 1) + 1] = {};
+    for(u32 i = 0; i < NumberOfFields; ++i) {
 
 #ifdef USE_ENTITY_CALLBACKS
 
@@ -165,7 +174,7 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
         entityInfo.entities[entityInfo.entities_count]->fields[i].type      = VOID_TYPE;
 
         sprintf(str, "%d", i);
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)str, (u8 *)entityInfo.entities[entityInfo.entities_count]->fields[i].descr);
+        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)entityInfo.entities[entityInfo.entities_count]->fields[i].descr);
     }
 
     ++entityInfo.entities_count;
@@ -179,7 +188,7 @@ int initEntity(int NumberOfFields, reg pointerSize, char descr[ENTITY_DECRIPTION
  */
 
 /// init field by field-number
-int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr)
+int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
@@ -189,7 +198,7 @@ int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField,
                                     entityInst->fields[(*fieldNumber)].type         = type;
 
                                     if(descr) {
-                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[(*fieldNumber)].descr);
+                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[(*fieldNumber)].descr);
                                     }
 
                                     if(field_ptr) {
@@ -204,12 +213,12 @@ int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField,
 }
 
 /// init field-array
-int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr, int startNum)
+int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
 
-                                    char str[(ENTITY_DECRIPTION_SIZE << 1) + 1] = {};
+                                    char str[(ENTITY_DESCRIPTION_SIZE << 1) + 1] = {};
                                     bitFlags |= ENTITY_ARRAY_MSK;
                                     for(int i = 0; i < arrayLen; ++i) {
 
@@ -219,7 +228,7 @@ int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityF
 
                                         if(descr) {
                                             sprintf(str, "%s%d", descr, (i + startNum));
-                                            MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)str, (u8 *)entityInst->fields[(*fieldNumber)].descr);
+                                            MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)entityInst->fields[(*fieldNumber)].descr);
                                         }
 
                                         shift += getMYCTypeLen(type);
@@ -238,7 +247,7 @@ int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityF
 
 
 ///init existing field by pointer
-int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE])
+int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE])
 {
     M_Assert_BreakSaveCheck((fieldInst == NULLPTR(EntityField *)), M_EMPTY, return ENTITY_ERROR, "initFieldPtr: No valid input");
 
@@ -247,18 +256,18 @@ int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlag
     fieldInst->type         = type;
 
     if(descr) {
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)descr, (u8 *)fieldInst->descr);
+        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)fieldInst->descr);
     }
     return ENTITY_OK;
 }
 
 /// rename field by field number
-int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DECRIPTION_SIZE])
+int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE])
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || descr == NULLPTR(char *)), M_EMPTY, return ENTITY_ERROR, "fieldRename: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > fieldNumber), {
 
-                                    MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[fieldNumber].descr);
+                                    MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[fieldNumber].descr);
                                     return ENTITY_OK;
 
                                 }, M_EMPTY, M_EMPTY, "fieldRename: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber, entityInst->fields_count);
@@ -276,7 +285,7 @@ int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DECRIPTI
 #ifdef USE_ENTITY_CALLBACKS
 
 /// init field with callbacks by field-number
-int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DECRIPTION_SIZE], void * field_ptr,
+int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULLPTR(int *)), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: No valid input");
@@ -303,7 +312,7 @@ int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(Enti
                                 #endif /* USE_ENTITY_WRITE_CALLBACK */
 
                                     if(descr) {
-                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DECRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[(*fieldNumber)].descr);
+                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[(*fieldNumber)].descr);
                                     }
 
                                     if(field_ptr) {
@@ -347,7 +356,7 @@ int entityInitCallback(Entity * entityInst, int filedNumber,
 }
 
 /// init callback function by description
-int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DECRIPTION_SIZE],
+int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SIZE],
                            TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *)), M_EMPTY, return ENTITY_ERROR, "initCallback_txt: No valid input");
@@ -402,19 +411,19 @@ int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int field
     return ENTITY_OK;
 }
 /// string compleate for entities---------------------------------------------------------------------------------------------------
-int entityDescrNotCompleate(const c8* str1, const c8* str2)
+inline int entityDescrNotCompleate(const c8* str1, const c8* str2)
 {
-#if ENTITY_DECRIPTION_SIZE == 0x01U
+#if ENTITY_DESCRIPTION_SIZE == 0x01U
     return ((*str1) == (*str2)) ? 0 : 1;
-#elif ENTITY_DECRIPTION_SIZE == 0x02U
+#elif ENTITY_DESCRIPTION_SIZE == 0x02U
     return (( *UINT16_TYPE_DC(str1) ) == ( *UINT16_TYPE_DC(str2) )) ? 0 : 1;
-#elif ENTITY_DECRIPTION_SIZE == 0x04U
+#elif ENTITY_DESCRIPTION_SIZE == 0x04U
     return (( *UINT32_TYPE_DC(str1) ) == ( *UINT32_TYPE_DC(str2) )) ? 0 : 1;
-#elif ENTITY_DECRIPTION_SIZE == 0x08U
+#elif ENTITY_DESCRIPTION_SIZE == 0x08U
     return (( *UINT64_TYPE_DC(str1) ) == ( *UINT64_TYPE_DC(str2) )) ? 0 : 1;
 #else
 
-    int n = ENTITY_DECRIPTION_SIZE;
+    int n = ENTITY_DESCRIPTION_SIZE;
     while(n--) {
         if(*str1++ != *str2++) {
             return 1;
@@ -424,6 +433,20 @@ int entityDescrNotCompleate(const c8* str1, const c8* str2)
 
 #endif /* description complementation function selector */
 }
+
+
+#ifdef USE_ENTITY_PING
+/*
+ * **********************************************************************************************************************************
+ *  user Ready functions
+ * **********************************************************************************************************************************
+ */
+void setEntityReadyState(b state)
+{
+    entityInfo.userInitReady = state;
+}
+
+#endif /* USE_ENTITY_PING */
 
 
 
