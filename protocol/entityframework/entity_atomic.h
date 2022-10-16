@@ -21,12 +21,17 @@
 #   define ENTITY_ATOMIC_ENABLE_IRQ()                      __enable_irq()
 #   define ENTITY_ATOMIC_GET_IRQ_PRIMASK()                 __get_PRIMASK()
 #   define ENTITY_ATOMIC_SET_IRQ_PRIMASK(priMask)          __set_PRIMASK((priMask))
+#elif defined(ENTITY_ATOMIC_ESP32)
+#   define ENTITY_ATOMIC_DISABLE_IRQ()
+#   define ENTITY_ATOMIC_ENABLE_IRQ()
+#   define ENTITY_ATOMIC_GET_IRQ_PRIMASK()                 0
+#   define ENTITY_ATOMIC_SET_IRQ_PRIMASK(priMask)          UNUSED((priMask))
 #else
 #   define ENTITY_ATOMIC_DISABLE_IRQ()
 #   define ENTITY_ATOMIC_ENABLE_IRQ()
 #   define ENTITY_ATOMIC_GET_IRQ_PRIMASK()                 0
 #   define ENTITY_ATOMIC_SET_IRQ_PRIMASK(priMask)          UNUSED((priMask))
-#   error Unsupported platform for Entity Atomic, user must define some atomic functions
+#   error Unsupported platform for Entity Atomic, user must determine some atomic functions (defined upper)
 #endif /* Atomic platform set */
 
 

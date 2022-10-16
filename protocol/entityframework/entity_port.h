@@ -109,6 +109,7 @@
 
 #ifdef USE_ENTITY_ATOMIC // atomic functions choose
 //#   define ENTITY_ATOMIC_STM32
+//#   define ENTITY_ATOMIC_ESP32
 #endif /* USE_ENTITY_ATOMIC */
 
 
