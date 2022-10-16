@@ -98,12 +98,19 @@
  *  ENTITY use atomic operations
  *  some fileds may be atomic for read & write
  *  WARNING!!! add's check atomic flag and call some functions before and after each write & read
+ *
+ *  -->User must be define some atomic functions in entity_atomic.h!!!
  * **********************************************************************************************************************************
  */
 
 #ifndef USE_ENTITY_ATOMIC
 //#   define USE_ENTITY_ATOMIC
 #endif /* USE_ENTITY_ATOMIC */
+
+#ifdef USE_ENTITY_ATOMIC // atomic functions choose
+//#   define ENTITY_ATOMIC_STM32
+#endif /* USE_ENTITY_ATOMIC */
+
 
 /* **********************************************************************************************************************************
  *  Macro for Defining Entity Copy function

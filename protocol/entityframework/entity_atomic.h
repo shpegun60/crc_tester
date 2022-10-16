@@ -16,8 +16,6 @@
 
 #include "my_ctypes.h"
 
-//#define ENTITY_ATOMIC_STM32
-
 #ifdef ENTITY_ATOMIC_STM32
 #   define ENTITY_ATOMIC_DISABLE_IRQ()                     __disable_irq()
 #   define ENTITY_ATOMIC_ENABLE_IRQ()                      __enable_irq()
@@ -28,6 +26,7 @@
 #   define ENTITY_ATOMIC_ENABLE_IRQ()
 #   define ENTITY_ATOMIC_GET_IRQ_PRIMASK()                 0
 #   define ENTITY_ATOMIC_SET_IRQ_PRIMASK(priMask)          UNUSED((priMask))
+#   error Unsupported platform for Entity Atomic, user must define some atomic functions
 #endif /* Atomic platform set */
 
 
