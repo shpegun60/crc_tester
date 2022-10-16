@@ -10,6 +10,10 @@
 #ifndef ENTITY_ATOMIC_H
 #define ENTITY_ATOMIC_H
 
+#include "entity_port.h"
+
+#ifdef USE_ENTITY_ATOMIC
+
 #include "my_ctypes.h"
 
 //#define ENTITY_ATOMIC_STM32
@@ -85,5 +89,6 @@ STATIC_FORCEINLINE void __irqSetPrimask(b flag, reg priMask)
 #define ATOMIC_BLOCK_RESTORATE(expression)	ATOMIC_BLOCK_RESTORATE_COND(1, expression)
 
 
+#endif /* USE_ENTITY_ATOMIC */
 
 #endif /* ENTITY_ATOMIC_H */

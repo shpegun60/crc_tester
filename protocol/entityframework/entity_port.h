@@ -43,9 +43,11 @@
 #   define MAX_NUBER_OF_FIELDS 255
 #endif /* MAX_NUBER_OF_FIELDS */
 
+
+
 /* **********************************************************************************************************************************
  * USE USER custom space (not allocation for ENTITY POINTER)
- * add`s some bytes to Entity struct, see USE_ENTITY_READ_CALLBACK and USE_ENTITY_WRITE_CALLBACK description
+ * WARNING!!!! add`s some bytes to Entity struct
  */
 
 #ifndef USE_ENTITY_USER_SPACE
@@ -80,6 +82,30 @@
 #endif /* USE_ENTITY_CALLBACKS */
 
 /* **********************************************************************************************************************************
+ *  ENTITY use ping
+ *  if you want to use ping function & ready flag define this
+ *  WARNING!!! adds some bytes to EntityInfo struct
+ * **********************************************************************************************************************************
+ */
+
+#ifndef USE_ENTITY_PING
+//#   define USE_ENTITY_PING
+#endif /* USE_ENTITY_PING */
+
+
+
+/* **********************************************************************************************************************************
+ *  ENTITY use atomic operations
+ *  some fileds may be atomic for read & write
+ *  WARNING!!! add's check atomic flag and call some functions before and after each write & read
+ * **********************************************************************************************************************************
+ */
+
+#ifndef USE_ENTITY_ATOMIC
+//#   define USE_ENTITY_ATOMIC
+#endif /* USE_ENTITY_ATOMIC */
+
+/* **********************************************************************************************************************************
  *  Macro for Defining Entity Copy function
  * **********************************************************************************************************************************
  */
@@ -92,19 +118,6 @@
 #else
 #    error unsupported endianness
 #endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
-
-
-
-/* **********************************************************************************************************************************
- *  ENTITY use ping
- *  if you want use ping function & ready flag define this
- *  WARNING!!! adds some bytes to EntityInfo struct
- * **********************************************************************************************************************************
- */
-
-#ifndef USE_ENTITY_PING
-//#   define USE_ENTITY_PING
-#endif /* USE_ENTITY_PING */
 
 
 /* **********************************************************************************************************************************
