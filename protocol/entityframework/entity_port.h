@@ -108,9 +108,25 @@
 #endif /* USE_ENTITY_ATOMIC */
 
 #ifdef USE_ENTITY_ATOMIC // atomic functions choose
-//#   define ENTITY_ATOMIC_STM32
+#   define ENTITY_ATOMIC_STM32
 //#   define ENTITY_ATOMIC_ESP32
 #endif /* USE_ENTITY_ATOMIC */
+
+
+/* **********************************************************************************************************************************
+ *  ENTITY use pointer
+ *  if you want to use entity - pointer define this
+ *  WARNING!!! adds some check to entity read & write functions
+ * **********************************************************************************************************************************
+ */
+
+#ifndef USE_ENTITY_POINTER
+#   define USE_ENTITY_POINTER
+#endif /* USE_ENTITY_POINTER */
+
+#ifndef USE_ENTITY_REGISTER
+#   define USE_ENTITY_REGISTER
+#endif /* USE_ENTITY_REGISTER */
 
 
 /* **********************************************************************************************************************************
@@ -120,9 +136,11 @@
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
 #   define ENTITY_BYTE_CPY(n, from, to) MY_CTYPE_USER_DATA_MEMCPY((n), (from), (to))
 #   define ENTITY_TYPE_CPY(type, from, to) cTypeMemcpy((type), (from), (to))
+#   define ENTITY_REG_CPY(from, to) MY_CTYPE_COPY_REGISTERS((from), (to))
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
 #   define ENTITY_BYTE_CPY(n, from, to) MY_CTYPE_USER_DATA_REVCPY((n), (from), (to))
 #   define ENTITY_TYPE_CPY(type, from, to) cTypeRevcpy((type), (from), (to))
+#   define ENTITY_REG_CPY(from, to) MY_CTYPE_REVCOPY_REGISTERS((from), (to))
 #else
 #    error unsupported endianness
 #endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */

@@ -26,12 +26,13 @@ typedef struct Entity       Entity;
   * @brief  entityCallback(entity, field, args). Pointer to function array callbacks
   * @param  entity      - pointer to Entity
   * @param  field       - pointer to EntityField
+  * @param  value       - pointer to value data (pointer + field shift)
   * @param  context     - pointer to context for callback (programmer must cast to other last defined value).
   * @retval None
   */
 typedef struct {
-    void (*entityCallback)(Entity* entity, EntityField* field, void* context); // callback function
-    void* context;                                                             // callback context
+    void (*entityCallback)(Entity* entity, EntityField* field, void* value, void* context); // callback function
+    void* context;                                                                          // callback context
 } entityCallbackContainer;
 
 

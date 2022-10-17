@@ -4,7 +4,7 @@
  * @brief		Interrupt blocking macros WARNING!!! ONLY STM32, if you use other platform change some macroces
  *
  * @version		v1.0
- * @date		18.10.2022
+ * @date		17.10.2022
  * @author		Shpegun60
  ************************************************************************************************/
 #ifndef ENTITY_ATOMIC_H
@@ -71,18 +71,20 @@ STATIC_FORCEINLINE void __irqSetPrimask(b flag, reg priMask)
 // if the condition is not met, the interrupt enable flag will not be changed
 #define ATOMIC_BLOCK_FORCEON_COND(condition, expression)    \
     do{                                                     \
-        __irqDis(condition);                                \
+        b _cond = condition;                                \
+        __irqDis(_cond);                                    \
         expression;                                         \
-        __irqEn(condition);                                 \
+        __irqEn(_cond);                                     \
     }while(0)
 
 // block with a preliminary check of the need to prohibit
 // if the condition is not met, the interrupt enable flag will not be changed
 #define ATOMIC_BLOCK_RESTORATE_COND(condition, expression)  \
     do{                                                     \
-        reg priMask = __irqDisGetPrimask(condition);        \
+        b _cond = condition;                                \
+        reg priMask = __irqDisGetPrimask(_cond);            \
         expression;                                         \
-        __irqSetPrimask(condition, priMask);                \
+        __irqSetPrimask(_cond, priMask);                    \
     }while(0)
 
 
