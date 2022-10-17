@@ -36,13 +36,27 @@
  * Maximum number of entities & fields
  */
 #ifndef MAX_NUBER_OF_ENTITIES
-#   define MAX_NUBER_OF_ENTITIES 255
+#   define MAX_NUBER_OF_ENTITIES 300
 #endif /* MAX_NUBER_OF_ENTITIES */
 
 #ifndef MAX_NUBER_OF_FIELDS
-#   define MAX_NUBER_OF_FIELDS 255
+#   define MAX_NUBER_OF_FIELDS 300
 #endif /* MAX_NUBER_OF_FIELDS */
 
+
+
+#if (MAX_NUBER_OF_ENTITIES < 256U)
+#   define ENTITIES_SIZEOF 1U
+#else
+#   define ENTITIES_SIZEOF 2U
+#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
+
+
+#if (MAX_NUBER_OF_FIELDS < 256U)
+#   define ENTITY_FIELD_SIZEOF 1U
+#else
+#   define ENTITY_FIELD_SIZEOF 2U
+#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
 
 
 /* **********************************************************************************************************************************
