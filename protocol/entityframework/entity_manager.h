@@ -10,6 +10,7 @@
 #include "entity_port.h"
 
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
+#include "my_ctype_cast.h"
 
 /**************************************************************************************************************************************************
  * main struct types definition before (for type saving in entityCallback functions)
@@ -43,12 +44,22 @@ typedef struct {
 #define ENTITY_READ_ONLY_MSK 	0x00000001U // its read only field (write protected field)
 #define ENTITY_PARAM_MSK 		0x00000002U // its parameter field (writed to flash once and read before start, must uncommitted USE_ENTITY_FLASH)
 #define ENTITY_LOG_MSK 			0x00000004U // its log (writed to flash continious, must uncommitted USE_ENTITY_FLASH)
-#define ENTITY_POINTER_MSK 		0x00000008U // its pointer, must specify reg in entity_types.h (reading and writing from addres which store in this field)
-#define ENTITY_REGISTER_MSK 	0x00000010U // its register, must specify reg and ENTITY_PERIF_BUS_TYPE_IND in entity_types.h (bus aligned read and write, it happens for one insrtuction, must uncommitted USE_ENTITY_REGISTER)
-#define ENTITY_ATOMIC_MSK 		0x00000020U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
-#define ENTITY_LOW_UPDATE_MSK 	0x00000040U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
-#define ENTITY_READ_ONCE_MSK 	0x00000080U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
-#define ENTITY_ARRAY_MSK        0x00000100U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it, must uncommitted USE_ENTITY_ATOMIC)
+
+#ifdef USE_ENTITY_POINTER
+#define ENTITY_POINTER_MSK 		0x00000008U // its field which contains pointer
+#endif /* USE_ENTITY_POINTER */
+
+#ifdef USE_ENTITY_REGISTER
+#define ENTITY_REGISTER_MSK 	0x00000010U // its register, bus type atomic write and read operaions with field
+#endif /* USE_ENTITY_REGISTER */
+
+#ifdef USE_ENTITY_ATOMIC
+#define ENTITY_ATOMIC_MSK 		0x00000020U // its atomic field must specify entity_atomic.h file (before write and read disabling interrupts and after restore it
+#endif /* USE_ENTITY_ATOMIC */
+
+#define ENTITY_LOW_UPDATE_MSK 	0x00000040U // its low update field (no impact on the program)
+#define ENTITY_READ_ONCE_MSK 	0x00000080U // its read once field  (no impact on the program)
+#define ENTITY_ARRAY_MSK        0x00000100U // its array - field    (no impact on the program)
 #define ENTITY_ALL_BIT_MSK 		0xFFFFFFFFU // its mask for counting all fields
 
 /**************************************************************************************************************************************************
@@ -172,8 +183,28 @@ int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SI
 int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* val, void* context), void* context);
 
 /// string compleate for entities---------------------------------------------------------------------------------------------------
-int entityDescrNotCompleate(const c8* str1, const c8* str2);
+STATIC_FORCEINLINE int entityDescrNotCompleate(const c8* str1, const c8* str2)
+{
+#if ENTITY_DESCRIPTION_SIZE == 0x01U
+    return ((*str1) == (*str2)) ? 0 : 1;
+#elif ENTITY_DESCRIPTION_SIZE == 0x02U
+    return (( *UINT16_TYPE_DC(str1) ) == ( *UINT16_TYPE_DC(str2) )) ? 0 : 1;
+#elif ENTITY_DESCRIPTION_SIZE == 0x04U
+    return (( *UINT32_TYPE_DC(str1) ) == ( *UINT32_TYPE_DC(str2) )) ? 0 : 1;
+#elif ENTITY_DESCRIPTION_SIZE == 0x08U
+    return (( *UINT64_TYPE_DC(str1) ) == ( *UINT64_TYPE_DC(str2) )) ? 0 : 1;
+#else
 
+    int n = ENTITY_DESCRIPTION_SIZE;
+    while(n--) {
+        if(*str1++ != *str2++) {
+            return 1;
+        }
+    }
+    return 0;
+
+#endif /* description complementation function selector */
+}
 
 
 

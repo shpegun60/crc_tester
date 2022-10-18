@@ -9,7 +9,7 @@
 typedef struct {
     // packet form -----------------------------------------
     u8           m_startByte;                                   // Specifies the value of start-byte.
-    u32          m_receivePackLen;
+    reg          m_receivePackLen;
 
 #ifndef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
     u8           m_receiveFrameBuffer[D_RAW_P_RX_BUF_SIZE];   // frame buffer to proceed into user logic`s
@@ -26,14 +26,14 @@ typedef struct {
     // ----------------------------------------------------
 
     u8              m_triggerSB;            // trigger for read start byte
-    u32             m_receivePos;           // receive raw position
+    reg             m_receivePos;           // receive raw position
 
-    u32             m_transmittPos;           // transmitt raw position
+    reg             m_transmittPos;           // transmitt raw position
 
     u8  receiveState;
     u8  transmittState;
     u8  transmissionRepeat;
-    u32 m_transmittPackLen;
+    reg m_transmittPackLen;
 
     RawParser_Frame_t TX;
     RawParser_Frame_t RX;

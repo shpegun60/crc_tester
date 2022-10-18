@@ -10,7 +10,7 @@
 typedef struct {
     // packet form -----------------------------------------
     u8           m_startByte;          // Specifies the value of start-byte.
-    u32          m_receivePackLen;
+    reg          m_receivePackLen;
     u8           m_receiveBuffer[D_RAW_P_RX_BUF_SIZE];        // received raw byte array
 
 #ifndef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
@@ -34,17 +34,17 @@ typedef struct {
     // ----------------------------------------------------
 
     u8              m_triggerSB;            // trigger for read start byte
-    u32             m_receivePos;           // receive raw position
-    u32             m_receiveReadPos;       // receive read position
-    u32             m_receiveHandlePos;     // receive handler position
+    reg             m_receivePos;           // receive raw position
+    reg             m_receiveReadPos;       // receive read position
+    reg             m_receiveHandlePos;     // receive handler position
 
-    u32             m_transmittPos;           // transmitt raw position
+    reg             m_transmittPos;           // transmitt raw position
 
     u8 receiveState;
 
     RawParser_Frame_t TX;
     RawParser_Frame_t RX;
-    u32 uniRXPosition; // value for universal read position function
+    reg uniRXPosition; // value for universal read position function
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA

@@ -27,7 +27,7 @@ static u8           m_sendBuffer_external[D_RAW_P_TX_BUF_SIZE];    // array for 
  *
  */
 
-static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
+static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, reg size)
 {
     int byteReceiveCompl = 0;
     int arrReceiveCompl = 0;
@@ -38,7 +38,7 @@ static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_
         return 1;
     }
 
-    for(int i = 0; i < Txframe->size; ++i) {
+    for(reg i = 0; i < Txframe->size; ++i) {
         RawParser_dma_receiveByte(desc, Txframe->data[i]);
     }
 
@@ -80,7 +80,7 @@ static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_
         arrReceiveCompl++;
     }
 
-    int last = 0;
+    reg last = 0;
     while (last < size) {
         RawParser_dma_proceed(desc);
         ++last;
@@ -95,7 +95,7 @@ static int receiveTransmittSimpleDmaTest(RawParser_dma_t* desc, u8 * data, rawP_
  *
  */
 
-static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, rawP_size_t size)
+static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, reg size)
 {
     int byteCollisisons = 0;
     int arrCollisisons = 0;
@@ -116,7 +116,7 @@ static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, r
     Txframe->data[lenBreak] = b_rand;
 
 
-    for(int i = 0; i < Txframe->size; ++i) {
+    for(reg i = 0; i < Txframe->size; ++i) {
         RawParser_dma_receiveByte(desc, Txframe->data[i]);
     }
 
@@ -153,7 +153,7 @@ static int receiveTransmittCollisionsDmaTest(RawParser_dma_t* desc, u8 * data, r
         arrCollisisons++;
     }
 
-    int last = 0;
+    reg last = 0;
     while (last < size) {
         RawParser_dma_proceed(desc);
         ++last;
@@ -223,7 +223,7 @@ static int receiveTransmittMacroWriteReadDmaTest(RawParser_dma_t* desc, int rand
             return 1;
         }
 
-        for(int i = 0; i < Txframe->size; ++i) {
+        for(reg i = 0; i < Txframe->size; ++i) {
             RawParser_dma_receiveByte(desc, Txframe->data[i]);
         }
 
@@ -316,7 +316,7 @@ static int receiveTransmittConvertDmaTest(RawParser_dma_t* desc, int randTestCou
             return 1;
         }
 
-        for(int i = 0; i < Txframe->size; ++i) {
+        for(reg i = 0; i < Txframe->size; ++i) {
             RawParser_dma_receiveByte(desc, Txframe->data[i]);
         }
 

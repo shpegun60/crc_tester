@@ -3,7 +3,7 @@
 
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
 #include "smart_assert.h"
-#include "my_ctype_cast.h"
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -222,7 +222,7 @@ int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityF
                                     bitFlags |= ENTITY_ARRAY_MSK;
                                     for(int i = 0; i < arrayLen; ++i) {
 
-                                        entityInst->fields[(*fieldNumber)].bitFlags   = bitFlags;
+                                        entityInst->fields[(*fieldNumber)].bitFlags   = (bitFlags | ENTITY_ARRAY_MSK);
                                         entityInst->fields[(*fieldNumber)].shift      = shift;
                                         entityInst->fields[(*fieldNumber)].type       = type;
 
@@ -412,31 +412,6 @@ int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int field
     }
     return ENTITY_OK;
 }
-
-/// string compleate for entities---------------------------------------------------------------------------------------------------
-inline int entityDescrNotCompleate(const c8* str1, const c8* str2)
-{
-#if ENTITY_DESCRIPTION_SIZE == 0x01U
-    return ((*str1) == (*str2)) ? 0 : 1;
-#elif ENTITY_DESCRIPTION_SIZE == 0x02U
-    return (( *UINT16_TYPE_DC(str1) ) == ( *UINT16_TYPE_DC(str2) )) ? 0 : 1;
-#elif ENTITY_DESCRIPTION_SIZE == 0x04U
-    return (( *UINT32_TYPE_DC(str1) ) == ( *UINT32_TYPE_DC(str2) )) ? 0 : 1;
-#elif ENTITY_DESCRIPTION_SIZE == 0x08U
-    return (( *UINT64_TYPE_DC(str1) ) == ( *UINT64_TYPE_DC(str2) )) ? 0 : 1;
-#else
-
-    int n = ENTITY_DESCRIPTION_SIZE;
-    while(n--) {
-        if(*str1++ != *str2++) {
-            return 1;
-        }
-    }
-    return 0;
-
-#endif /* description complementation function selector */
-}
-
 
 #ifdef USE_ENTITY_PING
 /*

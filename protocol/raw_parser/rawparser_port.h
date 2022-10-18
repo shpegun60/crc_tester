@@ -29,10 +29,8 @@
 #define D_RAW_P_TWO_BYTES_LEN_SUPPORT
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    typedef u16 rawP_size_t;
     #define D_RAW_P_MAX_PROTOCOL_LEN 8192U
 #else // use one byte of length
-    typedef u8 rawP_size_t;
     #define D_RAW_P_MAX_PROTOCOL_LEN 254U
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
@@ -65,8 +63,8 @@
 */
 
 typedef struct {
-    u8 *data;
-    rawP_size_t size;
+    u8* data;
+    reg size;
 } RawParser_Frame_t;
 
 /*
@@ -178,31 +176,6 @@ typedef struct {
    Check user input (DO NOT OWERWRITE THIS!!!!!!!)
 ***************************************************************************************************
 */
-
-// strict type control (PRECOMPILE)------------------------------------------------
-#if (__STDC_VERSION__ >= 201112L) // if C version equal or more than C11
-    #include "assert.h"
-
-    #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-        static_assert((sizeof(rawP_size_t) == 2), "MY_RAW_PARSER: size of length type must be equal 2, change --> raw_parser_port.h: typedef rawP_size_t");
-    #else // use one byte of length
-        static_assert((sizeof(rawP_size_t) == 1), "MY_RAW_PARSER: size of length type must be equal 1, change --> raw_parser_port.h: typedef rawP_size_t");
-    #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-
-#else // if old version C
-    #define C99_D_RAW_P_STATIC_ASSERTION_CREATE(COND,MSG) typedef int my_crc_static_assertion_##MSG[(COND)? 1 : -1] // define custom static assertion if version C less than C11
-    //--------------------------------------------------------------------------------------------------------------
-
-    #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-        C99_D_RAW_P_STATIC_ASSERTION_CREATE((sizeof(rawP_size_t) == 2), size_of_length_type_type_must_be_equal_2_change_typedef_rawP_size_t);
-    #else // use one byte of length
-        C99_D_RAW_P_STATIC_ASSERTION_CREATE((sizeof(rawP_size_t) == 1), size_of_length_type_type_must_be_equal_1_change_typedef_rawP_size_t);
-    #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-
-    //--------------------------------------------------------------------------------------------------------------
-    #undef C99_D_RAW_P_STATIC_ASSERTION_CREATE
-#endif /* (__STDC_VERSION__ >= 201112L) */
-
 
 // crc user check functions-----------------------
 #ifdef D_RAW_P_CRC_ENA

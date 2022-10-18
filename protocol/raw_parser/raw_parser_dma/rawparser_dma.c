@@ -223,7 +223,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #endif /* D_RAW_P_CRC_ENA */
 
-        self->m_receivePackLen = (rawP_size_t)(ch & 0x000000FFUL);    // read low byte
+        self->m_receivePackLen = (reg)(ch & 0x000000FFUL);    // read low byte
         self->receiveState = RAW_P_DMA_RECEIVE_LEN_HIGH;
         break;
 
@@ -233,7 +233,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
     self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #endif /* D_RAW_P_CRC_ENA */
 
-        self->m_receivePackLen |= (rawP_size_t)((((rawP_size_t)ch) << 8U) & 0x0000FF00UL); // read high byte
+        self->m_receivePackLen |= (reg)((((reg)ch) << 8U) & 0x0000FF00UL); // read high byte
         self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen);
 
         self->m_receiveHandlePos = 0;
@@ -546,7 +546,7 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
 
 #endif /* D_RAW_P_CRC_ENA */
 
-    self->TX.size = (rawP_size_t)self->m_transmittPos;
+    self->TX.size = self->m_transmittPos;
     return &self->TX;
 }
 

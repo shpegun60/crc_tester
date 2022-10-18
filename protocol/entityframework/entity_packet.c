@@ -47,7 +47,6 @@ int readEntitiesSizes(u8 *outputData, reg *size, reg maxOutBufferSize)
     // fields sizes --------------------------------------------------------------------------------------
     outputData[pos++] = ENTITY_FIELD_SIZEOF;                    // fields count sizeof
 
-
     outputData[pos++] = SIZEOF_STRUCT(EntityField, bitFlags);   // fields bitFlags sizeof
     outputData[pos++] = SIZEOF_STRUCT(EntityField, shift);      // fields shift sizeof
     outputData[pos++] = 1;                                      // fields type sizeof
@@ -153,17 +152,31 @@ int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYP
 
 
 
+//-----------------=============================-----------------------------------===========================-----------------------------=================================----OLD VERSION DO NOT SUPPORT---------------------------===========================----------------
+//            ENTITY_BYTE_CPY(sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags), (u8 *)&entityInfo.entities[entityNumber]->fields[i].bitFlags, &outputData[pos]);
+//            pos += sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags);
 
-            ENTITY_BYTE_CPY(sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags), (u8 *)&entityInfo.entities[entityNumber]->fields[i].bitFlags, &outputData[pos]);
-            pos += sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags);
+//            ENTITY_BYTE_CPY(sizeof(entityInfo.entities[entityNumber]->fields[i].shift), (u8 *)&entityInfo.entities[entityNumber]->fields[i].shift, &outputData[pos]);
+//            pos += sizeof(entityInfo.entities[entityNumber]->fields[i].shift);
 
-            ENTITY_BYTE_CPY(sizeof(entityInfo.entities[entityNumber]->fields[i].shift), (u8 *)&entityInfo.entities[entityNumber]->fields[i].shift, &outputData[pos]);
-            pos += sizeof(entityInfo.entities[entityNumber]->fields[i].shift);
+//            outputData[pos++] = (entityInfo.entities[entityNumber]->fields[i].type & 0xFFU);
+
+//            ENTITY_BYTE_CPY(ENTITY_DESCRIPTION_SIZE, (u8 *)&entityInfo.entities[entityNumber]->fields[i].descr, &outputData[pos]);
+//            pos += ENTITY_DESCRIPTION_SIZE;
+//-----------------=============================-----------------------------------===========================-----------------------------=================================-------------------------------===========================-------------------======================
+            // this is glitch
+            ENTITY_BYTE_CPY(1, (u8 *)&entityInfo.entities[entityNumber]->fields[i].bitFlags, &outputData[pos]);
+            pos += 1;
+
+            ENTITY_BYTE_CPY(2, (u8 *)&entityInfo.entities[entityNumber]->fields[i].shift, &outputData[pos]);
+            pos += 2;
 
             outputData[pos++] = (entityInfo.entities[entityNumber]->fields[i].type & 0xFFU);
 
             ENTITY_BYTE_CPY(ENTITY_DESCRIPTION_SIZE, (u8 *)&entityInfo.entities[entityNumber]->fields[i].descr, &outputData[pos]);
             pos += ENTITY_DESCRIPTION_SIZE;
+//------------------------------=========================================--------------------------------------===================================--------------------------------------=============================---------------------------------========================
+
         }
 
         (*size) = pos;

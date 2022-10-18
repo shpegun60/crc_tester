@@ -4,6 +4,7 @@
  *          If NDEBUG is not defined some expressions has change to empty define. (programmer must uncommit NDEBUG if code version released)
  *
  * @date
+ * @author Shpegun60
  */
 
 #ifndef __SMART_ASSERT_H_
@@ -22,29 +23,30 @@ extern "C" {
 
 //#define NDEBUG
 
-#define M_EMPTY /* ignored expression */
-#define M_ALWAYS 1 /* always proceed expression */
+#define M_EMPTY     /* ignored expression */
+#define M_ALWAYS 1  /* always proceed expression */
 
 
 void __M_DEBUG_INFO(const char* const msg, ...);
 void __M_DEBUG_ERROR(const char* const msg, ...);
 void __M_DEBUG_FILE(FILE * file, const char* const msg, ...);
 
+
 void __M_assert_test();
 
 #ifndef NDEBUG /* --------------------------------------------------------------------------------------------------------- */
 
-void __M_Error(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
-void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int line, const char* msg, ...);
+void __M_Error(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...);
+void __M_Warning(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...);
 
 
 /*
  * ***********************************************************************************************************************************************
- *  defines simple if NDEBUG disable expr
+ *  defines simple if NDEBUG disable this expression expr
  * ***********************************************************************************************************************************************
  */
 // this macros will disable if NDEBUG is defined
-#define M_Assert_disableExpr(...) __VA_ARGS__
+#   define M_Assert_disableExpr(...) __VA_ARGS__
 
 /*
  * ***********************************************************************************************************************************************
@@ -165,7 +167,7 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
  * ***********************************************************************************************************************************************
  */
 
-#define M_Assert_disableExpr(...)
+#   define M_Assert_disableExpr(...)
 /*
  * ***********************************************************************************************************************************************
  *  defines for break program
@@ -260,4 +262,4 @@ void __M_Warning(const char* expr_str, unsigned char expr, const char* file, int
 }
 #endif
 
-#endif // __SMART_ASSERT
+#endif /* __SMART_ASSERT_H_ */

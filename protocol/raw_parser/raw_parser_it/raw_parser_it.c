@@ -200,13 +200,13 @@ static void RawParser_it_proceedByte(RawParser_it_t* const self, const u8 ch, co
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     case RAW_P_IT_RECEIVE_LEN_LOW:
 
-        self->m_receivePackLen = (rawP_size_t)(ch & 0x000000FFUL);    // read low byte
+        self->m_receivePackLen = (reg)(ch & 0x000000FFUL);    // read low byte
         self->receiveState = RAW_P_IT_RECEIVE_LEN_HIGH;
         break;
 
     case RAW_P_IT_RECEIVE_LEN_HIGH:
 
-        self->m_receivePackLen |= (rawP_size_t)((((rawP_size_t)ch) << 8U) & 0x0000FF00UL); // read high byte
+        self->m_receivePackLen |= (reg)((((reg)ch) << 8U) & 0x0000FF00UL); // read high byte
         self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen);
 
         self->m_receivePos = 0;
@@ -305,7 +305,7 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
     if(m_sizeWithoutCRC > D_RAW_P_LEN_SEPARATOR) {
-        rawP_size_t tmp_len = LittleEndianU16(m_sizeWithoutCRC);
+        u16 tmp_len = LittleEndianU16(m_sizeWithoutCRC);
         m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, RECEIVE_EXTENDED_LEN_CMD);
         m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)( tmp_len         & 0x000000FFUL));
         m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)((tmp_len >> 8U)  & 0x000000FFUL));
@@ -424,7 +424,7 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 
 #if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) // add len to crc
 
-    rawP_size_t tmp_len = (len + RSCODE_NPAR);
+    reg tmp_len = (len + RSCODE_NPAR);
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
 

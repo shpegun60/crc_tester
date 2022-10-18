@@ -16,7 +16,7 @@ static u8           m_sendBuffer_external_it[D_RAW_P_TX_BUF_SIZE];    // array f
 
 #define D_RAW_P_IT_TEST_TRYING 2
 
-static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_size_t size)
+static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, reg size)
 {
     if(desc == NULL || data == NULL) {
         return 1;
@@ -80,7 +80,7 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, rawP_si
     return conterNotvalid;
 }
 
-static int receiveTransmittCollisionItTest(RawParser_it_t* desc, u8 * data, rawP_size_t size)
+static int receiveTransmittCollisionItTest(RawParser_it_t* desc, u8 * data, reg size)
 {
     if(desc == NULL || data == NULL) {
         return 1;
