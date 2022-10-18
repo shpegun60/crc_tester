@@ -36,7 +36,7 @@ int staticPoolContainer_delete(static_pool_container_t **self)
     return 0;
 }
 
-STATIC_INLINE void staticPoolContainer_proceedSignalls(static_pool_container_t * const self)
+STATIC_FORCEINLINE void staticPoolContainer_proceedSignalls(static_pool_container_t * const self)
 {
     /*
      *  Borrowed from Synchronous FIFO systemVerilog code (AW --> is fifo size, power of 2):

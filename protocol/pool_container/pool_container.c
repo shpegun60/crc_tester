@@ -51,7 +51,7 @@ void poolContainer_clear(pool_container_t * const self)
     self->rdEmpty = 1;
 }
 
-STATIC_INLINE void poolContainer_proceedSignalls(pool_container_t * const self)
+STATIC_FORCEINLINE void poolContainer_proceedSignalls(pool_container_t * const self)
 {
     /*
      *  Borrowed from Synchronous FIFO systemVerilog code (AW --> is fifo size, power of 2):
