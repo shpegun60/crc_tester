@@ -3,13 +3,18 @@
 
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
 
-#include "entity_manager.h"
 #include "smart_assert.h"
 #include "my_ctype_cast.h"
 
 #ifdef USE_ENTITY_ATOMIC
 #include "entity_atomic.h"
 #endif //USE_ENTITY_ATOMIC
+
+#ifdef OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
+#   define ENTITY_DBG_ASSERT_BUF M_Assert_Break
+#else
+#   define ENTITY_DBG_ASSERT_BUF M_Assert_BreakSaveCheck
+#endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
 
 
 /*------------------- Packet formaters function`s ----------------------------------
@@ -27,7 +32,9 @@ b entities_ping(void)
 
 int readEntitiesSizes(u8 *outputData, reg *size, reg maxOutBufferSize)
 {
-    M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < (8 + TYPE_ARRAY_LENGTH)) || outputData == NULL || size == NULL), M_EMPTY, return ENTITY_ERROR, "readEntitiesSizes: No allocated entities or invalid input");
+    M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (outputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "readEntitiesSizes: No allocated entities or invalid input");
+    ENTITY_DBG_ASSERT_BUF(maxOutBufferSize < (8 + TYPE_ARRAY_LENGTH), M_EMPTY, return ENTITY_ERROR, "readEntitiesSizes: sizes read more than buffer");
+
     reg pos = 0;
 
     // main sizes -----------------------------------------------------------------------------------------
@@ -52,6 +59,7 @@ int readEntitiesSizes(u8 *outputData, reg *size, reg maxOutBufferSize)
     }
 
     (*size) = pos;
+    UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
 
@@ -64,28 +72,30 @@ int readEntitiesDescriptions(TYPEOF_STRUCT(EntityInfo, entities_count) startEnti
         reg pos = 0;
 
         outputData[pos++] = ENTITY_OK;
-        outputData[pos++] = ENTITY_DESCRIPTION_SIZE;                // description sizeof
+        outputData[pos++] = ENTITY_DESCRIPTION_SIZE;                // description sizeof /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
         TYPEOF_STRUCT(EntityInfo, entities_count) tmp = (entityInfo.entities_count - startEntityNumber);
         len = MIN(tmp, len);
 
-#if (MAX_NUBER_OF_ENTITIES < 256U) // WARNING!!!!!!!!! DO NOT SUPPORT ON OLD VERSION-----------------------------------------------------------------------------------------------------------------------------------------------------------------
-        outputData[pos++] = (u8)(len & 0xFFU);
-#else
-        len &= 0xFFFFUL;
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&len, &outputData[pos]);
-        pos += ENTITIES_SIZEOF;
-#endif /* MAX_NUBER_OF_ENTITIES < 256 */
-
+        //#if (MAX_NUBER_OF_ENTITIES < 256U) // WARNING!!!!!!!!! DO NOT this SUPPORT ON OLD VERSION---------------------------------------------------------------------------------------------------------================================================-----===========================-------------------------------------------------------------------
+        //        outputData[pos++] = (u8)(len & 0xFFU);
+        //#else
+        //        len &= 0xFFFFUL;
+        //        ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&len, &outputData[pos]);
+        //        pos += ENTITIES_SIZEOF;
+        //#endif /* MAX_NUBER_OF_ENTITIES < 256 */
+        outputData[pos++] = (u8)(len & 0xFFU); // support on old version (this is glitch!!!)
+        //---------------------------================================----------------------------------==================================-----------------------------------================================---------------------------===========================---------------------------=========================------------------------
         len += startEntityNumber;
 
         for(TYPEOF_STRUCT(EntityInfo, entities_count) i = startEntityNumber; i < len; ++i) {
 
-            M_Assert_BreakSaveCheck( (pos + ENTITY_DESCRIPTION_SIZE) > maxOutBufferSize, M_EMPTY, {
-                                         outputData[0] = ENTITY_ERROR;
-                                         (*size) = 1;
-                                         return ENTITY_ERROR;
-                                     }, "readEntitiesDescriptions: description read size more than buffer");
+            ENTITY_DBG_ASSERT_BUF( (pos + ENTITY_DESCRIPTION_SIZE) > maxOutBufferSize, M_EMPTY, {
+                                       outputData[0]  = ENTITY_ERROR;
+                                       (*size)        = 1;
+                                       return ENTITY_ERROR;
+                                   }, "readEntitiesDescriptions: description read size more than buffer");
+
 
             ENTITY_BYTE_CPY(ENTITY_DESCRIPTION_SIZE, (u8 *)entityInfo.entities[i]->descr, &outputData[pos]);
             pos += ENTITY_DESCRIPTION_SIZE;
@@ -98,6 +108,7 @@ int readEntitiesDescriptions(TYPEOF_STRUCT(EntityInfo, entities_count) startEnti
         return ENTITY_ERROR;
     }
 
+    UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
 
@@ -112,7 +123,7 @@ int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYP
         outputData[pos++] = ENTITY_OK;
 
 #if (MAX_NUBER_OF_FIELDS < 256U)
-        outputData[pos++] = (u8)(startFieldNumber & 0xFFU);
+        outputData[pos++] = (u8)(startFieldNumber & 0xFFU);                             /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
         TYPEOF_STRUCT(Entity, fields_count) tmp = (entityInfo.entities[entityNumber]->fields_count - startFieldNumber);
         len = MIN(tmp, len);
@@ -120,7 +131,7 @@ int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYP
 
 #else
         startFieldNumber &= 0xFFFFUL;
-        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&startFieldNumber, &outputData[pos]);
+        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&startFieldNumber, &outputData[pos]); /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
         pos += ENTITY_FIELD_SIZEOF;
 
         len &= 0xFFFFUL;
@@ -132,13 +143,16 @@ int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYP
 #endif /* MAX_NUBER_OF_FIELDS < 256 */
 
         len += startFieldNumber;
-        for(TYPEOF_STRUCT(Entity, fields_count) i = startFieldNumber; i < len; ++i) {
 
-            M_Assert_BreakSaveCheck( ((pos + (sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags) + sizeof(entityInfo.entities[entityNumber]->fields[i].shift) + 1 + ENTITY_DESCRIPTION_SIZE)) > maxOutBufferSize), M_EMPTY, {
-                                         outputData[0] = ENTITY_ERROR;
-                                         (*size) = 1;
-                                         return ENTITY_ERROR;
-                                     }, "readEntityFields: fields read size more than buffer");
+        for(TYPEOF_STRUCT(Entity, fields_count) i = startFieldNumber; i < len; ++i) {
+            ENTITY_DBG_ASSERT_BUF( ((pos + (sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags) + sizeof(entityInfo.entities[entityNumber]->fields[i].shift) + 1 + ENTITY_DESCRIPTION_SIZE)) > maxOutBufferSize), M_EMPTY, {
+                                       outputData[0]  = ENTITY_ERROR;
+                                       (*size)        = 1;
+                                       return ENTITY_ERROR;
+                                   }, "readEntityFields: fields read size more than buffer");
+
+
+
 
             ENTITY_BYTE_CPY(sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags), (u8 *)&entityInfo.entities[entityNumber]->fields[i].bitFlags, &outputData[pos]);
             pos += sizeof(entityInfo.entities[entityNumber]->fields[i].bitFlags);
@@ -159,6 +173,7 @@ int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYP
         return ENTITY_ERROR;
     }
 
+    UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
 
@@ -168,9 +183,10 @@ STATIC_FORCEINLINE void proceedReadEntity(TYPEOF_STRUCT(EntityField, bitFlags) b
 
 #ifdef USE_ENTITY_ATOMIC
     ATOMIC_BLOCK_RESTORATE_COND((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_ATOMIC_MSK), {
-                                #endif /* USE_ENTITY_ATOMIC */
+#endif /* USE_ENTITY_ATOMIC */
 
-                                #if defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER)
+#if defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER)
+
                                     if((bitFlags) & (ENTITY_POINTER_MSK | ENTITY_REGISTER_MSK)) {
                                         volatile reg* reg_ptr_from = (volatile reg*) (* REG_TYPE_DC(ptr));
                                         volatile reg* reg_ptr_to   = (volatile reg*) (  outputData);
@@ -181,25 +197,23 @@ STATIC_FORCEINLINE void proceedReadEntity(TYPEOF_STRUCT(EntityField, bitFlags) b
 
                                     else
 
-                                #endif /* defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER) */
+#endif /* defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER) */
 
 
-                                #if defined(USE_ENTITY_REGISTER)
+#if defined(USE_ENTITY_REGISTER)
 
                                     if((bitFlags) & ENTITY_REGISTER_MSK) {
-                                        volatile reg* reg_ptr_from = ((volatile reg*)   ptr);
+                                        volatile reg* reg_ptr_from = ((volatile reg*) (ptr));
                                         volatile reg* reg_ptr_to   = ((volatile reg*) (outputData));
-                                        if(reg_ptr_from) {
-                                            ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
-                                        }
+                                        ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
                                     }
 
                                     else
 
-                                #endif /* defined(USE_ENTITY_REGISTER) */
+#endif /* defined(USE_ENTITY_REGISTER) */
 
 
-                                #if defined(USE_ENTITY_POINTER)
+#if defined(USE_ENTITY_POINTER)
 
                                     if((bitFlags) & ENTITY_POINTER_MSK) {
                                         u8* reg_ptr_from = (u8 *)(* REG_TYPE_DC(ptr));
@@ -210,13 +224,14 @@ STATIC_FORCEINLINE void proceedReadEntity(TYPEOF_STRUCT(EntityField, bitFlags) b
 
                                     else
 
-                                #endif /* defined(USE_ENTITY_POINTER) */
+#endif /* defined(USE_ENTITY_POINTER) */
 
                                     {
                                         ENTITY_BYTE_CPY(typeLen, (u8*)ptr, outputData);
                                     }
-                                #ifdef USE_ENTITY_ATOMIC
-                                });
+
+#ifdef USE_ENTITY_ATOMIC
+                            });
 #endif /* USE_ENTITY_ATOMIC */
 
 }
@@ -225,9 +240,10 @@ STATIC_FORCEINLINE void proceedWriteEntity(TYPEOF_STRUCT(EntityField, bitFlags) 
 {
 #ifdef USE_ENTITY_ATOMIC
     ATOMIC_BLOCK_RESTORATE_COND((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_ATOMIC_MSK), {
-                                #endif /* USE_ENTITY_ATOMIC */
+#endif /* USE_ENTITY_ATOMIC */
 
-                                #if defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER)
+#if defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER)
+
                                     if((bitFlags) & (ENTITY_POINTER_MSK | ENTITY_REGISTER_MSK)) {
                                         volatile reg* reg_ptr_to        = (volatile reg*) (* REG_TYPE_DC(ptr));
                                         volatile reg* reg_ptr_from      = (volatile reg*) (  inputData);
@@ -238,25 +254,23 @@ STATIC_FORCEINLINE void proceedWriteEntity(TYPEOF_STRUCT(EntityField, bitFlags) 
 
                                     else
 
-                                #endif /* defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER) */
+#endif /* defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER) */
 
 
-                                #if defined(USE_ENTITY_REGISTER)
+#if defined(USE_ENTITY_REGISTER)
 
                                     if((bitFlags) & ENTITY_REGISTER_MSK) {
-                                        volatile reg* reg_ptr_to        = ((volatile reg*)   ptr);
+                                        volatile reg* reg_ptr_to        = ((volatile reg*)  (ptr));
                                         volatile reg* reg_ptr_from      = ((volatile reg*)  (inputData));
-                                        if(reg_ptr_to) {
-                                            ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
-                                        }
+                                        ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
                                     }
 
                                     else
 
-                                #endif /* defined(USE_ENTITY_REGISTER) */
+#endif /* defined(USE_ENTITY_REGISTER) */
 
 
-                                #if defined(USE_ENTITY_POINTER)
+#if defined(USE_ENTITY_POINTER)
 
                                     if((bitFlags) & ENTITY_POINTER_MSK) {
                                         u8* reg_ptr_to = (u8 *)(* REG_TYPE_DC(ptr));
@@ -267,12 +281,13 @@ STATIC_FORCEINLINE void proceedWriteEntity(TYPEOF_STRUCT(EntityField, bitFlags) 
 
                                     else
 
-                                #endif /* defined(USE_ENTITY_POINTER) */
+#endif /* defined(USE_ENTITY_POINTER) */
 
                                     {
                                         ENTITY_BYTE_CPY(typeLen, inputData, (u8*)ptr);
                                     }
-                                #ifdef USE_ENTITY_ATOMIC
+
+#ifdef USE_ENTITY_ATOMIC
                                 });
 #endif /* USE_ENTITY_ATOMIC */
 }
@@ -291,15 +306,16 @@ int readFieldValue(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEO
         reg pos = 0;
 
         outputData[pos++] = ENTITY_OK;
-        outputData[pos++] = entityInfo.entities[entityNumber]->fields[fieldNumber].type;
+        outputData[pos++] = entityInfo.entities[entityNumber]->fields[fieldNumber].type;    /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
         u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
-        M_Assert_BreakSaveCheck(((pos + typeLen) > maxOutBufferSize), M_EMPTY, {
-                                    outputData[0] = ENTITY_ERROR;
-                                    (*size) = 1;
-                                    return ENTITY_ERROR;
-                                }, "readFieldValue: field read size more than buffer");
+        ENTITY_DBG_ASSERT_BUF(((pos + typeLen) > maxOutBufferSize), M_EMPTY, {
+                                  outputData[0] = ENTITY_ERROR;
+                                  (*size) = 1;
+                                  return ENTITY_ERROR;
+                              }, "readFieldValue: field read size more than buffer");
+
 
         void* ptr = (entityInfo.entities[entityNumber]->pointer + entityInfo.entities[entityNumber]->fields[fieldNumber].shift);
 
@@ -365,11 +381,12 @@ int readSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOut
 
             u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
-            M_Assert_BreakSaveCheck(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, {
-                                        outputData[0] = ENTITY_ERROR;
-                                        (*size) = 1;
-                                        return ENTITY_ERROR;
-                                    }, "readSeveralFieldsValues: field read size more than buffer");
+            ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, {
+                                      outputData[0] = ENTITY_ERROR;
+                                      (*size) = 1;
+                                      return ENTITY_ERROR;
+                                  }, "readSeveralFieldsValues: field read size more than buffer");
+
 
 
             ptr = (entityInfo.entities[entityNumber]->pointer + entityInfo.entities[entityNumber]->fields[fieldNumber].shift);
@@ -397,6 +414,7 @@ int readSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOut
 
 
     (*size) = Wpos;
+    UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
 
@@ -429,6 +447,7 @@ int setFieldValue(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF
 
     }
 
+    UNUSED(inputBufferSize);
     return ENTITY_OK;
 }
 
@@ -472,14 +491,15 @@ int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutB
         if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
             u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
-            M_Assert_BreakSaveCheck(((Rpos + typeLen) > (*size)), M_EMPTY, {
-                                        Wpos = 0;
-                                        outputData[Wpos++] = ENTITY_ERROR;
-                                        ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
-                                        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
-                                        (*size) = Wpos;
-                                        return ENTITY_ERROR;
-                                    }, "setSeveralFieldsValues: field read size more than buffer");
+            ENTITY_DBG_ASSERT_BUF(((Rpos + typeLen) > (*size)), M_EMPTY, {
+                                      Wpos = 0;
+                                      outputData[Wpos++] = ENTITY_ERROR;
+                                      ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
+                                      ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
+                                      (*size) = Wpos;
+                                      return ENTITY_ERROR;
+                                  }, "setSeveralFieldsValues: field read size more than buffer");
+
 
             if((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_READ_ONLY_MSK) == 0) {
 
@@ -487,11 +507,11 @@ int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutB
                 proceedWriteEntity(entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags, ptr, &inputData[Rpos], typeLen);
 
 
-#ifdef USE_ENTITY_READ_CALLBACK
+#ifdef USE_ENTITY_WRITE_CALLBACK
                 if(entityInfo.entities[entityNumber]->fields[fieldNumber].wrCallback.entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
                     entityInfo.entities[entityNumber]->fields[fieldNumber].wrCallback.entityCallback(entityInfo.entities[entityNumber], &entityInfo.entities[entityNumber]->fields[fieldNumber], ptr, entityInfo.entities[entityNumber]->fields[fieldNumber].wrCallback.context);
                 }
-#endif /* USE_ENTITY_READ_CALLBACK */
+#endif /* USE_ENTITY_WRITE_CALLBACK */
 
 
             }
@@ -510,9 +530,11 @@ int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutB
 
 
     (*size) = Wpos;
+    UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
 
 
+#undef ENTITY_DBG_ASSERT_BUF
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */

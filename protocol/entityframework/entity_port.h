@@ -34,13 +34,14 @@
 
 /* **********************************************************************************************************************************
  * Maximum number of entities & fields
+ * WARNING!!! it changes the entity protocol for read & write, see entity_packet.c
  */
 #ifndef MAX_NUBER_OF_ENTITIES
 #   define MAX_NUBER_OF_ENTITIES 300
 #endif /* MAX_NUBER_OF_ENTITIES */
 
 #ifndef MAX_NUBER_OF_FIELDS
-#   define MAX_NUBER_OF_FIELDS 300
+#   define MAX_NUBER_OF_FIELDS 255
 #endif /* MAX_NUBER_OF_FIELDS */
 
 
@@ -128,7 +129,7 @@
 
 
 /* **********************************************************************************************************************************
- *  ENTITY use pointer
+ *  ENTITY use pointer (field which contains pointer to other value)
  *  if you want to use entity - pointer define this
  *  WARNING!!! adds some check to entity read & write functions
  * **********************************************************************************************************************************
@@ -138,13 +139,28 @@
 #   define USE_ENTITY_POINTER
 #endif /* USE_ENTITY_POINTER */
 
+/* **********************************************************************************************************************************
+ *  ENTITY use register (bus type atomic read & write)
+ *  if you want to use entity - register define this
+ *  WARNING!!! adds some check to entity read & write functions
+ * **********************************************************************************************************************************
+ */
+
 #ifndef USE_ENTITY_REGISTER
 #   define USE_ENTITY_REGISTER
 #endif /* USE_ENTITY_REGISTER */
 
+/* **********************************************************************************************************************************
+ *  Optimization for check buffers after RELEASE see smart_asert.h
+ * **********************************************************************************************************************************
+ */
+
+#ifndef OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
+//#   define OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
+#endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
 
 /* **********************************************************************************************************************************
- *  Macro for Defining Entity Copy function
+ *  Macro for Defining Entity Copy function (Platform depent)
  * **********************************************************************************************************************************
  */
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
