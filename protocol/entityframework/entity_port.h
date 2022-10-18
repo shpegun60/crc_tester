@@ -172,7 +172,7 @@
 #   define ENTITY_TYPE_CPY(type, from, to) cTypeRevcpy((type), (from), (to))
 #   define ENTITY_REG_CPY(from, to) MY_CTYPE_REVCOPY_REGISTERS((from), (to))
 #else
-#    error unsupported endianness
+#   error unsupported endianness
 #endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
 
 
@@ -191,15 +191,15 @@
  */
 
 #if ENTITY_DESCRIPTION_SIZE > 0xFFU
-    #error ENTITY_DESCRIPTION_SIZE is too long
+#   error ENTITY_DESCRIPTION_SIZE is too long
 #endif /* ENTITY_DESCRIPTION_SIZE check*/
 
 #if MAX_NUBER_OF_ENTITIES > 0xFFFFUL
-    #error MAX_NUBER_OF_ENTITIES is too long
+#   error MAX_NUBER_OF_ENTITIES is too long
 #endif /* MAX_NUBER_OF_ENTITIES check*/
 
 #if MAX_NUBER_OF_FIELDS > 0xFFFFUL
-    #error MAX_NUBER_OF_FIELDS is too long
+#   error MAX_NUBER_OF_FIELDS is too long
 #endif /* MAX_NUBER_OF_FIELDS check*/
 
 

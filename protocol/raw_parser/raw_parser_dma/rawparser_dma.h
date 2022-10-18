@@ -162,7 +162,7 @@ STATIC_FORCEINLINE void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, 
     }
 }
 #else
-#define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte(self, byte)
+#   define RawParser_dma_addTxByteCRC(self, byte) RawParser_dma_addTxByte(self, byte)
 #endif /* D_RAW_P_CRC_ENA */
 
 
