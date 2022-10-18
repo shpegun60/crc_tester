@@ -299,8 +299,11 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         }
 
 #       elif defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
+
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_2;
+
 #       endif /* CRC16 - CRC32 - CRC64 SWITCH */
+
         break;
 
 #   endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
