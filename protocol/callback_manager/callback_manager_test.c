@@ -25,8 +25,13 @@ int callbackManagerTest(void)
     CallbackManager_addWorker(manager, 0, testWorker1, ptr_context1);
     CallbackManager_addWorker(manager, 1, testWorker2, ptr_context2);
 
-    CallbackManager_proceed(manager, 0, time1);
-    CallbackManager_proceed(manager, 1, time2);
+    if(!CallbackManager_proceed(manager, 0, time1)) {
+        ++testNotPassed;
+    }
+
+    if(!CallbackManager_proceed(manager, 1, time2)) {
+        ++testNotPassed;
+    }
 
 
     testNotPassed += CallbackManager_delete(&manager);

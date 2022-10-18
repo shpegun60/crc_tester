@@ -46,7 +46,7 @@ int CallbackManager_delete(CallbackManager_t ** self);
 
 //**********************************************************************************************************************************************************************
 // callback manager call function with warning!!!
-void CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time);
+int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time);
 
 
 #endif /* __INC_CALLBACK_MANAGER_H__ */

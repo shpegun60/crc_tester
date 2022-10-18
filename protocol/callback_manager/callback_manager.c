@@ -60,25 +60,28 @@ void CallbackManager_addWorker(CallbackManager_t * const self, CallBManIdType co
 
 
 //**********************************************************************************************************************************************************************
-void CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time)
+int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time)
 {
-    M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return, "CallbackManager_proceed: no valid input data");
-    M_Assert_Break(self->parser == NULL, M_EMPTY, return, "CallbackManager_proceed: parser must not be NULL, call CallbackManager_init function before");
+    M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return 0, "CallbackManager_proceed: no valid input data");
+    M_Assert_Break(self->parser == NULL, M_EMPTY, return 0, "CallbackManager_proceed: parser must not be NULL, call CallbackManager_init function before");
 
 #if !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL))
-    M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return, "CallbackManager_proceed: no valid input id");
+    M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return 0, "CallbackManager_proceed: no valid input id");
 #endif /* !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL)) */
 
 
 #ifdef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
     M_Assert_SafeFunctionCall((self->workers[id] != (CallbackWorker)NULL),  {
                                   self->workers[id](self->parser, self->context[id], time);
+                                  return 1;
                               });
 #else
     M_Assert_SafeFunctionCall((self->workers[id] != (CallbackWorker)NULL),  {
                                   self->workers[id](self->parser, self->context, time);
+                                  return 1;
                               });
 #endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
+    return 0;
 }
 
 
