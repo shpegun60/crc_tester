@@ -169,7 +169,7 @@ int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SI
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* context), void* context);
+int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* val, void* context), void* context);
 
 /// string compleate for entities---------------------------------------------------------------------------------------------------
 int entityDescrNotCompleate(const c8* str1, const c8* str2);

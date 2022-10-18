@@ -397,19 +397,22 @@ int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SI
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* context), void* context)
+int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* val, void* context), void* context)
 {
     M_Assert_BreakSaveCheck((predicate == NULLPTR(TYPEOF_DATA(predicate))), M_EMPTY, return ENTITY_ERROR, "foreachEntities: no valid function");
 
-    for(u32 i = 0; i < entityInfo.entities_count; ++i) {
-        for(u32 j = 0; j < entityInfo.entities[i]->fields_count; ++j) {
-            if(predicate(i, entityInfo.entities[i], j, &entityInfo.entities[i]->fields[j], context)) {
+    void* ptr;
+    for(TYPEOF_STRUCT(EntityInfo, entities_count) i = 0; i < entityInfo.entities_count; ++i) {
+        for(TYPEOF_STRUCT(Entity, fields_count) j = 0; j < entityInfo.entities[i]->fields_count; ++j) {
+            ptr = (entityInfo.entities[i]->pointer + entityInfo.entities[i]->fields[j].shift);
+            if(predicate(i, entityInfo.entities[i], j, &entityInfo.entities[i]->fields[j], ptr, context)) {
                 return ENTITY_OK;
             }
         }
     }
     return ENTITY_OK;
 }
+
 /// string compleate for entities---------------------------------------------------------------------------------------------------
 inline int entityDescrNotCompleate(const c8* str1, const c8* str2)
 {
