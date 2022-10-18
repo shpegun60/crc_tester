@@ -4,11 +4,11 @@
 #include "my_ctypes.h"
 
 #ifndef CALL_B_MAN_TEST_DISABLE
-    //#define CALL_B_MAN_TEST_DISABLE 1
+//#   define CALL_B_MAN_TEST_DISABLE 1
 #endif /* CALL_B_MAN_TEST_DISABLE */
 
 #ifndef CALL_B_MAN_MAX_COMMAND_FUNCTIONS
-    #define CALL_B_MAN_MAX_COMMAND_FUNCTIONS 256
+#   define CALL_B_MAN_MAX_COMMAND_FUNCTIONS 256
 #endif /* CALL_B_MAN_MAX_COMMAND_FUNCTIONS */
 
 #if ((CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1)     < 256)
@@ -21,7 +21,7 @@
 
 
 #ifndef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
-    //#define CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT 1
+//#   define CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT 1
 #endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
 
 typedef void (*CallbackWorker)(void * parser, void * context, u32 time);
@@ -45,6 +45,8 @@ void CallbackManager_addWorker(CallbackManager_t * const self, CallBManIdType co
 int CallbackManager_delete(CallbackManager_t ** self);
 
 //**********************************************************************************************************************************************************************
-void CallbackManager_proceed(CallbackManager_t * const self, CallBManIdType const id, u32 time);
+// callback manager call function with warning!!!
+void CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time);
+
 
 #endif /* __INC_CALLBACK_MANAGER_H__ */
