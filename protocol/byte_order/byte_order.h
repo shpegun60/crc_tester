@@ -70,14 +70,14 @@ int endiansTest();
  * ********************************************************
  */
 
-forceinline u16 Reverse16(const u16 value)
+STATIC_FORCEINLINE u16 Reverse16(const u16 value)
 {
     return (u16)( 0
                        | ((value & 0x00ffU) << 8U)
                        | ((value & 0xff00U) >> 8U) );
 }
 
-forceinline u32 Reverse32(const u32 value)
+STATIC_FORCEINLINE u32 Reverse32(const u32 value)
 {
     return (u32)( 0
                        | ((value & 0x000000ffUL) << 24U)
@@ -86,7 +86,7 @@ forceinline u32 Reverse32(const u32 value)
                        | ((value & 0xff000000UL) >> 24U) );
 }
 
-forceinline u64 Reverse64(const u64 value)
+STATIC_FORCEINLINE u64 Reverse64(const u64 value)
 {
     return (u64)( 0
                        | ((value & 0x00000000000000ffULL) << 56U)
@@ -100,14 +100,14 @@ forceinline u64 Reverse64(const u64 value)
 }
 
 // pointrs input ----------------------------------------------
-forceinline void Reverse16_ptr(const u16 * const value, u16 * const to)
+STATIC_FORCEINLINE void Reverse16_ptr(const u16 * const value, u16 * const to)
 {
     *to = (u16)( 0
                        | (((*value) & 0x00ff) << 8U)
                        | (((*value) & 0xff00) >> 8U) );
 }
 
-forceinline void Reverse32_ptr(const u32 * const value, u32 * const to)
+STATIC_FORCEINLINE void Reverse32_ptr(const u32 * const value, u32 * const to)
 {
     *to = (u32)( 0
                        | (((*value) & 0x000000ffUL) << 24U)
@@ -116,7 +116,7 @@ forceinline void Reverse32_ptr(const u32 * const value, u32 * const to)
                        | (((*value) & 0xff000000UL) >> 24U) );
 }
 
-forceinline void Reverse64_ptr(const u64 * const value, u64 * const to)
+STATIC_FORCEINLINE void Reverse64_ptr(const u64 * const value, u64 * const to)
 {
     *to = (u64)( 0
                        | (((*value) & 0x00000000000000ffULL) << 56U)
@@ -134,7 +134,7 @@ forceinline void Reverse64_ptr(const u64 * const value, u64 * const to)
  * 16 bit variable reverse function
  * ********************************************************
  */
-forceinline u16 LittleEndianU16(u16 value)
+STATIC_FORCEINLINE u16 LittleEndianU16(u16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -145,7 +145,7 @@ forceinline u16 LittleEndianU16(u16 value)
 #endif
 }
 
-forceinline i16 LittleEndianI16(i16 value)
+STATIC_FORCEINLINE i16 LittleEndianI16(i16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -158,7 +158,7 @@ forceinline i16 LittleEndianI16(i16 value)
 #endif
 }
 
-forceinline u16 BigEndianU16(u16 value)
+STATIC_FORCEINLINE u16 BigEndianU16(u16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse16(value);
@@ -169,7 +169,7 @@ forceinline u16 BigEndianU16(u16 value)
 #endif
 }
 
-forceinline i16 BigEndianI16(i16 value)
+STATIC_FORCEINLINE i16 BigEndianI16(i16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     i16 data;
@@ -188,7 +188,7 @@ forceinline i16 BigEndianI16(i16 value)
  * ********************************************************
  */
 
-forceinline u32 LittleEndianU32(u32 value)
+STATIC_FORCEINLINE u32 LittleEndianU32(u32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -199,7 +199,7 @@ forceinline u32 LittleEndianU32(u32 value)
 #endif
 }
 
-forceinline i32 LittleEndianI32(i32 value)
+STATIC_FORCEINLINE i32 LittleEndianI32(i32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -212,7 +212,7 @@ forceinline i32 LittleEndianI32(i32 value)
 #endif
 }
 
-forceinline u32 BigEndianU32(u32 value)
+STATIC_FORCEINLINE u32 BigEndianU32(u32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse32(value);
@@ -223,7 +223,7 @@ forceinline u32 BigEndianU32(u32 value)
 #endif
 }
 
-forceinline i32 BigEndianI32(i32 value)
+STATIC_FORCEINLINE i32 BigEndianI32(i32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     i32 data;
@@ -243,7 +243,7 @@ forceinline i32 BigEndianI32(i32 value)
  * ********************************************************
  */
 
-forceinline u64 LittleEndianU64(u64 value)
+STATIC_FORCEINLINE u64 LittleEndianU64(u64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -254,7 +254,7 @@ forceinline u64 LittleEndianU64(u64 value)
 #endif
 }
 
-forceinline i64 LittleEndianI64(i64 value)
+STATIC_FORCEINLINE i64 LittleEndianI64(i64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -267,7 +267,7 @@ forceinline i64 LittleEndianI64(i64 value)
 #endif
 }
 
-forceinline u64 BigEndianU64(u64 value)
+STATIC_FORCEINLINE u64 BigEndianU64(u64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse64(value);
@@ -278,7 +278,7 @@ forceinline u64 BigEndianU64(u64 value)
 #endif
 }
 
-forceinline i64 BigEndianI64(i64 value)
+STATIC_FORCEINLINE i64 BigEndianI64(i64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     i64 data;
@@ -298,7 +298,7 @@ forceinline i64 BigEndianI64(i64 value)
  * ********************************************************
  */
 
-forceinline f32 LittleEndianF32(f32 value)
+STATIC_FORCEINLINE f32 LittleEndianF32(f32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -311,7 +311,7 @@ forceinline f32 LittleEndianF32(f32 value)
 #endif
 }
 
-forceinline f32 BigEndianF32(f32 value)
+STATIC_FORCEINLINE f32 BigEndianF32(f32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     f32 data;
@@ -330,7 +330,7 @@ forceinline f32 BigEndianF32(f32 value)
  * ********************************************************
  */
 
-forceinline f64 LittleEndianF64(f64 value)
+STATIC_FORCEINLINE f64 LittleEndianF64(f64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -343,7 +343,7 @@ forceinline f64 LittleEndianF64(f64 value)
 #endif
 }
 
-forceinline f64 BigEndianF64(f64 value)
+STATIC_FORCEINLINE f64 BigEndianF64(f64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     f64 data;

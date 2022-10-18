@@ -43,14 +43,6 @@
 #define RAW_P_DMA_RECEIVE_OK              0x0DU
 //----------------------------------------------
 
-// receive functions-----------------------------------------------------------------------------------------
-C_INLINE void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte);
-C_INLINE void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, reg len);
-
-// elementary byte adding functions ----------------------------------------------------------------------------
-C_INLINE void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte);
-C_INLINE void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte);
-
 
 /* CREATE/DELETE FUNCTIONS *************************************************************************************************
  *

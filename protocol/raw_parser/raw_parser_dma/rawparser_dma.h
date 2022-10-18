@@ -79,14 +79,14 @@ void rawParser_dma_setUserBuffers(RawParser_dma_t * const self, u8 * const rxBuf
  */
 
 // receive functions-----------------------------------------------------------------------------------------
-forceinline void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte)
+STATIC_FORCEINLINE void RawParser_dma_receiveByte(RawParser_dma_t* const self, const u8 byte)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "RawParser_dma_receiveByte: No valid input");
     self->m_receiveBuffer[self->m_receivePos & (D_RAW_P_RX_BUF_SIZE - 1U)] = byte;
     ++self->m_receivePos;
 }
 
-forceinline void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, reg len)
+STATIC_FORCEINLINE void RawParser_dma_receiveArray(RawParser_dma_t* const self, u8* arr, reg len)
 {
     M_Assert_Break((self == NULL || arr == NULL), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input");
     M_Assert_Break( (len > D_RAW_P_RX_BUF_SIZE), M_EMPTY, return, "RawParser_dma_receiveArray: No valid input length, len: %d, max_len: %d", len, D_RAW_P_RX_BUF_SIZE);
@@ -108,7 +108,7 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
 
 
 // elementary byte adding functions ----------------------------------------------------------------------------
-forceinline void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte)
+STATIC_FORCEINLINE void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 byte)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByte: No valid input");
     M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_addTxByte: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
@@ -134,7 +134,7 @@ forceinline void RawParser_dma_addTxByte(RawParser_dma_t* const self, const u8 b
 
 #ifdef D_RAW_P_CRC_ENA
 // elementary byte adding functions with calc crc----------------------------------------------------------------------------
-forceinline void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte)
+STATIC_FORCEINLINE void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, const u8 byte)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return, "RawParser_dma_addTxByteCRC: No valid input");
     M_Assert_Break((self->RX.data == NULL || self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_addTxByteCRC: No valid RX or/and TX buffer , call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");

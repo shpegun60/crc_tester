@@ -11,7 +11,7 @@
 
 /* If using non-GNU C, then ignore __attribute__ */
 #ifndef __GNUC__
-# define __attribute__(x) /* NOTHING */
+#   define __attribute__(x) /* NOTHING */
 #endif /* __GNUC__ */
 
 /*
@@ -21,7 +21,7 @@
  */
 
 #ifndef INLINE
-#define INLINE inline
+#   define INLINE inline
 #endif /* INLINE */
 
 
@@ -31,17 +31,17 @@
  * ******************************************************
  */
 #ifdef _MSC_VER
-    #define forceinline __forceinline
+#   define forceinline __forceinline
 #elif defined(__GNUC__)
-    #define forceinline INLINE __attribute__((__always_inline__))
+#   define forceinline INLINE __attribute__((__always_inline__))
 #elif defined(__CLANG__)
-    #if __has_attribute(__always_inline__)
-        #define forceinline INLINE __attribute__((__always_inline__))
-    #else
-        #define forceinline INLINE
-    #endif
+#   if __has_attribute(__always_inline__)
+#       define forceinline INLINE __attribute__((__always_inline__))
+#   else
+#       define forceinline INLINE
+#   endif
 #else
-    #define forceinline INLINE
+#   define forceinline INLINE
 #endif
 /*
  * external force inline linkage use==>
@@ -65,19 +65,19 @@
  */
 
 #ifndef H_INLINE /* this define mus be used in .h file*/
-    # if __GNUC__ && !__GNUC_STDC_INLINE__
-        # define H_INLINE extern INLINE
-    # else
-        # define H_INLINE INLINE
-    # endif
+#   if __GNUC__ && !__GNUC_STDC_INLINE__
+#       define H_INLINE extern INLINE
+#   else
+#       define H_INLINE INLINE
+#   endif /* __GNUC__ && !__GNUC_STDC_INLINE__ */
 #endif /* H_INLINE */
 
 #ifndef C_INLINE /* this define mus be used in .c file*/
-    # if __GNUC__ && !__GNUC_STDC_INLINE__
-        # define C_INLINE
-    # else
-        # define C_INLINE extern
-    # endif
+#   if __GNUC__ && !__GNUC_STDC_INLINE__
+#       define C_INLINE
+#   else
+#       define C_INLINE extern
+#   endif /* __GNUC__ && !__GNUC_STDC_INLINE__ */
 #endif /* C_INLINE */
 
 /*
@@ -101,12 +101,15 @@
  * *********************************************************************
  */
 
+// macro for internal (.c) or external (.h) static inlining
 #ifndef STATIC_INLINE
-#define STATIC_INLINE static INLINE
+#   define STATIC_INLINE static INLINE
 #endif /* STATIC_INLINE */
 
+
+// macro for internal (.c) or external (.h) static forceinlining
 #ifndef STATIC_FORCEINLINE
-#define STATIC_FORCEINLINE static forceinline
+#   define STATIC_FORCEINLINE static forceinline
 #endif /* STATIC_FORCEINLINE */
 
 #endif /* __INLINE_H__ */
