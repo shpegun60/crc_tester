@@ -16,9 +16,9 @@ static_pool_container_t* staticPoolContainer_new(void)
 void staticPoolContainer_init(static_pool_container_t * const self)
 {
     M_Assert_BreakSaveCheck(self == (static_pool_container_t *)NULL, M_EMPTY, return, "staticPoolContainer_init: No valid input");
-    self->rd_raw = 0;
-    self->wr_raw = 0;
-    self->wrFull = 0;
+    self->rd_raw  = 0;
+    self->wr_raw  = 0;
+    self->wrFull  = 0;
     self->rdEmpty = 1;
 }
 

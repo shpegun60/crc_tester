@@ -33,6 +33,7 @@ typedef struct {
 
 static_pool_container_t* staticPoolContainer_new(void);
 void staticPoolContainer_init(static_pool_container_t * const self);
+#define staticPontainer_clear(self) staticPoolContainer_init((self))
 
 /* free memory associated with the static_Pool_container_t  */
 int staticPoolContainer_delete(static_pool_container_t **self);
