@@ -41,7 +41,7 @@ typedef struct {
 
 CallbackManager_t * CallbackManager_new(void * const parser);
 void CallbackManager_init(CallbackManager_t * const self, void * const parser);
-void CallbackManager_addWorker(CallbackManager_t * const self, CallBManIdType const id, CallbackWorker const worker, void * const context);
+void CallbackManager_addWorker(CallbackManager_t * const self, const CallBManIdType id, const CallbackWorker worker, void * const context);
 int CallbackManager_delete(CallbackManager_t ** self);
 
 //**********************************************************************************************************************************************************************

@@ -116,6 +116,40 @@ extern EntityInfo entityInfo;  // global variable entities for user projects (ad
 
 /*
  * **********************************************************************************************************************************
+ *  help functions
+ * **********************************************************************************************************************************
+*/
+
+// getter entity pointer by entity number
+STATIC_FORCEINLINE Entity * getEntityPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
+{
+    if(entityNumber < entityInfo.entities_count) {
+        return entityInfo.entities[entityNumber];
+    }
+    return NULLPTR(Entity*);
+}
+
+// getter data pointer by entity number
+STATIC_FORCEINLINE void * getVoidPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
+{
+    if(entityNumber < entityInfo.entities_count) {
+        return entityInfo.entities[entityNumber]->pointer;
+    }
+    return NULL;
+}
+
+// getter field data pointer by entity number and field number
+STATIC_FORCEINLINE void * getFieldPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+{
+    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
+        return (UINT8_TYPE_DC(entityInfo.entities[entityNumber]->pointer) + entityInfo.entities[entityNumber]->fields[fieldNumber].shift);
+    }
+    return NULL;
+}
+
+
+/*
+ * **********************************************************************************************************************************
  * entity new/delete functions
  * **********************************************************************************************************************************
  */

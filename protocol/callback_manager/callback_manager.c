@@ -41,7 +41,7 @@ int CallbackManager_delete(CallbackManager_t ** self)
     return 0;
 }
 
-void CallbackManager_addWorker(CallbackManager_t * const self, CallBManIdType const id, CallbackWorker const worker, void * const context)
+void CallbackManager_addWorker(CallbackManager_t * const self, const CallBManIdType id, const CallbackWorker worker, void * const context)
 {
     M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return, "CallbackManager_addWorker: no valid input data");
 

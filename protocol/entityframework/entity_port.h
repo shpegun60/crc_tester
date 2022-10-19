@@ -151,7 +151,7 @@
 #endif /* USE_ENTITY_REGISTER */
 
 /* **********************************************************************************************************************************
- *  Optimization for check buffers after RELEASE see smart_asert.h
+ *  Optimization for check buffers after RELEASE see entity_packet.c and smart_asert.h
  * **********************************************************************************************************************************
  */
 
