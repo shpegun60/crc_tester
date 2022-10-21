@@ -186,12 +186,12 @@ void cTypeMemcpy(u8 type, u8* from, u8* to);
 void cTypeRevcpy(u8 type, u8* from, u8* to);
 
 // init data type ---------------------------------------
-void cTypePointerInit(u8 type, u8* ptr);
+void cTypePointerInit(u8* ptr, u8 type);
 
 // init data sizeof ---------------------------------------
-void pointerInit(reg n, u8* ptr);
+void pointerInit(u8* ptr, reg n);
 // fill data sizeof ---------------------------------------
-void pointerFill(reg n, u8* ptr, u8 data);
+void pointerFill(u8* ptr, u8 data, reg n);
 
 // string compleate------------------------------------------
 int cTypeStrnCmp(reg n, const c8* str1, const c8* str2);

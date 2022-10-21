@@ -7,11 +7,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef USE_ENTITY_PING
 EntityInfo entityInfo = {0, 0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};    // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
 #else
-EntityInfo entityInfo = {0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};       // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+EntityInfo entityInfo = {   0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};   // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
 #endif /* USE_ENTITY_PING */
 
 /*
@@ -21,7 +22,7 @@ EntityInfo entityInfo = {0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};   
  */
 
 /// delete some entity for internal using
-static void deleteEntitityFieldsInternal(u32 entityNumber)
+static void deleteEntitityFieldsInternal(reg entityNumber)
 {
     M_Assert_BreakSaveCheck((entityNumber > entityInfo.entities_count), M_EMPTY, return, "deleteEntitityFieldsInternal: No entity for delete!!!");
     M_Assert_BreakSaveCheck((entityInfo.entities[entityNumber] == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]))), M_EMPTY, return, "initEntity: entity number: %d is null", entityNumber);
@@ -44,7 +45,7 @@ static void deleteEntitityFieldsInternal(u32 entityNumber)
 }
 
 /// delete some entity for external using
-void deleteEntitityFieldsExternal(u32 entityNumber)
+void deleteEntitityFieldsExternal(reg entityNumber)
 {
     M_Assert_BreakSaveCheck((entityNumber >= entityInfo.entities_count), M_EMPTY, return, "deleteEntitityFieldsInternal: No entity for delete!!!");
     M_Assert_BreakSaveCheck((entityInfo.entities[entityNumber] == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities[entityNumber]))), M_EMPTY, return, "initEntity: entity number: %d is null", entityNumber);
@@ -70,24 +71,18 @@ void deleteEntitityFieldsExternal(u32 entityNumber)
 /// delete all entities and deallocation all memory
 void deleteEntities(void)
 {
-    for(u32 i = 0; i < entityInfo.entities_count; ++i) {
+    for(reg i = 0; i < entityInfo.entities_count; ++i) {
         deleteEntitityFieldsInternal(i);
     }
 
     free(entityInfo.entities);
-#ifdef USE_ENTITY_PING
-    entityInfo.userInitReady                = 0;
-#endif /* USE_ENTITY_PING */
-
-    entityInfo.entities_count               = 0;
-    entityInfo.allocated_entity_pointers    = 0;
-    entityInfo.entities                     = NULLPTR(TYPEOF_STRUCT(EntityInfo, entities));
+    pointerInit((u8*)&entityInfo, sizeof(entityInfo));
 }
 
 
 
 /// allocation new entities pointers
-int newEntities(u32 numberOfEntities)
+int newEntities(reg numberOfEntities)
 {
     M_Assert_BreakSaveCheck((numberOfEntities > MAX_NUBER_OF_ENTITIES), M_EMPTY, return ENTITY_ERROR, "newEntities: No valid input number of entities, value: %d, max: %d", numberOfEntities, MAX_NUBER_OF_ENTITIES);
 
@@ -102,7 +97,7 @@ int newEntities(u32 numberOfEntities)
 
 
 /// allocation entitites pointer & fields
-int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg)
+int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg)
 {
     M_Assert_BreakSaveCheck((NumberOfFields > MAX_NUBER_OF_FIELDS), M_EMPTY, return ENTITY_ERROR, "initEntity: No valid input number of fields, value: %d, max: %d", NumberOfFields, MAX_NUBER_OF_FIELDS);
     M_Assert_BreakSaveCheck((entityInfo.entities_count == entityInfo.allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
@@ -153,7 +148,7 @@ int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTIO
 
     // initialization Fields-------------------------------------------------------------------------------------------------------------------------------------------------------------------
     char str[(ENTITY_DESCRIPTION_SIZE << 1) + 1] = {};
-    for(u32 i = 0; i < NumberOfFields; ++i) {
+    for(reg i = 0; i < NumberOfFields; ++i) {
 
 #ifdef USE_ENTITY_CALLBACKS
 
@@ -188,7 +183,7 @@ int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTIO
  */
 
 /// init field by field-number
-int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
+int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
@@ -202,7 +197,7 @@ int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField,
                                     }
 
                                     if(field_ptr) {
-                                        cTypePointerInit(type, (u8 *)field_ptr);
+                                        cTypePointerInit((u8 *)field_ptr, type);
                                     }
 
                                     ++(*fieldNumber);
@@ -213,7 +208,7 @@ int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField,
 }
 
 /// init field-array
-int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum)
+int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
@@ -236,7 +231,7 @@ int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityF
                                     }
 
                                     if(field_ptr) {
-                                        pointerInit((arrayLen * getMYCTypeLen(type)), field_ptr);
+                                        pointerInit(field_ptr, (arrayLen * getMYCTypeLen(type)));
                                     }
                                     return ENTITY_OK;
 
@@ -262,7 +257,7 @@ int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlag
 }
 
 /// rename field by field number
-int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE])
+int fieldRename(Entity * entityInst, reg fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE])
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || descr == NULLPTR(char *)), M_EMPTY, return ENTITY_ERROR, "fieldRename: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > fieldNumber), {
@@ -285,10 +280,10 @@ int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DESCRIPT
 #ifdef USE_ENTITY_CALLBACKS
 
 /// init field with callbacks by field-number
-int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
+int initFieldCallback(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
-    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULLPTR(int *)), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: No valid input");
+    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULLPTR(reg *)), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
 
                                     entityInst->fields[(*fieldNumber)].bitFlags     = bitFlags;
@@ -316,7 +311,7 @@ int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(Enti
                                     }
 
                                     if(field_ptr) {
-                                        cTypePointerInit(type, (u8 *)field_ptr);
+                                        cTypePointerInit((u8 *)field_ptr, type);
                                     }
 
                                     ++(*fieldNumber);
@@ -327,7 +322,7 @@ int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(Enti
 }
 
 /// init callback function by fieldNumber
-int entityInitCallback(Entity * entityInst, int filedNumber,
+int entityInitCallback(Entity * entityInst, reg filedNumber,
                        TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *)), M_EMPTY, return ENTITY_ERROR, "initCallback: No valid input");
@@ -397,7 +392,7 @@ int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SI
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* val, void* context), void* context)
+int foreachEntities(int (*predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, void* context), void* context)
 {
     M_Assert_BreakSaveCheck((predicate == NULLPTR(TYPEOF_DATA(predicate))), M_EMPTY, return ENTITY_ERROR, "foreachEntities: no valid function");
 

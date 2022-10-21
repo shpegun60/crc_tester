@@ -53,7 +53,7 @@ void cTypeRevcpy(u8 type, u8* from, u8* to)
 }
 
 // init data type ---------------------------------------
-void cTypePointerInit(u8 type, u8* ptr)
+void cTypePointerInit(u8* ptr, u8 type)
 {
     u8 len = getMYCTypeLen(type);
 
@@ -63,7 +63,7 @@ void cTypePointerInit(u8 type, u8* ptr)
 }
 
 // init data sizeof ---------------------------------------
-void pointerInit(reg n, u8* ptr)
+void pointerInit(u8* ptr, reg n)
 {
     while(n--) {
         *ptr++ = 0;
@@ -71,7 +71,7 @@ void pointerInit(reg n, u8* ptr)
 }
 
 // fill data sizeof ---------------------------------------
-void pointerFill(reg n, u8* ptr, u8 data)
+void pointerFill(u8* ptr, u8 data, reg n)
 {
     while(n--) {
         *ptr++ = data;

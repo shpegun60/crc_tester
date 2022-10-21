@@ -106,8 +106,8 @@ typedef struct {
     b           userInitReady;
 #endif /* USE_ENTITY_PING */
 
-    u32         allocated_entity_pointers;
-    u32         entities_count;
+    reg         allocated_entity_pointers;
+    reg         entities_count;
     Entity**    entities;
 } EntityInfo;
 
@@ -118,7 +118,7 @@ extern EntityInfo entityInfo;  // global variable entities for user projects (ad
  * **********************************************************************************************************************************
  *  help functions
  * **********************************************************************************************************************************
-*/
+ */
 
 // getter entity pointer by entity number
 STATIC_FORCEINLINE Entity * getEntityPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
@@ -155,16 +155,16 @@ STATIC_FORCEINLINE void * getFieldPointer(TYPEOF_STRUCT(EntityInfo, entities_cou
  */
 
 /// delete some entity for external using
-void deleteEntitityFieldsExternal(u32 entityNumber);
+void deleteEntitityFieldsExternal(reg entityNumber);
 
 /// delete all entities and deallocation all memory
 void deleteEntities(void);
 
 /// allocation new entities pointers
-int newEntities(u32 numberOfEntities);
+int newEntities(reg numberOfEntities);
 
 /// allocation entitites pointer & fields
-int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
+int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
 
 /*
  * **********************************************************************************************************************************
@@ -173,16 +173,16 @@ int initEntity(u32 NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTIO
  */
 
 /// init field by field-number
-int initField(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr);
+int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr);
 
 /// init field-array
-int initFieldArray(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum);
+int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum);
 
 ///init existing field by pointer
 int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE]);
 
 /// rename field by field number
-int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE]);
+int fieldRename(Entity * entityInst, reg fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE]);
 
 /*
  * ****************************************************************************************************
@@ -193,11 +193,11 @@ int fieldRename(Entity * entityInst, int fieldNumber, char descr[ENTITY_DESCRIPT
 #ifdef USE_ENTITY_CALLBACKS
 
 /// init field with callbacks by field-number
-int initFieldCallback(Entity * entityInst, int * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
+int initFieldCallback(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 /// init callback function by fieldNumber
-int entityInitCallback(Entity * entityInst, int filedNumber,
+int entityInitCallback(Entity * entityInst, reg filedNumber,
                        TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 /// init callback function by description
@@ -214,7 +214,7 @@ int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SI
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (*predicate)(int entityNumber, Entity* entity, int fieldNumber, EntityField* field, void* val, void* context), void* context);
+int foreachEntities(int (*predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, void* context), void* context);
 
 /// string compleate for entities---------------------------------------------------------------------------------------------------
 STATIC_FORCEINLINE int entityDescrNotCompleate(const c8* str1, const c8* str2)
