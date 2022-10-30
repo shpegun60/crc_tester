@@ -20,12 +20,7 @@ typedef struct {
             (u16, , (0x00),        "desN", 1, 1, 3,, p3._nameN)                               \
     )
 
-typedef struct {
-    parent1 p1;
-    parent2 p2;
-    parent3 p3;
-    volatile u8 _name1;
-} entityName_t;
+ENTITY_MACRO_EXPAND_STRUCT(ENTITY_TUPLE);
 
 int entityMactoTest()
 {
