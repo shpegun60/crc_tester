@@ -19,31 +19,7 @@ int entityMactoTest()
     entityName_t  data;
     entityName_t* data_ptr = &data;
 
-    (entityNumber) = 0x010000UL;
-    initEntity(&(entityNumber), (1 + 1 + 1), sizeof(entityName_t), "entt", 0, 0,
-               ((void *)0));
-    if ((entityNumber) == 0x010000UL) {
-        return 0x00;
-    }
-    (entity) = getEntityPointer(entityNumber);
-    if ((entity) == ((void *)0)) {
-        return 0x00;
-    }
-    if ((initField((entity), (&fieldNumber), ((0x00 | 0x01)),
-                   __builtin_offsetof(entityName_t, _name1), (1), ("des1"),
-                   &((data_ptr)->_name1))) == 0x010000UL) {
-        return 0x00;
-    }
-    if ((initField((entity), (&fieldNumber), ((0x00 | 0x01)),
-                   __builtin_offsetof(entityName_t, _name2), (3), ("des1"),
-                   &((data_ptr)->_name2))) == 0x010000UL) {
-        return 0x00;
-    }
-    if ((initField((entity), (&fieldNumber), ((0x00)),
-                   __builtin_offsetof(entityName_t, _nameN), (2), ("desN"),
-                   &((data_ptr)->_nameN))) == 0x010000UL) {
-        return 0x00;
-    };
+    ENTITY_MACRO_EXPAND_INIT(return ENTITY_ERROR, entityNumber, fieldNumber, entity, data_ptr, ENTITY_TUPLE);
     return 0;
 }
 
