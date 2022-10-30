@@ -164,7 +164,7 @@ void deleteEntities(void);
 int newEntities(reg numberOfEntities);
 
 /// allocation entitites pointer & fields
-int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
+int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
 
 /*
  * **********************************************************************************************************************************
@@ -172,8 +172,14 @@ int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTIO
  * **********************************************************************************************************************************
  */
 
-/// init field by field-number
+/// init field by Entity pointer and field-number
 int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr);
+
+/// init field by Entity number and field-number
+STATIC_FORCEINLINE int initFieldPos(reg entityNumber, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
+{
+    return initField(getEntityPointer(entityNumber), fieldNumber, bitFlags, shift, type, descr, field_ptr);
+}
 
 /// init field-array
 int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum);

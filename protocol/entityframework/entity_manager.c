@@ -10,9 +10,9 @@
 #include <string.h>
 
 #ifdef USE_ENTITY_PING
-EntityInfo entityInfo = {0, 0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};    // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+EntityInfo entityInfo = {0, 0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};    // global variable entities for user projects (adds sizeof(EntityInfo) to .data section, and adds to .text sizeof(EntityInfo) initialization data)
 #else
-EntityInfo entityInfo = {   0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};   // global variable entities for user projects (adds sizeof(EntityInfo) to .data section)
+EntityInfo entityInfo = {   0, 0, NULLPTR(TYPEOF_STRUCT(EntityInfo, entities))};    // global variable entities for user projects (adds sizeof(EntityInfo) to .data section, and adds to .text sizeof(EntityInfo) initialization data)
 #endif /* USE_ENTITY_PING */
 
 /*
@@ -97,7 +97,7 @@ int newEntities(reg numberOfEntities)
 
 
 /// allocation entitites pointer & fields
-int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg)
+int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg)
 {
     M_Assert_BreakSaveCheck((NumberOfFields > MAX_NUBER_OF_FIELDS), M_EMPTY, return ENTITY_ERROR, "initEntity: No valid input number of fields, value: %d, max: %d", NumberOfFields, MAX_NUBER_OF_FIELDS);
     M_Assert_BreakSaveCheck((entityInfo.entities_count == entityInfo.allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
@@ -172,8 +172,10 @@ int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTIO
         MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)entityInfo.entities[entityInfo.entities_count]->fields[i].descr);
     }
 
+    (*entityNumber) = entityInfo.entities_count;
     ++entityInfo.entities_count;
-    return (entityInfo.entities_count - 1U);
+
+    return ENTITY_OK;
 }
 
 /*
@@ -182,7 +184,7 @@ int initEntity(reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTIO
  * **********************************************************************************************************************************
  */
 
-/// init field by field-number
+/// init field by Entity pointer and field-number
 int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
@@ -207,10 +209,11 @@ int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField,
     return ENTITY_ERROR;
 }
 
+
 /// init field-array
 int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum)
 {
-    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
+    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL) || (arrayLen == 0), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
 
                                     char str[(ENTITY_DESCRIPTION_SIZE << 1) + 1] = {};

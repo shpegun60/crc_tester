@@ -88,6 +88,18 @@
 
 
 
+// the same as PREPROCESSOR_MAP but contains some user parameter
+#define PREPROCESSOR_MAP_PARAMETER(par, op, sep, ...) \
+   PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__))(PREPROCESSOR_EVAL(PREPROCESSOR_MAP_PARAMETER_INNER(par, op, sep, __VA_ARGS__)))
+
+#define PREPROCESSOR_MAP_PARAMETER_INNER(par, op, sep, cur_val, ...)                                    \
+  op(par, cur_val)                                                                                      \
+  PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__))(                                            \
+    sep() PREPROCESSOR_DEFER2(_PREPROCESSOR_MAP_PARAMETER_INNER)()(par, op, sep, ##__VA_ARGS__)         \
+  )
+#define _PREPROCESSOR_MAP_PARAMETER_INNER() PREPROCESSOR_MAP_PARAMETER_INNER
+
+
 
 /************************************************************************************************************************************************************
  * PREPROCESSOR MAP FOR MERGING NAMES TO ONE NAME

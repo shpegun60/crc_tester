@@ -212,6 +212,28 @@ extern "C" {
 #define PREPROCESSOR_TUPLE_FOR_EACH(f, sep, ...) \
     PREPROCESSOR_FOR_EACH(f, sep, __VA_ARGS__)
 
+/************************************************************************************************************
+ * TUPLE FOR_EACH with parameter
+ * the same as PREPROCESSOR_TUPLE_FOR_EACH but contains some user parameter (may be tuple)
+ *
+ *       #define TUPLE_FOO(par, x) printf(par); PREPROCESSOR_CONCAT(myFoo, PREPROCESSOR_TUPLE_COUNT(x)) x
+ *       PREPROCESSOR_TUPLE_FOR_EACH_PARAMETER("next par------", TUPLE_FOO, PREPROCESSOR_COMMA_POINT, (1,2,3,4), (6,5), (3))
+ *
+ *      Which expands to:
+ *           printf("next par------");
+ *           myFoo4(1, 2, 3, 4);
+ *           printf("next par------");
+ *           myFoo2(6, 5);
+ *           printf("next par------");
+ *           myFoo1(3)
+ *
+ *          **** parameters may be tuple -->(2, 3, 4), but progremmer must proceed this
+ *
+ */
+
+#define PREPROCESSOR_TUPLE_FOR_EACH_PARAMETER(par, f, sep, ...) \
+    PREPROCESSOR_FOR_EACH_PARAMETER(par, f, sep, __VA_ARGS__)
+
 
 #ifdef __cplusplus
 }

@@ -30,8 +30,21 @@ extern "C" {
  * EXPANDS TO:
  *      A ; B ; C ; D
  *
+ *
  */
 #define PREPROCESSOR_FOR_EACH(op, sep, ...)  PREPROCESSOR_MAP(op, sep, __VA_ARGS__)
+
+
+/************************************************************************************************************************************************************
+ *
+ *      #define FOO(par, x) par + x
+ *      PREPROCESSOR_FOR_EACH_PARAMETER(USER, FOO, PREPROCESSOR_COMMA_POINT, A,B,C,D)
+ *
+ * EXPANDS TO:
+ *      USER + A ; USER + B ; USER + C ; USER + D
+ *
+ */
+#define PREPROCESSOR_FOR_EACH_PARAMETER(par, op, sep, ...)  PREPROCESSOR_MAP_PARAMETER(par, op, sep, __VA_ARGS__)
 
 
 

@@ -180,8 +180,9 @@
  *  ERROR / OK macro
  */
 
-#define ENTITY_ERROR 0x00
-#define ENTITY_OK 	 0x01
+#define ENTITY_ERROR            0x00
+#define ENTITY_OK               0x01
+#define ENTITY_NUMBER_ERROR     0x010000UL
 //------------------------------------
 
 
