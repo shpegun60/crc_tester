@@ -30,7 +30,7 @@
 
 /* Offset of member MEMBER in a struct of type TYPE. */
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+#   define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #endif
 
 /*

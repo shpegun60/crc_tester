@@ -10,6 +10,7 @@
 
 #include "callback_container.h"
 
+
 void callback(void ** context)
 {
     (void)(context);
@@ -204,7 +205,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
 
-    entityTest(randomSeed, testCnt);
+    //entityTest(randomSeed, testCnt);
 
 
 

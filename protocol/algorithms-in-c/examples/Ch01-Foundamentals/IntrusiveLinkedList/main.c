@@ -35,8 +35,8 @@ typedef struct _Student {
 
 void show_student(IntrusiveDList * head)
 {
-    dlist_for_each(position, head) {
-        Student *student = dlist_entry(position->next, Student, link);
+    idlist_for_each(position, head) {
+        Student *student = idlist_entry(position->next, Student, link);
         printf("student address: %p, name: %s, age: %d\n",
                student, student->name, student->age);
     }
@@ -52,8 +52,8 @@ void show_student(IntrusiveDList * head)
  */
 IntrusiveDListNode *find_student(IntrusiveDList * head, char *name)
 {
-    dlist_for_each(position, head) {
-        Student *student = dlist_entry(position->next, Student, link);
+    idlist_for_each(position, head) {
+        Student *student = idlist_entry(position->next, Student, link);
         if (strcmp(student->name, name) == 0)
             return position;
     }
@@ -64,7 +64,7 @@ void use_intrusive_dlist()
 {
     printf("\nTesting intrusive doubly linked list...\n");
     IntrusiveDList head;
-    dlist_init(&head);
+    idlist_init(&head);
 
     char *names[] = { "Tonny", "Andy", "Michael", "Leslie", "John" };
     int ages[] = { 12, 10, 11, 14, 13 };
@@ -72,22 +72,22 @@ void use_intrusive_dlist()
         Student *student = (Student *) malloc(sizeof(Student));
         strcpy(student->name, names[i]);
         student->age = ages[i];
-        dlist_init(&(student->link));
-        dlist_insert_back(&head, &(student->link));
+        idlist_init(&(student->link));
+        idlist_insert_back(&head, &(student->link));
     }
     printf("Student list after populating:\n");
     show_student(&head);
 
     IntrusiveDListNode *position = find_student(&head, "Michael");
     if (position) {
-        Student *student = dlist_entry(position->next, Student, link);
-        dlist_remove_back(position);
+        Student *student = idlist_entry(position->next, Student, link);
+        idlist_remove_back(position);
         free(student);
         printf("\nStudent list after deletion:\n");
         show_student(&head);
     }
 
-    dlist_destroy(&head, Student, link, free);
+    idlist_destroy(&head, Student, link, free);
 }
 
 typedef struct _Book {
@@ -98,8 +98,8 @@ typedef struct _Book {
 
 void show_book(IntrusiveSList * head)
 {
-    slist_for_each(position, head) {
-        Book *book = slist_entry(position->next, Book, link);
+    islist_for_each(position, head) {
+        Book *book = islist_entry(position->next, Book, link);
         printf("book address: %p, title: %s, price: %8.2f\n",
                book, book->title, book->price);
     }
@@ -115,8 +115,8 @@ void show_book(IntrusiveSList * head)
  */
 IntrusiveSListNode *find_book(IntrusiveSList * head, char *title)
 {
-    slist_for_each(position, head) {
-        Book *book = slist_entry(position->next, Book, link);
+    islist_for_each(position, head) {
+        Book *book = islist_entry(position->next, Book, link);
         if (strcmp(book->title, title) == 0)
             return position;
     }
@@ -127,7 +127,7 @@ void use_intrusive_slist()
 {
     printf("\nTesting intrusive singly linked list...\n");
     IntrusiveSList head;
-    slist_init(&head);
+    islist_init(&head);
 
     char *titles[] = { "C Programming", "C++ Programming", "Internet",
         "Compiler Design", "Data Structures"
@@ -137,23 +137,24 @@ void use_intrusive_slist()
         Book *book = (Book *) malloc(sizeof(Book));
         strcpy(book->title, titles[i]);
         book->price = prices[i];
-        slist_init(&(book->link));
-        slist_insert_back(&head, &(book->link));
+        islist_init(&(book->link));
+        islist_insert_back(&head, &(book->link));
     }
     printf("Book list after populating:\n");
     show_book(&head);
 
     IntrusiveSListNode *position = find_book(&head, "Internet");
     if (position) {
-        Book *book = slist_entry_of_position(position, Book, link);
-        slist_remove_back(position);
+        Book *book = islist_entry_of_position(position, Book, link);
+        islist_remove_back(position);
         free(book);
         printf("\nBook list after deletion:\n");
         show_book(&head);
     }
 
-    slist_destroy(&head, Book, link, free);
+    islist_destroy(&head, Book, link, free);
 }
+
 
 int main(int argc, char *argv[])
 {

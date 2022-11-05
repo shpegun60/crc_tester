@@ -57,7 +57,7 @@ extern struct JmpStack jmpStack;
 static inline int push_jmp(void)
 {
     jmpStack.buf =
-        realloc(jmpStack.buf, sizeof(jmp_buf) * (jmpStack.count + 1));
+        (jmp_buf *)realloc(jmpStack.buf, sizeof(jmp_buf) * (jmpStack.count + 1));
     return jmpStack.count++;
 }
 
@@ -65,7 +65,7 @@ static inline int pop_jmp(void)
 {
     if (jmpStack.count > 0)
         jmpStack.buf =
-            realloc(jmpStack.buf, sizeof(jmp_buf) * (--jmpStack.count));
+            (jmp_buf *)realloc((void*)jmpStack.buf, sizeof(jmp_buf) * (--jmpStack.count));
     return 1;
 }
 
