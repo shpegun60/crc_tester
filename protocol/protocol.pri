@@ -12,6 +12,7 @@ include($$PWD/callback_manager/callback_manager.pri)
 include($$PWD/callback_container/callback_container.pri)
 include($$PWD/pool_container/pool_container.pri)
 include($$PWD/entityframework/entityframework.pri)
+include($$PWD/algorithms-in-c/c_algo.pri)
 
 
 SOURCES +=  \

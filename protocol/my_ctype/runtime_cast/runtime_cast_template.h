@@ -5,7 +5,7 @@
 #   define T int
 #endif /* T */
 
-T TEMPLATE(reedRuntimeCast, T)(void* data, u8 type);
+T TEMPLATE(readRuntimeCast, T)(void* data, u8 type);
 int TEMPLATE(writeRuntimeCast, T)(void* data, u8 type, T value);
 
 

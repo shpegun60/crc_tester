@@ -5,14 +5,6 @@
  * Define user copy
  * *************************************************
  */
-C_INLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to);
-C_INLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to);
-C_INLINE void MY_CTYPE_COPY_REGISTERS(volatile reg* from, volatile reg* to);
-C_INLINE void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile reg* to);
-
-C_INLINE const u8* myCTypeGetTablePointer();
-C_INLINE u8 getMYCTypeLen(u8 type);
-
 
 const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH] = {
     (u8)0x00U,                  //VOID_TYPE           ((u8) 0)

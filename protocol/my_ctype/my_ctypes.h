@@ -129,19 +129,48 @@ extern const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH];
 /************************************************************************************
  *  Macro for user copy
  */
-forceinline void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to)
+STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to)
 {
     while((n)--) {
         *(to)++ = *(from)++;
     }
 }
 
-forceinline void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
+STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
 {
     while((n)--) {
         *(to)++ = *((from) + (n));
     }
 }
+
+STATIC_FORCEINLINE void MY_CTYPE_WRITE_ONCE_SIZE(volatile void *p, void *res, reg size)
+{
+    switch (size) {
+    case 1: *(volatile u8  *)p = *(u8  *)res; break;
+    case 2: *(volatile u16 *)p = *(u16 *)res; break;
+    case 4: *(volatile u32 *)p = *(u32 *)res; break;
+    case 8: *(volatile u64 *)p = *(u64 *)res; break;
+    default:
+            //barrier(); /// need block all---------------------------
+            MY_CTYPE_USER_DATA_MEMCPY(size, (u8*)res, (u8*)p);
+            //barrier(); /// need unblock all-------------------------
+    }
+}
+
+STATIC_FORCEINLINE void MY_CTYPE_READ_ONCE_SIZE(const volatile void *p, void *res, reg size)
+{
+    switch (size) {
+    case 1: *(u8  *)res = *(volatile u8  *)p; break;
+    case 2: *(u16 *)res = *(volatile u16 *)p; break;
+    case 4: *(u32 *)res = *(volatile u32 *)p; break;
+    case 8: *(u64 *)res = *(volatile u64 *)p; break;
+    default:
+            //barrier(); /// need block all---------------------------
+            MY_CTYPE_USER_DATA_MEMCPY(size, (u8*)p, (u8*)res);
+            //barrier(); /// need unblock all-------------------------
+    }
+}
+
 
 
 /*
@@ -151,12 +180,12 @@ forceinline void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
  * and platform dependent
  * *************************************************
  */
-forceinline void MY_CTYPE_COPY_REGISTERS(volatile reg* from, volatile reg* to)
+STATIC_FORCEINLINE void MY_CTYPE_COPY_REGISTERS(volatile reg* from, volatile reg* to)
 {
     MY_CTYPE_REG_CPY(to, from);
 }
 
-forceinline void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile reg* to)
+STATIC_FORCEINLINE void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile reg* to)
 {
     volatile reg rev;
     volatile reg cpy = *(from);
@@ -165,13 +194,13 @@ forceinline void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile reg* to
     MY_CTYPE_REG_CPY(to, rev);
 }
 
-forceinline const u8* myCTypeGetTablePointer()
+STATIC_FORCEINLINE const u8* myCTypeGetTablePointer()
 {
     return &typeLengthMappingArray[VOID_TYPE];
 }
 
 
-forceinline u8 getMYCTypeLen(u8 type)
+STATIC_FORCEINLINE u8 getMYCTypeLen(u8 type)
 {
     if(type < TYPE_ARRAY_LENGTH) {
         return typeLengthMappingArray[type];

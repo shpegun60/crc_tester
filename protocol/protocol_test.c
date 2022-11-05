@@ -1,4 +1,5 @@
 #include "protocol_test.h"
+#include "entity_tests.h"
 #include "protocol.h"
 #include "raw_parser_it_test.h"
 
@@ -200,6 +201,10 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     TEMPLATE(CallbackContainer, void, p2) callback_ibj;
     TEMPLATE(initCallbackContainerUser, void, p2)(&callback_ibj, callback, NULL);
     CC_CALL(&callback_ibj);
+
+
+
+    entityTest(randomSeed, testCnt);
 
 
 

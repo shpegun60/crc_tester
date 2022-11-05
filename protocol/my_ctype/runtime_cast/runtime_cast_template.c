@@ -7,8 +7,8 @@
 #   define T int
 #endif /* T */
 
-// reed from (void *) to some type
-T TEMPLATE(reedRuntimeCast, T)(void* data, u8 type)
+// read from (void *) to some type
+T TEMPLATE(readRuntimeCast, T)(void* data, u8 type)
 {
 
     T value;

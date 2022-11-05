@@ -129,6 +129,15 @@ STATIC_FORCEINLINE Entity * getEntityPointer(TYPEOF_STRUCT(EntityInfo, entities_
     return NULLPTR(Entity*);
 }
 
+// getter field value pointer by entity number and field number
+STATIC_FORCEINLINE EntityField * getFieldPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+{
+    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
+        return &entityInfo.entities[entityNumber]->fields[fieldNumber];
+    }
+    return NULLPTR(EntityField*);
+}
+
 // getter data pointer by entity number
 STATIC_FORCEINLINE void * getVoidPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
 {
@@ -138,8 +147,8 @@ STATIC_FORCEINLINE void * getVoidPointer(TYPEOF_STRUCT(EntityInfo, entities_coun
     return NULL;
 }
 
-// getter field data pointer by entity number and field number
-STATIC_FORCEINLINE void * getFieldPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+// getter field value pointer by entity number and field number
+STATIC_FORCEINLINE void * getFieldValuePointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
     if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
         return (UINT8_TYPE_DC(entityInfo.entities[entityNumber]->pointer) + entityInfo.entities[entityNumber]->fields[fieldNumber].shift);

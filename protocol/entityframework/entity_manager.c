@@ -102,12 +102,20 @@ int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char desc
     M_Assert_BreakSaveCheck((NumberOfFields > MAX_NUBER_OF_FIELDS), M_EMPTY, return ENTITY_ERROR, "initEntity: No valid input number of fields, value: %d, max: %d", NumberOfFields, MAX_NUBER_OF_FIELDS);
     M_Assert_BreakSaveCheck((entityInfo.entities_count == entityInfo.allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
 
+    char str[(ENTITY_DESCRIPTION_SIZE + 8) + 1] = {};
+
     // allocation pointer to Entity--------------------------------------------------------------------------------------------------------------------------------------------------------------
     entityInfo.entities[entityInfo.entities_count] = (Entity*) calloc(1, sizeof(Entity));
     M_Assert_BreakSaveCheck(entityInfo.entities[entityInfo.entities_count] == NULLPTR(Entity*), M_EMPTY, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
 
     // copy entity description-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
+    if(descr) {
+        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
+    } else {
+        sprintf(str, "E%d", entityInfo.entities_count);
+        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
+    }
+
 
     // allocation or initialization pointer to data----------------------------------------------------------------------------------------------------------------------------------------------
 #ifdef USE_ENTITY_USER_SPACE
@@ -147,7 +155,6 @@ int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char desc
     entityInfo.entities[entityInfo.entities_count]->fields_count = NumberOfFields;
 
     // initialization Fields-------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    char str[(ENTITY_DESCRIPTION_SIZE << 1) + 1] = {};
     for(reg i = 0; i < NumberOfFields; ++i) {
 
 #ifdef USE_ENTITY_CALLBACKS
@@ -168,7 +175,7 @@ int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char desc
         entityInfo.entities[entityInfo.entities_count]->fields[i].shift     = 0;
         entityInfo.entities[entityInfo.entities_count]->fields[i].type      = VOID_TYPE;
 
-        sprintf(str, "%d", i);
+        sprintf(str, "F%d", i);
         MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)entityInfo.entities[entityInfo.entities_count]->fields[i].descr);
     }
 
@@ -188,6 +195,11 @@ int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char desc
 int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
+
+#ifdef USE_ENTITY_REGISTER
+    M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initField: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
+#endif /* USE_ENTITY_REGISTER */
+
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
 
                                     entityInst->fields[(*fieldNumber)].bitFlags     = bitFlags;
@@ -213,14 +225,19 @@ int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField,
 /// init field-array
 int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum)
 {
-    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL) || (arrayLen == 0), M_EMPTY, return ENTITY_ERROR, "initFieldSequence: No valid input");
+    M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL) || (arrayLen == 0), M_EMPTY, return ENTITY_ERROR, "initFieldArray: No valid input");
+
+#ifdef USE_ENTITY_REGISTER
+    M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initFieldArray: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
+#endif /* USE_ENTITY_REGISTER */
+
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
 
-                                    char str[(ENTITY_DESCRIPTION_SIZE << 1) + 1] = {};
+                                    char str[(ENTITY_DESCRIPTION_SIZE + 8) + 1] = {};
                                     bitFlags |= ENTITY_ARRAY_MSK;
                                     for(int i = 0; i < arrayLen; ++i) {
 
-                                        entityInst->fields[(*fieldNumber)].bitFlags   = (bitFlags | ENTITY_ARRAY_MSK);
+                                        entityInst->fields[(*fieldNumber)].bitFlags   = bitFlags;
                                         entityInst->fields[(*fieldNumber)].shift      = shift;
                                         entityInst->fields[(*fieldNumber)].type       = type;
 
@@ -238,7 +255,7 @@ int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityF
                                     }
                                     return ENTITY_OK;
 
-                                }, M_EMPTY, M_EMPTY, "initFieldSequence: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber) + arrayLen, entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initFieldArray: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber) + arrayLen, entityInst->fields_count);
 
     return ENTITY_ERROR;
 }
@@ -248,6 +265,10 @@ int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityF
 int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE])
 {
     M_Assert_BreakSaveCheck((fieldInst == NULLPTR(EntityField *)), M_EMPTY, return ENTITY_ERROR, "initFieldPtr: No valid input");
+
+#ifdef USE_ENTITY_REGISTER
+    M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initFieldFromPtr: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
+#endif /* USE_ENTITY_REGISTER */
 
     fieldInst->bitFlags     = bitFlags;
     fieldInst->shift        = shift;
@@ -287,6 +308,11 @@ int initFieldCallback(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(Enti
                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULLPTR(reg *)), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: No valid input");
+
+#ifdef USE_ENTITY_REGISTER
+    M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
+#endif /* USE_ENTITY_REGISTER */
+
     M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
 
                                     entityInst->fields[(*fieldNumber)].bitFlags     = bitFlags;
