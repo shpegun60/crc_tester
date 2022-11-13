@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     int i = 0;
     //M_Assert_WarningElseSaveCheck((i != 0), tmpFuncTrue(), tmpFuncFalse(), M_EMPTY, "Msg: aaaaaaaaaaaaaaa");
-    M_Assert_Break((i == 0), M_EMPTY, M_EMPTY, M_LIB_DATA_DEF "Msg: aaaaaaaaaaaaaaa, %d, %d", 1,"entityFramework", 456, 789);
+    M_Assert_Break((i == 0), M_EMPTY, M_EMPTY, "[d]Msg: aaaaaaaaaaaaaaa, %d, %d", 1,"entityFramework", 456, 789);
 
 //    //callbackManagerTest();
 //    //qDebug() << "test: "<<pullContainerTest(123, 100);

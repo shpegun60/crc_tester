@@ -5,17 +5,46 @@
 #include <stdarg.h>
 #include <assert.h>
 
-#define __M_CHECK_LIB_DATA(msg) (((msg)[0] == '[') && ((msg)[1] == 'd') && ((msg)[2] == ']'))
+#define __M_IF_ASSERT_ADDITION_DATA(msg) (((msg)[0] == '[') && ((msg)[2] == ']'))
+#define __M_ASSERT_DATA(msg) ((msg)[1])
 
 static inline void __M_SEND_MSG(const char* const header,
                                 const char* const expr_str, const unsigned char expr,
                                 const char* const file, const int line,
                                 const char* const msg, va_list args)
 {
-    if(__M_CHECK_LIB_DATA(msg)) {
-        // get library info
-        int assertEna = va_arg(args, const int);
-        char* descr = va_arg(args, char*);
+    if(__M_IF_ASSERT_ADDITION_DATA(msg)) {
+
+        int assertEna = 1;
+        char* descr = 0;
+
+        switch(__M_ASSERT_DATA(msg)) {
+
+        case 'd':
+            // get library info
+            assertEna = va_arg(args, const int);
+            descr = va_arg(args, char*);
+            break;
+
+        case 's':
+            // get library info
+            assertEna = 1;
+            descr = va_arg(args, char*);
+            break;
+
+        case 'e':
+            // get library info
+            assertEna = va_arg(args, const int);
+            descr = 0;
+            break;
+
+        case '0':
+            return;
+            break;
+
+        default: ;
+
+        }
 
         // send message if enabled message
         if(assertEna) {
@@ -58,7 +87,8 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
     va_end(args);
 }
 
-#undef __M_CHECK_LIB_DATA
+#undef __M_IF_ASSERT_ADDITION_DATA
+#undef __M_ASSERT_DATA
 
 #endif /* NDEBUG */
 
