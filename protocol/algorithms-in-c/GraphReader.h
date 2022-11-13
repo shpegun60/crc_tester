@@ -27,6 +27,7 @@
 #define GRAPH_READER_H
 
 #include "exception.h"
+#include <stdio.h>
 
 #define INVALID_CHARACTER 1
 #define INVALID_KEYWORD   2

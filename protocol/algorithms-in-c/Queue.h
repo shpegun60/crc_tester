@@ -48,7 +48,7 @@ typedef IntrusiveDListNode Queue;
 
 #define queue_size(q) idlist_size(q)
 
-#define queue_is_empty(q) ((q)->prev == (q) && (q)->next == (q))
+#define queue_is_empty(q) idlist_is_empty(q)
 
 #define queue_front(q) ((q)->next)
 

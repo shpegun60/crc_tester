@@ -1,49 +1,44 @@
 #include "smart_assert.h"
+
+#ifndef NDEBUG
+
 #include <stdarg.h>
 #include <assert.h>
 
+#define __M_CHECK_LIB_DATA(msg) (((msg)[0] == '[') && ((msg)[1] == 'd') && ((msg)[2] == ']'))
 
-void __M_DEBUG_INFO(const char* const msg, ...)
+static inline void __M_SEND_MSG(const char* const header,
+                                const char* const expr_str, const unsigned char expr,
+                                const char* const file, const int line,
+                                const char* const msg, va_list args)
 {
-    va_list args;
-    va_start(args, msg);
-    vfprintf(stdout, msg, args);
-    fprintf(stdout, "\n");
-    fflush(stdout);
-    va_end(args);
-}
+    if(__M_CHECK_LIB_DATA(msg)) {
+        // get library info
+        int assertEna = va_arg(args, const int);
+        char* descr = va_arg(args, char*);
 
-void __M_DEBUG_ERROR(const char* const msg, ...)
-{
-    va_list args;
-    va_start(args, msg);
-    vfprintf(stderr, msg, args);
-    fprintf(stderr, "\n");
-    fflush(stderr);
-    va_end(args);
-}
+        // send warning message if enabled message
+        if(assertEna) {
+            fprintf(stderr, "\n%s\n", header);
+            fprintf(stderr, "Library Name: %s\n", descr);
+            fprintf(stderr, "Assert failed:\t");
+            vfprintf(stderr, &msg[3], args);
+            fprintf(stderr, "\n");
 
-void __M_DEBUG_FILE(FILE * file, const char* const msg, ...)
-{
-    va_list args;
-    va_start(args, msg);
-    vfprintf(file, msg, args);
-    fprintf(file, "\n");
-    fflush(file);
-    va_end(args);
-}
+            fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
+            fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+            fflush(stderr);
+        }
+    } else {
+        fprintf(stderr, "\n%s\n", header);
+        fprintf(stderr, "Assert failed:\t");
+        vfprintf(stderr, msg, args);
+        fprintf(stderr, "\n");
 
-#ifndef NDEBUG
-static inline void __M_SEND_MSG(const char* const header, const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, const va_list args)
-{
-    fprintf(stderr, "\n%s\n", header);
-    fprintf(stderr, "Assert failed:\t");
-    vfprintf(stderr, msg, args);
-    fprintf(stderr, "\n");
-
-    fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
-    fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
-    fflush(stderr);
+        fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
+        fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+        fflush(stderr);
+    }
 }
 
 void __M_Error(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...)
@@ -57,15 +52,47 @@ void __M_Error(const char* const expr_str, const unsigned char expr, const char*
 
 void __M_Warning(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...)
 {
-    (void)expr;
-
     va_list args;
     va_start(args, msg);
     __M_SEND_MSG("WARNING!!!", expr_str, expr, file, line, msg, args);
     va_end(args);
 }
 
+#undef __M_CHECK_LIB_DATA
+
 #endif /* NDEBUG */
+
+//--------------------------------------------------------------------------------------------------------
+void __M_DBG(const char* const msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(stdout, msg, args);
+    fprintf(stdout, "\n");
+    fflush(stdout);
+    va_end(args);
+}
+
+void __M_DBG_ERR(const char* const msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(stderr, msg, args);
+    fprintf(stderr, "\n");
+    fflush(stderr);
+    va_end(args);
+}
+
+void __M_DBG_FILE(FILE * file, const char* const msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(file, msg, args);
+    fprintf(file, "\n");
+    fflush(file);
+    va_end(args);
+}
+
 
 void __M_assert_test()
 {
@@ -83,5 +110,6 @@ void __M_assert_test()
 
     (void)i;
 }
+
 
 

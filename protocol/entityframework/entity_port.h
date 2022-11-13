@@ -159,6 +159,21 @@
 //#   define OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
 #endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
 
+#ifdef OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
+#   define ENTITY_DBG_ASSERT_BUF M_Assert_Break
+#else
+#   define ENTITY_DBG_ASSERT_BUF M_Assert_BreakSaveCheck
+#endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
+
+/* **********************************************************************************************************************************
+ *
+ * **********************************************************************************************************************************
+ */
+
+#ifndef USE_ENTITY_MAIL_SERVICE
+#   define USE_ENTITY_MAIL_SERVICE
+#endif /* USE_ENTITY_MAIL_SERVICE */
+
 /* **********************************************************************************************************************************
  *  Macro for Defining Entity Copy function (Platform depent)
  * **********************************************************************************************************************************
@@ -182,7 +197,7 @@
 
 #define ENTITY_ERROR            0x00
 #define ENTITY_OK               0x01
-#define ENTITY_NUMBER_ERROR     0x010000UL
+#define ENTITY_NUMBER_ERROR     0x00010000UL
 //------------------------------------
 
 

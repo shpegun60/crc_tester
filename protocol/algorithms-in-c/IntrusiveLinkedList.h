@@ -112,6 +112,13 @@ static inline size_t idlist_size(IntrusiveDList * head)
 }
 
 /**
+ * idlist_is_empty - returns true if list is empty
+ * @q: list to be check
+ */
+
+#define idlist_is_empty(q) ((q)->prev == (q) && (q)->next == (q))
+
+/**
  * idlist_destroy - destroy list node containers, not including dummy head
  * @head: list to be destroyed
  * @type:    the type of the struct this is embedded in.
@@ -216,6 +223,12 @@ static inline size_t islist_size(IntrusiveSList * head)
     }
     return count;
 }
+
+/**
+ * islist_is_empty - returns true if list is empty
+ * @q: list to be check
+ */
+#define islist_is_empty(s) ((s)->next == NULL)
 
 /**
  * islist_destroy - destroy list node containers, not including dummy head

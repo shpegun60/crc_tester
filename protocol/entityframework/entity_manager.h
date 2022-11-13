@@ -156,6 +156,15 @@ STATIC_FORCEINLINE void * getFieldValuePointer(TYPEOF_STRUCT(EntityInfo, entitie
     return NULL;
 }
 
+// check if entity is exists
+STATIC_FORCEINLINE int entityPositionIsExists(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+{
+    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
+        return ENTITY_OK;
+    }
+    return ENTITY_ERROR;
+}
+
 
 /*
  * **********************************************************************************************************************************

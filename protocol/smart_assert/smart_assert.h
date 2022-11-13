@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 #include <stdio.h>
 
@@ -25,20 +25,13 @@ extern "C" {
 
 #define M_EMPTY     /* ignored expression */
 #define M_ALWAYS 1  /* always proceed expression */
+#define M_LIB_DATA_DEF "[d]" /* adds text for some library data, user must adds to message list 0--> assertEna, 1-->libDescr  */
 
-
-void __M_DEBUG_INFO(const char* const msg, ...);
-void __M_DEBUG_ERROR(const char* const msg, ...);
-void __M_DEBUG_FILE(FILE * file, const char* const msg, ...);
-
-
-void __M_assert_test();
 
 #ifndef NDEBUG /* --------------------------------------------------------------------------------------------------------- */
 
 void __M_Error(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...);
 void __M_Warning(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...);
-
 
 /*
  * ***********************************************************************************************************************************************
@@ -245,6 +238,13 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
 #endif /* NDEBUG */
 
 
+void __M_DBG(const char* const msg, ...);
+void __M_DBG_ERR(const char* const msg, ...);
+void __M_DBG_FILE(FILE * file, const char* const msg, ...);
+
+
+void __M_assert_test();
+
 
 #define PRINT_ONCE(...) \
     do{ \
@@ -260,6 +260,6 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
 #endif /* __SMART_ASSERT_H_ */

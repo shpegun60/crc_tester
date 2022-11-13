@@ -48,7 +48,7 @@ typedef IntrusiveSListNode Stack;
 
 #define stack_size(s) islist_size(s)
 
-#define stack_is_empty(s) ((s)->next == NULL)
+#define stack_is_empty(s) islist_is_empty(s)
 
 #define stack_top(s) ((s)->next)
 

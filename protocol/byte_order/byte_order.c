@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-__attribute__((unused)) static int byteOrderRevCheck(void * source, void * destination, int len)
+static int byteOrderRevCheck(void * source, void * destination, int len)
 {
     u8 * src = source;
     u8 * dst = destination;

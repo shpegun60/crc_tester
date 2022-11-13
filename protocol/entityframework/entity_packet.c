@@ -10,11 +10,7 @@
 #include "entity_atomic.h"
 #endif //USE_ENTITY_ATOMIC
 
-#ifdef OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
-#   define ENTITY_DBG_ASSERT_BUF M_Assert_Break
-#else
-#   define ENTITY_DBG_ASSERT_BUF M_Assert_BreakSaveCheck
-#endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
+
 
 
 /*------------------- Packet formaters function`s ----------------------------------
@@ -189,122 +185,6 @@ int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYP
     UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
-
-
-STATIC_FORCEINLINE void proceedReadEntity(TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* ptr, u8* outputData, u8 typeLen)
-{
-
-#ifdef USE_ENTITY_ATOMIC
-    ATOMIC_BLOCK_RESTORATE_COND((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_ATOMIC_MSK), {
-#endif /* USE_ENTITY_ATOMIC */
-
-#if defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER)
-
-                                    if((bitFlags) & (ENTITY_POINTER_MSK | ENTITY_REGISTER_MSK)) {
-                                        volatile reg* reg_ptr_from = (volatile reg*) (* REG_TYPE_DC(ptr));
-                                        volatile reg* reg_ptr_to   = (volatile reg*) (  outputData);
-                                        if(reg_ptr_from) {
-                                            ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
-                                        }
-                                    }
-
-                                    else
-
-#endif /* defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER) */
-
-
-#if defined(USE_ENTITY_REGISTER)
-
-                                    if((bitFlags) & ENTITY_REGISTER_MSK) {
-                                        volatile reg* reg_ptr_from = ((volatile reg*) (ptr));
-                                        volatile reg* reg_ptr_to   = ((volatile reg*) (outputData));
-                                        ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
-                                    }
-
-                                    else
-
-#endif /* defined(USE_ENTITY_REGISTER) */
-
-
-#if defined(USE_ENTITY_POINTER)
-
-                                    if((bitFlags) & ENTITY_POINTER_MSK) {
-                                        u8* reg_ptr_from = (u8 *)(* REG_TYPE_DC(ptr));
-                                        if(reg_ptr_from) {
-                                            ENTITY_BYTE_CPY(typeLen, reg_ptr_from, outputData);
-                                        }
-                                    }
-
-                                    else
-
-#endif /* defined(USE_ENTITY_POINTER) */
-
-                                    {
-                                        ENTITY_BYTE_CPY(typeLen, (u8*)ptr, outputData);
-                                    }
-
-#ifdef USE_ENTITY_ATOMIC
-                            });
-#endif /* USE_ENTITY_ATOMIC */
-
-}
-
-STATIC_FORCEINLINE void proceedWriteEntity(TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* ptr, u8* inputData, u8 typeLen)
-{
-#ifdef USE_ENTITY_ATOMIC
-    ATOMIC_BLOCK_RESTORATE_COND((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_ATOMIC_MSK), {
-#endif /* USE_ENTITY_ATOMIC */
-
-#if defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER)
-
-                                    if((bitFlags) & (ENTITY_POINTER_MSK | ENTITY_REGISTER_MSK)) {
-                                        volatile reg* reg_ptr_to        = (volatile reg*) (* REG_TYPE_DC(ptr));
-                                        volatile reg* reg_ptr_from      = (volatile reg*) (  inputData);
-                                        if(reg_ptr_to) {
-                                            ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
-                                        }
-                                    }
-
-                                    else
-
-#endif /* defined(USE_ENTITY_POINTER) && defined(USE_ENTITY_REGISTER) */
-
-
-#if defined(USE_ENTITY_REGISTER)
-
-                                    if((bitFlags) & ENTITY_REGISTER_MSK) {
-                                        volatile reg* reg_ptr_to        = ((volatile reg*)  (ptr));
-                                        volatile reg* reg_ptr_from      = ((volatile reg*)  (inputData));
-                                        ENTITY_REG_CPY(reg_ptr_from, reg_ptr_to);
-                                    }
-
-                                    else
-
-#endif /* defined(USE_ENTITY_REGISTER) */
-
-
-#if defined(USE_ENTITY_POINTER)
-
-                                    if((bitFlags) & ENTITY_POINTER_MSK) {
-                                        u8* reg_ptr_to = (u8 *)(* REG_TYPE_DC(ptr));
-                                        if(reg_ptr_to) {
-                                            ENTITY_BYTE_CPY(typeLen, inputData, reg_ptr_to);
-                                        }
-                                    }
-
-                                    else
-
-#endif /* defined(USE_ENTITY_POINTER) */
-
-                                    {
-                                        ENTITY_BYTE_CPY(typeLen, inputData, (u8*)ptr);
-                                    }
-
-#ifdef USE_ENTITY_ATOMIC
-                                });
-#endif /* USE_ENTITY_ATOMIC */
-}
-
 
 
 /* ******************************************************************************************************************
@@ -546,8 +426,5 @@ int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutB
     UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
-
-
-#undef ENTITY_DBG_ASSERT_BUF
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */
