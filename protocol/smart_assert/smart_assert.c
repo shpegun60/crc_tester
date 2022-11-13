@@ -17,7 +17,7 @@ static inline void __M_SEND_MSG(const char* const header,
         int assertEna = va_arg(args, const int);
         char* descr = va_arg(args, char*);
 
-        // send warning message if enabled message
+        // send message if enabled message
         if(assertEna) {
             fprintf(stderr, "\n%s\n", header);
             fprintf(stderr, "Library Name: %s\n", descr);
