@@ -8,7 +8,7 @@
 #define __M_IF_ASSERT_ADDITION_DATA(msg) (((msg)[0] == '[') && ((msg)[2] == ']'))
 #define __M_ASSERT_DATA(msg) ((msg)[1])
 
-static inline void __M_SEND_MSG(const char* const header,
+static inline void __M_SEND_ASSERT_MSG(const char* const header,
                                 const char* const expr_str, const unsigned char expr,
                                 const char* const file, const int line,
                                 const char* const msg, va_list args)
@@ -74,7 +74,7 @@ void __M_Error(const char* const expr_str, const unsigned char expr, const char*
 {
     va_list args;
     va_start(args, msg);
-    __M_SEND_MSG("PROGRAMM EXIT WITH ERROR!!!", expr_str, expr, file, line, msg, args);
+    __M_SEND_ASSERT_MSG("PROGRAMM EXIT WITH ERROR!!!", expr_str, expr, file, line, msg, args);
     va_end(args);
     abort(); // exit programm
 }
@@ -83,7 +83,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
 {
     va_list args;
     va_start(args, msg);
-    __M_SEND_MSG("WARNING!!!", expr_str, expr, file, line, msg, args);
+    __M_SEND_ASSERT_MSG("WARNING!!!", expr_str, expr, file, line, msg, args);
     va_end(args);
 }
 

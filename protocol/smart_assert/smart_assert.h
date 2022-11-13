@@ -25,7 +25,11 @@ extern "C" {
 
 #define M_EMPTY     /* ignored expression */
 #define M_ALWAYS 1  /* always proceed expression */
-#define M_LIB_DATA_DEF "[d]" /* adds text for some library data, user must adds to message list 0--> assertEna, 1-->libDescr  */
+#define M_LIB_DATA_DEF          "[d]" /* adds text for some library data, user must adds to message list 0--> assertEna, 1-->libDescr  (0|1, "descr")*/
+#define M_LIB_NAME_DEF          "[s]" /* adds text for some library data, user must adds to message list 0--> libDescr ("descr") */
+#define M_LIB_ENA_DEF           "[e]" /* adds text for some library data, user must adds to message list 0--> assertEna (0|1) */
+#define M_LIB_ALWAYS_DIS_DEF    "[0]" /* always disable smart assert, nothing to adds */
+#define M_LIB_ALWAYS_ENA_DEF    "[1]" /* always enable smart assert, nothing to adds */
 
 
 #ifndef NDEBUG /* --------------------------------------------------------------------------------------------------------- */
