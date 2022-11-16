@@ -174,6 +174,10 @@
 #   define USE_ENTITY_MAIL_SERVICE
 #endif /* USE_ENTITY_MAIL_SERVICE */
 
+#ifndef USE_ENTITY_READ_SERVICE
+#   define USE_ENTITY_READ_SERVICE
+#endif /* USE_ENTITY_READ_SERVICE */
+
 /* **********************************************************************************************************************************
  *  Macro for Defining Entity Copy function (Platform depent)
  * **********************************************************************************************************************************

@@ -6,7 +6,9 @@ SOURCES += \
     $$PWD/entity_mail_service.c \
     $$PWD/entity_manager.c \
     $$PWD/entity_packet.c \
-    $$PWD/entity_tests.c
+    $$PWD/entity_tests.c \
+    $$PWD/reader/entity_read_base.c \
+    $$PWD/reader/entity_read_parent_pool.c
 
 HEADERS += \
     $$PWD/entity_atomic.h \
@@ -15,4 +17,6 @@ HEADERS += \
     $$PWD/entity_manager.h \
     $$PWD/entity_packet.h \
     $$PWD/entity_port.h \
-    $$PWD/entity_tests.h
+    $$PWD/entity_tests.h \
+    $$PWD/reader/entity_read_base.h \
+    $$PWD/reader/entity_read_parent_pool.h

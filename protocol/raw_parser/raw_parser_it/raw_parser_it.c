@@ -511,7 +511,7 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 
 #endif /* D_RAW_P_CRC_ENA */
 
-
+    self->transmittState = RAW_P_IT_TRANSMITT_SB;
     self->TX.size = len;
     return len;
 }

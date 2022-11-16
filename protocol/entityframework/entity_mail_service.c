@@ -157,7 +157,7 @@ void EntityMailService_getStream(EntityMailService_t* self, u32 time, u8* output
         self->lastStream = position;
     }
 
-    // move to head
+    // move to head if end of container
     if(position->next == NULL) {
         self->lastStream = &self->head;
     }

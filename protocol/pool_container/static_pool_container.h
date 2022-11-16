@@ -6,11 +6,11 @@
 
 
 #ifndef STATIC_POOL_CONTAINER_COLUMNS
-    #define STATIC_POOL_CONTAINER_COLUMNS 256 // number of bytes per one array
+    #define STATIC_POOL_CONTAINER_COLUMNS 256 // maximum number of bytes per one array
 #endif /* STATIC_POOL_CONTAINER_COLUMNS */
 
 #ifndef STATIC_POOL_CONTAINER_RAWS
-    #define STATIC_POOL_CONTAINER_RAWS 128 // number of arrays
+    #define STATIC_POOL_CONTAINER_RAWS 128 // maximum number of arrays
 #endif /* STATIC_POOL_CONTAINER_RAWS */
 
 

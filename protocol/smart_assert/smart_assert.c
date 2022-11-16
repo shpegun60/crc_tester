@@ -1,8 +1,9 @@
 #include "smart_assert.h"
+#include <stdarg.h>
 
 #ifndef NDEBUG
 
-#include <stdarg.h>
+
 #include <assert.h>
 
 #define __M_IF_ASSERT_ADDITION_DATA(msg) (((msg)[0] == '[') && ((msg)[2] == ']'))
