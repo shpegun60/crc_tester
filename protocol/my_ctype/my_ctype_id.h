@@ -1,10 +1,6 @@
 #ifndef __MY_CTYPE_ID_H__
 #define __MY_CTYPE_ID_H__ 1
 
-#include "preprocessor_if.h"
-#include "preprocessor_type_eq.h"
-#include "preprocessor_nat_eq.h"
-
 // types mapping ------------------------------------------
 #define VOID_TYPE 			0   // uni
 // unsigned type
@@ -37,64 +33,32 @@
  *      MY_CTYPE_GET_TYPE_ID(reg) // expands to 16
  *
  */
-#define MY_CTYPE_GET_TYPE_ID(type) MY_CTYPE_GET_TYPE_ID_IMPL(type)
-#define MY_CTYPE_GET_TYPE_ID_IMPL(type)\
-    PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, uni))( \
-        VOID_TYPE, \
-        PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, u8))( \
-            UINT8_TYPE, \
-            PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, u16))( \
-                UINT16_TYPE, \
-                PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, u24))( \
-                    UINT24_TYPE, \
-                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, u32))( \
-                        UINT32_TYPE, \
-                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, u64))( \
-                            UINT64_TYPE, \
-                            PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, c8))( \
-                                CHAR_TYPE, \
-                                PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, i8))( \
-                                    INT8_TYPE, \
-                                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, i16))( \
-                                        INT16_TYPE, \
-                                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, i24))( \
-                                            INT24_TYPE, \
-                                            PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, i32))( \
-                                                INT32_TYPE, \
-                                                PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, i64))( \
-                                                    INT64_TYPE, \
-                                                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, f32))( \
-                                                        FLOAT_TYPE, \
-                                                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, f64))( \
-                                                            DOUBLE_TYPE, \
-                                                            PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, f128))( \
-                                                                LONG_DOUBLE_TYPE, \
-                                                                PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, b))( \
-                                                                    BOOL_TYPE, \
-                                                                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, reg))( \
-                                                                        REG_TYPE, \
-                                                                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_TYPE_EQ(type, sreg))( \
-                                                                            SREG_TYPE, \
-                                                                            VOID_TYPE\
-                                                                        )\
-                                                                    )\
-                                                                )\
-                                                            )\
-                                                        )\
-                                                    )\
-                                                )\
-                                            )\
-                                        )\
-                                    )\
-                                )\
-                            )\
-                        )\
-                    )\
-                )\
-            )\
-        )\
-    )
 
+#define MY_CTYPE_GET_TYPE_ID(type) MY_CTYPE_GET_TYPE_ID_IMPL(type)
+#define MY_CTYPE_GET_TYPE_ID_IMPL(type) MY_CTYPE_GET_TYPE_ID_ ## type
+
+#define MY_CTYPE_GET_TYPE_ID_uni    VOID_TYPE               // uni
+// unsigned type
+#define MY_CTYPE_GET_TYPE_ID_u8     UINT8_TYPE              // u8
+#define MY_CTYPE_GET_TYPE_ID_u16    UINT16_TYPE             // u16
+#define MY_CTYPE_GET_TYPE_ID_u32    UINT32_TYPE             // u32
+#define MY_CTYPE_GET_TYPE_ID_u64    UINT64_TYPE             // u64
+//signed type
+#define MY_CTYPE_GET_TYPE_ID_c8     CHAR_TYPE               // c8
+#define MY_CTYPE_GET_TYPE_ID_i8     INT8_TYPE               // i8
+#define MY_CTYPE_GET_TYPE_ID_i16    INT16_TYPE              // i16
+#define MY_CTYPE_GET_TYPE_ID_i32    INT32_TYPE              // i32
+#define MY_CTYPE_GET_TYPE_ID_i64    INT64_TYPE              // i64
+// floating point type
+#define MY_CTYPE_GET_TYPE_ID_f32    FLOAT_TYPE              // f32
+#define MY_CTYPE_GET_TYPE_ID_f64    DOUBLE_TYPE             // f64
+#define MY_CTYPE_GET_TYPE_ID_f128   LONG_DOUBLE_TYPE        // f128
+// other types
+#define MY_CTYPE_GET_TYPE_ID_b      BOOL_TYPE               //  b
+#define MY_CTYPE_GET_TYPE_ID_u24    UINT24_TYPE             // u24
+#define MY_CTYPE_GET_TYPE_ID_i24    INT24_TYPE              // i24
+#define MY_CTYPE_GET_TYPE_ID_reg    REG_TYPE                // reg
+#define MY_CTYPE_GET_TYPE_ID_sreg   SREG_TYPE               // sreg
 
 
 /* ***************************************************************************
@@ -104,62 +68,30 @@
  *
  */
 
-#define MY_CTYPE_GET_TYPE(id) MY_CTYPE_GET_TYPE_IMPL(id)
-#define MY_CTYPE_GET_TYPE_IMPL(id)\
-    PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, VOID_TYPE))( \
-        uni, \
-        PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, UINT8_TYPE))( \
-            u8, \
-            PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, UINT16_TYPE))( \
-                u16, \
-                PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, UINT24_TYPE))( \
-                    u24, \
-                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, UINT32_TYPE))( \
-                        u32, \
-                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, UINT64_TYPE))( \
-                            u64, \
-                            PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, CHAR_TYPE))( \
-                                c8, \
-                                PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, INT8_TYPE))( \
-                                    i8, \
-                                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, INT16_TYPE))( \
-                                        i16, \
-                                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, INT24_TYPE))( \
-                                            i24, \
-                                            PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, INT32_TYPE))( \
-                                                i32, \
-                                                PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, INT64_TYPE))( \
-                                                    i64, \
-                                                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, FLOAT_TYPE))( \
-                                                        f32, \
-                                                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, DOUBLE_TYPE))( \
-                                                            f64, \
-                                                            PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, LONG_DOUBLE_TYPE))( \
-                                                                f128, \
-                                                                PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, BOOL_TYPE))( \
-                                                                    b, \
-                                                                    PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, REG_TYPE))( \
-                                                                        reg, \
-                                                                        PREPROCESSOR_IF_ELSE(PREPROCESSOR_NAT_EQ(id, SREG_TYPE))( \
-                                                                            sreg, \
-                                                                            uni\
-                                                                        )\
-                                                                    )\
-                                                                )\
-                                                            )\
-                                                        )\
-                                                    )\
-                                                )\
-                                            )\
-                                        )\
-                                    )\
-                                )\
-                            )\
-                        )\
-                    )\
-                )\
-            )\
-        )\
-    )
+#define MY_CTYPE_GET_TYPE(typeId) MY_CTYPE_GET_TYPE_IMPL(typeId)
+#define MY_CTYPE_GET_TYPE_IMPL(typeId) MY_CTYPE_GET_TYPE_ ## typeId
+
+#define MY_CTYPE_GET_TYPE_0         uni                     // VOID_TYPE
+// unsigned type
+#define MY_CTYPE_GET_TYPE_1          u8                     // UINT8_TYPE
+#define MY_CTYPE_GET_TYPE_2         u16                     // UINT16_TYPE
+#define MY_CTYPE_GET_TYPE_3         u32                     // UINT32_TYPE
+#define MY_CTYPE_GET_TYPE_4         u64                     // UINT64_TYPE
+//signed type
+#define MY_CTYPE_GET_TYPE_5          c8                     // CHAR_TYPE
+#define MY_CTYPE_GET_TYPE_6          i8                     // INT8_TYPE
+#define MY_CTYPE_GET_TYPE_7         i16                     // INT16_TYPE
+#define MY_CTYPE_GET_TYPE_8         i32                     // INT32_TYPE
+#define MY_CTYPE_GET_TYPE_9         i64                     // INT64_TYPE
+// floating point type
+#define MY_CTYPE_GET_TYPE_10         f32                    // FLOAT_TYPE
+#define MY_CTYPE_GET_TYPE_11         f64                    // DOUBLE_TYPE
+#define MY_CTYPE_GET_TYPE_12        f128                    // LONG_DOUBLE_TYPE
+// other types
+#define MY_CTYPE_GET_TYPE_13          b                     // BOOL_TYPE
+#define MY_CTYPE_GET_TYPE_14         u24                    // UINT24_TYPE
+#define MY_CTYPE_GET_TYPE_15         i24                    // INT24_TYPE
+#define MY_CTYPE_GET_TYPE_16         reg                    // REG_TYPE
+#define MY_CTYPE_GET_TYPE_17        sreg                    // SREG_TYPE
 
 #endif // __MY_CTYPE_ID_H__

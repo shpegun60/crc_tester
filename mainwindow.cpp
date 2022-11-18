@@ -32,9 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
 //    //protocolAllTest(time(NULL), 100, (TESTER_RAW_P_IT));
 
 //    //__M_assert_test();
-//    M_Assert_disableExpr({
-//                             __M_DBG_FILE(stdout, "debug: %d", 123);
-//                         });
+    M_Assert_disableExpr({
+                             __M_DBG_FILE(stdout, "debug: %d", 123);
+                         });
 
 
     int i = 0;

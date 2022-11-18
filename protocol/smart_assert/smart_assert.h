@@ -56,7 +56,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
         if (Expr) {                                                                                                                     \
             beforeExpr;                                                                                                                 \
             __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                                                           \
-            afterExpr; /* ignored if NDEBUG because programm is break, but compiler not known it */                                     \
+            afterExpr; /* ignored because programm is break, but compiler not known it */                                               \
         }                                                                                                                               \
     }while(0L)
 
@@ -65,7 +65,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
         if (Expr) {                                                                                                                     \
             beforeExpr;                                                                                                                 \
             __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                                                           \
-            afterExpr; /* ignored if NDEBUG because programm is break, but compiler not known it */                                     \
+            afterExpr; /* ignored because programm is break, but compiler not known it */                                     \
         }                                                                                                                               \
     }while(0L)
 
@@ -75,7 +75,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
     do{                                                                                                                                 \
         if(Expr) {                                                                                                                      \
             trueExpr;                                                                                                                   \
-        } else {                                                                                                                        \
+        } else { /* ignored else expression if NDEBUG */                                                                                \
             falseBeforeExpr;                                                                                                            \
             __M_Error("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                      \
             falseAfterExpr;                                                                                                             \
@@ -86,7 +86,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
     do{                                                                                                                                 \
         if(Expr) {                                                                                                                      \
             trueExpr;                                                                                                                   \
-        } else {                                                                                                                        \
+        } else {  /* ignored else expression if NDEBUG */                                                                               \
             falseBeforeExpr;                                                                                                            \
             __M_Error("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                      \
             falseAfterExpr;                                                                                                             \
@@ -123,7 +123,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
     do{                                                                                                                                 \
         if(Expr) {                                                                                                                      \
             trueExpr;                                                                                                                   \
-        } else {                                                                                                                        \
+        } else { /* ignored else expression if NDEBUG */                                                                                \
             falseBeforeExpr;                                                                                                            \
             __M_Warning("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                    \
             falseAfterExpr;                                                                                                             \
@@ -134,7 +134,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
     do{                                                                                                                                 \
         if(Expr) {                                                                                                                      \
             trueExpr;                                                                                                                   \
-        } else {                                                                                                                        \
+        } else { /* ignored else expression if NDEBUG */                                                                                \
             falseBeforeExpr;                                                                                                            \
             __M_Warning("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                    \
             falseAfterExpr;                                                                                                             \
