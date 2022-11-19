@@ -7,18 +7,6 @@
 #include <stdlib.h>
 
 
-// declarating container nodes
-typedef struct {
-    TYPEOF_STRUCT(Entity, fields_count) fields_count;
-    EntityReadParent_t** fields;
-} EN_EntityReadNode_t;
-
-struct EN_BoardReadNode{
-    TYPEOF_STRUCT(EntityInfo, entities_count) entities_count;
-    EN_EntityReadNode_t* entities;
-};
-
-
 
 // new / init entity read pool container
 EntityReadPoolContainer_t* entityReadPoolContainer_newBoards(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count)

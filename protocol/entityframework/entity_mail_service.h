@@ -20,7 +20,7 @@
 
 
 typedef struct {
-    b               mailDis;
+    reg               mailDis;
     IntrusiveSList* lastStream;
     IntrusiveSList  head;
 } EntityMailService_t;

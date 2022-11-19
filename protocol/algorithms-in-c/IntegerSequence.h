@@ -27,6 +27,7 @@
 #define INTEGER_SEQUENCE_H
 
 #include "Vector.h"
+#include <stdio.h>
 
 VECTOR_DECL(sequence, int, IntegerSequence)
 #define sequence_entry(s, i) (s->element[i])

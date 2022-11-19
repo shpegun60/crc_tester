@@ -126,7 +126,7 @@ void EntityMailService_getStream(EntityMailService_t* self, u32 time, u8* output
 
         if((time - letter->lastUpdateTimeMs) > letter->updateTimeMs) {
             // read field to out buffer
-            u8 typeLen = getMYCTypeLen(entityInfo.entities[letter->entityNumber]->fields[letter->entityNumber].type);
+            reg typeLen = getMYCTypeLen(entityInfo.entities[letter->entityNumber]->fields[letter->entityNumber].type);
             void * data_ptr = (entityInfo.entities[letter->entityNumber]->pointer + entityInfo.entities[letter->entityNumber]->fields[letter->fieldNumber].shift);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > maxOutBufferSize), M_EMPTY, return, "EntityMailService_getStream: field read size more than buffer");

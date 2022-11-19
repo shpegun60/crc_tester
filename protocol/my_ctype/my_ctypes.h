@@ -123,7 +123,7 @@ typedef ptrdiff_t   sreg;   // platform depend type
 /************************************************************************************
  *  Extern array which contain`s size for all types
  */
-extern const u8 typeLengthMappingArray[TYPE_ARRAY_LENGTH];
+extern const reg typeLengthMappingArray[TYPE_ARRAY_LENGTH];
 
 
 /************************************************************************************
@@ -143,6 +143,9 @@ STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
     }
 }
 
+/************************************************************************************
+ *  Macro from linux
+ */
 STATIC_FORCEINLINE void MY_CTYPE_WRITE_ONCE_SIZE(volatile void *p, void *res, reg size)
 {
     switch (size) {
@@ -194,13 +197,13 @@ STATIC_FORCEINLINE void MY_CTYPE_REVCOPY_REGISTERS(volatile reg* from, volatile 
     MY_CTYPE_REG_CPY(to, rev);
 }
 
-STATIC_FORCEINLINE const u8* myCTypeGetTablePointer()
+STATIC_FORCEINLINE const reg* myCTypeGetTablePointer()
 {
     return &typeLengthMappingArray[VOID_TYPE];
 }
 
 
-STATIC_FORCEINLINE u8 getMYCTypeLen(u8 type)
+STATIC_FORCEINLINE reg getMYCTypeLen(reg type)
 {
     if(type < TYPE_ARRAY_LENGTH) {
         return typeLengthMappingArray[type];
@@ -211,16 +214,16 @@ STATIC_FORCEINLINE u8 getMYCTypeLen(u8 type)
 
 
 // copy types -------------------------------------------------
-void cTypeMemcpy(u8 type, u8* from, u8* to);
-void cTypeRevcpy(u8 type, u8* from, u8* to);
+void cTypeMemcpy(reg type, u8* from, u8* to);
+void cTypeRevcpy(reg type, u8* from, u8* to);
 
 // init data type ---------------------------------------
-void cTypePointerInit(u8* ptr, u8 type);
+void cTypePointerInit(reg type, u8* ptr);
 
 // init data sizeof ---------------------------------------
-void pointerInit(u8* ptr, reg n);
+void pointerInit(reg n, u8* ptr);
 // fill data sizeof ---------------------------------------
-void pointerFill(u8* ptr, u8 data, reg n);
+void pointerFill(reg n, u8* ptr, u8 data);
 
 // string compleate------------------------------------------
 int cTypeStrnCmp(reg n, const c8* str1, const c8* str2);

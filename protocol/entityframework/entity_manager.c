@@ -76,7 +76,7 @@ void deleteEntities(void)
     }
 
     free(entityInfo.entities);
-    pointerInit((u8*)&entityInfo, sizeof(entityInfo));
+    pointerInit(sizeof(entityInfo), (u8*)&entityInfo);
 }
 
 
@@ -211,7 +211,7 @@ int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField,
                                     }
 
                                     if(field_ptr) {
-                                        cTypePointerInit((u8 *)field_ptr, type);
+                                        cTypePointerInit(type, (u8 *)field_ptr);
                                     }
 
                                     ++(*fieldNumber);
@@ -251,7 +251,7 @@ int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityF
                                     }
 
                                     if(field_ptr) {
-                                        pointerInit(field_ptr, (arrayLen * getMYCTypeLen(type)));
+                                        pointerInit((arrayLen * getMYCTypeLen(type)), field_ptr);
                                     }
                                     return ENTITY_OK;
 
@@ -340,7 +340,7 @@ int initFieldCallback(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(Enti
                                     }
 
                                     if(field_ptr) {
-                                        cTypePointerInit((u8 *)field_ptr, type);
+                                        cTypePointerInit(type, (u8 *)field_ptr);
                                     }
 
                                     ++(*fieldNumber);

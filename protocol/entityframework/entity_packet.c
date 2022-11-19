@@ -201,7 +201,7 @@ int readFieldValue(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEO
         outputData[pos++] = ENTITY_OK;
         outputData[pos++] = entityInfo.entities[entityNumber]->fields[fieldNumber].type;    /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
-        u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
+        reg typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
         ENTITY_DBG_ASSERT_BUF(((pos + typeLen) > maxOutBufferSize), M_EMPTY, {
                                   outputData[0] = ENTITY_ERROR;
@@ -272,7 +272,7 @@ int readSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOut
 
         if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
 
-            u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
+            reg typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, {
                                       outputData[0] = ENTITY_ERROR;
@@ -323,7 +323,7 @@ int setFieldValue(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF
     if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count) && ((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_READ_ONLY_MSK) == 0)) {
         void* ptr = (entityInfo.entities[entityNumber]->pointer + entityInfo.entities[entityNumber]->fields[fieldNumber].shift);
 
-        u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
+        reg typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
         if(typeLen > inputBufferSize) {
             return ENTITY_ERROR;
@@ -382,7 +382,7 @@ int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutB
 #endif /* (MAX_NUBER_OF_FIELDS < 256U) */
 
         if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
-            u8 typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
+            reg typeLen = getMYCTypeLen(entityInfo.entities[entityNumber]->fields[fieldNumber].type);
 
             ENTITY_DBG_ASSERT_BUF(((Rpos + typeLen) > (*size)), M_EMPTY, {
                                       Wpos = 0;
