@@ -17,8 +17,8 @@
 #define D_RAW_P_RX_BUF_SIZE 512U // rx buffer must be is power of 2, else error
 #define D_RAW_P_TX_BUF_SIZE 512U // tx buffer must be is power of 2, else error
 
-#define D_RAW_P_DISABLE_INTERNAL_RX_BUFFER 1
-#define D_RAW_P_DISABLE_INTERNAL_TX_BUFFER 1
+//#define D_RAW_P_DISABLE_INTERNAL_RX_BUFFER 1
+//#define D_RAW_P_DISABLE_INTERNAL_TX_BUFFER 1
 
 /*
 ***************************************************************************************************

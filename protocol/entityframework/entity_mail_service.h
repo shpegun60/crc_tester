@@ -28,19 +28,18 @@ typedef struct {
 
 EntityMailService_t* entityMailService_new(void);
 
-int entityMailService_init(EntityMailService_t* self);
+int entityMailService_init(EntityMailService_t* const self);
 
-int EntityMailService_subscribe(EntityMailService_t* self,
-                                TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
-                                TYPEOF_STRUCT(Entity, fields_count)         fieldNumber, u32 updateTimeMs, u32 time);
+int EntityMailService_subscribe(EntityMailService_t* const self,
+                                const TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
+                                const TYPEOF_STRUCT(Entity, fields_count)         fieldNumber, u32 updateTimeMs, u32 time);
 
-int EntityMailService_unsubscribe(EntityMailService_t* self,
-                                  TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
-                                  TYPEOF_STRUCT(Entity, fields_count)         fieldNumber);
+int EntityMailService_unsubscribe(EntityMailService_t* const self,
+                                  const TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
+                                  const TYPEOF_STRUCT(Entity, fields_count)         fieldNumber);
 
-void EntityMailService_getStream(EntityMailService_t* self, u32 time, u8* outputBuffer, reg * size, reg maxOutBufferSize);
-
-
+void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
+                                 u8* const outputBuffer, reg* const size, const reg maxOutBufferSize);
 #if ENTITY_MAIL_MTU > 255
 #error ENTITY_MAIL_MTU must be less than 255
 #endif /* ENTITY_MAIL_MTU > 255 */

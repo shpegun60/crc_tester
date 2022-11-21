@@ -121,7 +121,7 @@ extern EntityInfo entityInfo;  // global variable entities for user projects (ad
  */
 
 // getter entity pointer by entity number
-STATIC_FORCEINLINE Entity * getEntityPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
+STATIC_FORCEINLINE Entity * getEntityPointer(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
 {
     if(entityNumber < entityInfo.entities_count) {
         return entityInfo.entities[entityNumber];
@@ -130,16 +130,18 @@ STATIC_FORCEINLINE Entity * getEntityPointer(TYPEOF_STRUCT(EntityInfo, entities_
 }
 
 // getter field value pointer by entity number and field number
-STATIC_FORCEINLINE EntityField * getFieldPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+STATIC_FORCEINLINE EntityField * getFieldPointer(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
-    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
-        return &entityInfo.entities[entityNumber]->fields[fieldNumber];
+    const Entity* const entity = entityInfo.entities[entityNumber];
+
+    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count)) {
+        return &entity->fields[fieldNumber];
     }
     return NULLPTR(EntityField*);
 }
 
 // getter data pointer by entity number
-STATIC_FORCEINLINE void * getVoidPointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
+STATIC_FORCEINLINE void * getVoidPointer(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber)
 {
     if(entityNumber < entityInfo.entities_count) {
         return entityInfo.entities[entityNumber]->pointer;
@@ -148,16 +150,19 @@ STATIC_FORCEINLINE void * getVoidPointer(TYPEOF_STRUCT(EntityInfo, entities_coun
 }
 
 // getter field value pointer by entity number and field number
-STATIC_FORCEINLINE void * getFieldValuePointer(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+STATIC_FORCEINLINE void * getFieldValuePointer(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
-    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
-        return (UINT8_TYPE_DC(entityInfo.entities[entityNumber]->pointer) + entityInfo.entities[entityNumber]->fields[fieldNumber].shift);
+    const Entity*       const entity    = entityInfo.entities[entityNumber];
+    const EntityField*  const field     = &entityInfo.entities[entityNumber]->fields[fieldNumber];
+
+    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count)) {
+        return (UINT8_TYPE_DC(entity->pointer) + field->shift);
     }
     return NULL;
 }
 
 // check if entity is exists
-STATIC_FORCEINLINE int entityPositionIsExists(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+STATIC_FORCEINLINE int entityPositionIsExists(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
     if((entityNumber < entityInfo.entities_count) && (fieldNumber < entityInfo.entities[entityNumber]->fields_count)) {
         return ENTITY_OK;
@@ -173,7 +178,7 @@ STATIC_FORCEINLINE int entityPositionIsExists(TYPEOF_STRUCT(EntityInfo, entities
  */
 
 /// delete some entity for external using
-void deleteEntitityFieldsExternal(reg entityNumber);
+void deleteEntitityFieldsExternal(const reg entityNumber);
 
 /// delete all entities and deallocation all memory
 void deleteEntities(void);
@@ -182,7 +187,7 @@ void deleteEntities(void);
 int newEntities(reg numberOfEntities);
 
 /// allocation entitites pointer & fields
-int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char descr[ENTITY_DESCRIPTION_SIZE], b isCustomSpace, b isHeap, void* arg);
+int initEntity(reg* const entityNumber, const reg NumberOfFields, const reg pointerSize, const char descr[ENTITY_DESCRIPTION_SIZE], const b isCustomSpace, const b isHeap, void* arg);
 
 /*
  * **********************************************************************************************************************************
@@ -191,22 +196,22 @@ int initEntity(reg* entityNumber, reg NumberOfFields, reg pointerSize, char desc
  */
 
 /// init field by Entity pointer and field-number
-int initField(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr);
+int initField(Entity* const entityInst, reg* const fieldNumber, const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, const TYPEOF_STRUCT(EntityField, shift) shift, const TYPEOF_STRUCT(EntityField, type) type, const char descr[ENTITY_DESCRIPTION_SIZE], void* const field_ptr);
 
 /// init field by Entity number and field-number
-STATIC_FORCEINLINE int initFieldPos(reg entityNumber, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr)
+STATIC_FORCEINLINE int initFieldPos(const reg entityNumber, reg* const fieldNumber, const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, const TYPEOF_STRUCT(EntityField, shift) shift, const TYPEOF_STRUCT(EntityField, type) type, const char descr[ENTITY_DESCRIPTION_SIZE], void* const field_ptr)
 {
     return initField(getEntityPointer(entityNumber), fieldNumber, bitFlags, shift, type, descr, field_ptr);
 }
 
 /// init field-array
-int initFieldArray(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, int arrayLen, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr, int startNum);
+int initFieldArray(Entity* const entityInst, reg* const fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, const TYPEOF_STRUCT(EntityField, type) type, const int arrayLen, const char descr[ENTITY_DESCRIPTION_SIZE], void* const field_ptr, const int startNum);
 
 ///init existing field by pointer
-int initFieldFromPtr(EntityField * fieldInst, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE]);
+int initFieldFromPtr(EntityField* const fieldInst, const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, const TYPEOF_STRUCT(EntityField, shift) shift, const TYPEOF_STRUCT(EntityField, type) type, const char descr[ENTITY_DESCRIPTION_SIZE]);
 
 /// rename field by field number
-int fieldRename(Entity * entityInst, reg fieldNumber, char descr[ENTITY_DESCRIPTION_SIZE]);
+int fieldRename(Entity* const entityInst, const reg fieldNumber, const char descr[ENTITY_DESCRIPTION_SIZE]);
 
 /*
  * ****************************************************************************************************
@@ -217,16 +222,16 @@ int fieldRename(Entity * entityInst, reg fieldNumber, char descr[ENTITY_DESCRIPT
 #ifdef USE_ENTITY_CALLBACKS
 
 /// init field with callbacks by field-number
-int initFieldCallback(Entity * entityInst, reg * fieldNumber, TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, TYPEOF_STRUCT(EntityField, shift) shift, TYPEOF_STRUCT(EntityField, type) type, char descr[ENTITY_DESCRIPTION_SIZE], void * field_ptr,
-                      TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
+int initFieldCallback(Entity* const  entityInst, reg* const fieldNumber, const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, const TYPEOF_STRUCT(EntityField, shift) shift, const TYPEOF_STRUCT(EntityField, type) type, const char descr[ENTITY_DESCRIPTION_SIZE], void* const field_ptr,
+                      const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) readContext, const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 /// init callback function by fieldNumber
-int entityInitCallback(Entity * entityInst, reg filedNumber,
-                       TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
+int entityInitCallback(Entity* const entityInst, const reg filedNumber,
+                       const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) readContext, const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 /// init callback function by description
-int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SIZE],
-                     TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, TYPEOF_STRUCT(entityCallbackContainer, context) readContext, TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
+int entityInitCallback_txt(Entity* const entityInst, const char descr[ENTITY_DESCRIPTION_SIZE],
+                           const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) readContext, const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) writeContext);
 
 #endif /* USE_ENTITY_CALLBACKS */
 
@@ -238,7 +243,7 @@ int entityInitCallback_txt(Entity * entityInst, char descr[ENTITY_DESCRIPTION_SI
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (*predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, void* context), void* context);
+int foreachEntities(int (*predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, void* ctx), void* ctx);
 
 /// string compleate for entities---------------------------------------------------------------------------------------------------
 STATIC_FORCEINLINE int entityDescrNotCompleate(const c8* str1, const c8* str2)
@@ -272,7 +277,7 @@ STATIC_FORCEINLINE int entityDescrNotCompleate(const c8* str1, const c8* str2)
  *  user Ready functions
  * **********************************************************************************************************************************
  */
-void setEntityReadyState(b state);
+void setEntityReadyState(const b state);
 
 #endif /* USE_ENTITY_PING */
 

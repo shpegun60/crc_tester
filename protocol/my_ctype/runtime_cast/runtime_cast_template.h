@@ -5,8 +5,8 @@
 #   define T int
 #endif /* T */
 
-T TEMPLATE(readRuntimeCast, T)(void* data, u8 type);
-int TEMPLATE(writeRuntimeCast, T)(void* data, u8 type, T value);
+T TEMPLATE(readRuntimeCast, T)(const void* const data, const reg type, reg* const ok);
+reg TEMPLATE(writeRuntimeCast, T)(void* const data, const reg type, const T value);
 
 
 #undef T

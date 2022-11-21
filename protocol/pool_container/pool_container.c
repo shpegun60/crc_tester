@@ -102,10 +102,11 @@ int poolContainer_writeArr(pool_container_t * const self, u8 * const data, const
     M_Assert_BreakSaveCheck((len > self->columns), M_EMPTY, return 0, "poolContainer_writeArr: len more than buffer");
     M_Assert_WarningSaveCheck(POOL_CONTAINER_IS_FULL(self), M_EMPTY, return 0, "poolContainer_writeArr: buffer is full!!!");
 
-    reg wr_pos = self->wr_raw & (self->rows - 1);
+    const reg wr_pos = self->wr_raw & (self->rows - 1);
+    u8* const buffer_raw = self->pool[wr_pos];
 
-    for(int i = 0; i < len; ++i) {
-        self->pool[wr_pos][i] = data[i];
+    for(reg i = 0; i != len; ++i) {
+        buffer_raw[i] = data[i];
     }
     self->size[wr_pos] = len;
 
@@ -121,7 +122,7 @@ void poolContainer_getWriteMeta(pool_container_t * const self, u8 ** const data,
     M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return, "poolContainer_writeArr: incorrect input values");
     M_Assert_Break((self->pool == NULL || self->size == NULL || self->pool[self->wr_raw & (self->rows - 1)] == NULL), M_EMPTY, return, "poolContainer_writeArr: no allocated memory");
 
-    reg wr_pos = self->wr_raw & (self->rows - 1);
+    const reg wr_pos = self->wr_raw & (self->rows - 1);
     (*data) = &self->pool[wr_pos][0];
     (*size) = &self->size[wr_pos];
 }
@@ -143,7 +144,7 @@ u16 poolContainer_readArr(pool_container_t * const self, u8 ** const data)
     M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return 0, "poolContainer_readArr: incorrect input values");
     M_Assert_Break((self->pool == NULL || self->size == NULL || self->pool[self->rd_raw & (self->rows - 1)] == NULL), M_EMPTY, return 0, "poolContainer_readArr: no allocated memory");
 
-    reg rd_pos = self->rd_raw & (self->rows - 1);
+    const reg rd_pos = self->rd_raw & (self->rows - 1);
     (*data) = &self->pool[rd_pos][0];
     return self->size[rd_pos];
 }

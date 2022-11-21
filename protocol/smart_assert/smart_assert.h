@@ -65,7 +65,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
         if (Expr) {                                                                                                                     \
             beforeExpr;                                                                                                                 \
             __M_Error((#Expr), (Expr), (__FILE__), (__LINE__), (Msg), ##arg);                                                           \
-            afterExpr; /* ignored because programm is break, but compiler not known it */                                     \
+            afterExpr; /* ignored because programm is break, but compiler not known it */                                               \
         }                                                                                                                               \
     }while(0L)
 

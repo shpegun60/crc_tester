@@ -294,8 +294,7 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 #ifdef D_RAW_P_CRC_ENA
 
     M_Assert_WarningSaveCheck((self->RX.size < (sizeof(rawP_crc_t) + 1U)), M_EMPTY, {
-                                  self->RX.size = 0U;
-                                  return &self->RX;
+                                  goto error;
                               }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + crc size, rx len-->&d, need len-->%d", self->RX.size, (sizeof(rawP_crc_t) + 1U));
 
     reg m_sizeWithoutCRC = (self->RX.size - sizeof(rawP_crc_t));
@@ -326,26 +325,22 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 #if defined(D_RAW_P_USE_CRC8)
     rawP_crc_t m_receiveCrc = self->RX.data[m_sizeWithoutCRC];
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
-                                  self->RX.size = 0U;
-                                  return &self->RX;
+                                  goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC8, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC16)
     rawP_crc_t m_receiveCrc = LittleEndianU16( *UINT16_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
-                                  self->RX.size = 0U;
-                                  return &self->RX;
+                                  goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC16, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC32)
     rawP_crc_t m_receiveCrc = LittleEndianU32( *UINT32_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
-                                  self->RX.size = 0U;
-                                  return &self->RX;
+                                  goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC32, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC64)
     rawP_crc_t m_receiveCrc = LittleEndianU64( *UINT64_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
-                                  self->RX.size = 0U;
-                                  return &self->RX;
+                                  goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC64, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #endif /* byte order selection */
 
@@ -357,8 +352,7 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     M_Assert_WarningSaveCheck((self->RX.size < (RSCODE_NPAR + 1U)), M_EMPTY, {
-                                  self->RX.size = 0U;
-                                  return &self->RX;
+                                  goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
 
     /* Now decode -- encoded codeword size must be passed */
@@ -367,6 +361,12 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
     return &self->RX;
+
+
+    // error handling -----------------------------------------------------
+    error:
+        self->RX.size = 0U;
+        return &self->RX;
 }
 
 

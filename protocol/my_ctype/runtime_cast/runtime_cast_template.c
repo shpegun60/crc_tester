@@ -8,10 +8,11 @@
 #endif /* T */
 
 // read from (void *) to some type
-T TEMPLATE(readRuntimeCast, T)(void* data, u8 type)
+T TEMPLATE(readRuntimeCast, T)(const void* const data, const reg type, reg* const ok)
 {
 
     T value;
+    (*ok) = 1;
 
     switch(type) {
 
@@ -89,6 +90,7 @@ T TEMPLATE(readRuntimeCast, T)(void* data, u8 type)
 
     default:
         value = (T)(0);
+        (*ok) = 0;
         break;
     }
 
@@ -96,9 +98,10 @@ T TEMPLATE(readRuntimeCast, T)(void* data, u8 type)
 }
 
 // write from some type to (void *)
-int TEMPLATE(writeRuntimeCast, T)(void* data, u8 type, T value)
+reg TEMPLATE(writeRuntimeCast, T)(void* const data, const reg type, const T value)
 {
-    int ok = 1;
+
+    reg ok = 1;
 
     switch(type) {
 

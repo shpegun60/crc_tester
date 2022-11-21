@@ -23,35 +23,33 @@ b entities_ping(void);
 
 #endif /* USE_ENTITY_PING */
 
-int readEntitiesSizes(u8 *outputData, reg *size, reg maxOutBufferSize);
-int readEntitiesDescriptions(TYPEOF_STRUCT(EntityInfo, entities_count) startEntityNumber, TYPEOF_STRUCT(EntityInfo, entities_count) len, u8 *outputData, reg *size, reg maxOutBufferSize);
-int readEntityFields(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) startFieldNumber, TYPEOF_STRUCT(Entity, fields_count) len, u8 *outputData, reg *size, reg maxOutBufferSize);
-
+int readEntitiesSizes(u8* const outputData, reg* const size, const reg maxOutBufferSize);
+int readEntitiesDescriptions(const TYPEOF_STRUCT(EntityInfo, entities_count) startEntityNumber, TYPEOF_STRUCT(EntityInfo, entities_count) len, u8* const outputData, reg* const size, const reg maxOutBufferSize);
+int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) startFieldNumber, TYPEOF_STRUCT(Entity, fields_count) len, u8* const outputData, reg* const size, const reg maxOutBufferSize);
 
 /* ******************************************************************************************************************
  * READ one field value
  *
  */
-int readFieldValue(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber, u8 *outputData, reg *size, reg maxOutBufferSize);
+int readFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber, u8* const outputData, reg* const size, const reg maxOutBufferSize);
 
 /* ******************************************************************************************************************
  * READ several fields values
  *
  */
-int readSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutBufferSize);
+int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const size, const reg maxOutBufferSize);
 
 /* ******************************************************************************************************************
  * WRITE one field value
  *
  */
-int setFieldValue(TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber, u8* inputData, reg inputBufferSize);
-
+int setFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber, u8* const inputData, const reg inputBufferSize);
 
 /* ******************************************************************************************************************
  * WRITE several fields values
  *
  */
-int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutBufferSize);
+int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const size, const reg maxOutBufferSize);
 
 
 
@@ -59,7 +57,7 @@ int setSeveralFieldsValues(u8 *inputData, u8 *outputData, reg *size, reg maxOutB
  * Help functions for read and wrire entity if exists pointer to data, len and bit flags
  *
  */
-STATIC_FORCEINLINE void proceedReadEntity(TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* ptr, u8* outputData, u8 typeLen)
+STATIC_FORCEINLINE void proceedReadEntity(const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, const void* const ptr, u8* const outputData, const reg typeLen)
 {
 
 #ifdef USE_ENTITY_ATOMIC
@@ -117,7 +115,7 @@ STATIC_FORCEINLINE void proceedReadEntity(TYPEOF_STRUCT(EntityField, bitFlags) b
 
 }
 
-STATIC_FORCEINLINE void proceedWriteEntity(TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* ptr, u8* inputData, u8 typeLen)
+STATIC_FORCEINLINE void proceedWriteEntity(const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* const ptr, u8* const inputData, const reg typeLen)
 {
 #ifdef USE_ENTITY_ATOMIC
     ATOMIC_BLOCK_RESTORATE_COND((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_ATOMIC_MSK), {

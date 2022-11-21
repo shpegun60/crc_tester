@@ -9,7 +9,7 @@
 
 
 // new / init entity read pool container
-EntityReadPoolContainer_t* entityReadPoolContainer_newBoards(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count)
+EntityReadPoolContainer_t* entityReadPoolContainer_newBoards(const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count)
 {
     M_Assert_BreakSaveCheck((boards_count == 0), M_EMPTY, return NULL, "entityreadPool_new: No valid input");
     EntityReadPoolContainer_t * m = calloc(1, sizeof(EntityReadPoolContainer_t));
@@ -20,8 +20,8 @@ EntityReadPoolContainer_t* entityReadPoolContainer_newBoards(TYPEOF_STRUCT(Entit
     return m;
 }
 
-int entityReadPoolContainer_initBoards(EntityReadPoolContainer_t* self,
-                                       TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count)
+int entityReadPoolContainer_initBoards(EntityReadPoolContainer_t* const self,
+                                       const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count)
 {
     M_Assert_BreakSaveCheck((self == NULL || boards_count == 0), M_EMPTY, return ENTITY_ERROR, "entityReadPoolContainer_initBoards: No valid input");
 
@@ -33,41 +33,36 @@ int entityReadPoolContainer_initBoards(EntityReadPoolContainer_t* self,
     return ENTITY_OK;
 }
 
-int entityReadPoolContainer_initBoard(EntityReadPoolContainer_t* self,
-                                      TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)* boardNumber, TYPEOF_STRUCT(EntityInfo, entities_count) entities_count, TYPEOF_STRUCT(Entity, fields_count)* fieldCountList, reg fieldCountListSize)
+int entityReadPoolContainer_initBoard(EntityReadPoolContainer_t* const self,
+                                      TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)* const boardNumber, const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count, TYPEOF_STRUCT(Entity, fields_count)* const fieldCountList, const reg fieldCountListSize)
 {
     M_Assert_BreakSaveCheck((self == NULL || boardNumber == NULL || entities_count == 0 || entities_count > MAX_NUBER_OF_ENTITIES
                              || fieldCountList == NULL || fieldCountListSize < entities_count), M_EMPTY, {
-                                entityReadPoolContainer_delete(self);
-                                return ENTITY_ERROR;
+                                goto error;
                             }, "entityReadPoolContainer_initBoard: No valid input");
 
     M_Assert_BreakSaveCheck((self->boards_count == 0 || self->boards == NULL), M_EMPTY, {
-                                entityReadPoolContainer_delete(self);
-                                return ENTITY_ERROR;
+                                goto error;
                             }, "entityReadPoolContainer_initBoard: invoke /entityReadPoolContainer_initBoards/ function before");
 
     M_Assert_BreakElseSaveCheck((self->boards_count > (*boardNumber)), {
 
                                     self->boards[(*boardNumber)].entities = calloc(entities_count, sizeof(EN_EntityReadNode_t));
                                     M_Assert_BreakSaveCheck((self->boards[(*boardNumber)].entities == NULL), M_EMPTY, {
-                                        entityReadPoolContainer_delete(self);
-                                        return ENTITY_ERROR;
+                                        goto error;
                                     }, "entityReadPoolContainer_initBoard: No memory for allocation");
 
                                     self->boards[(*boardNumber)].entities_count = entities_count;
 
                                     for(TYPEOF_STRUCT(EntityInfo, entities_count) i = 0; i < entities_count; ++i) {
                                         M_Assert_BreakSaveCheck((fieldCountList[i] > MAX_NUBER_OF_FIELDS), M_EMPTY, {
-                                            entityReadPoolContainer_delete(self);
-                                            return ENTITY_ERROR;
+                                            goto error;
                                         }, "entityReadPoolContainer_initBoard: field count more than maximum fields number");
 
                                         self->boards[(*boardNumber)].entities[i].fields = calloc(fieldCountList[i], sizeof(EntityReadParent_t*));
 
                                         M_Assert_BreakSaveCheck((self->boards[(*boardNumber)].entities[i].fields == NULL), M_EMPTY, {
-                                            entityReadPoolContainer_delete(self);
-                                            return ENTITY_ERROR;
+                                            goto error;
                                         }, "entityReadPoolContainer_initBoard: No memory for allocation");
                                         self->boards[(*boardNumber)].entities[i].fields_count = fieldCountList[i];
                                     }
@@ -78,7 +73,9 @@ int entityReadPoolContainer_initBoard(EntityReadPoolContainer_t* self,
 
                                 }, M_EMPTY, M_EMPTY, "entityReadPoolContainer_initBoard: too long board number: %d, allocated: %d", (*boardNumber), self->boards_count);
 
-    return ENTITY_ERROR;
+    error:
+        entityReadPoolContainer_delete(self);
+        return ENTITY_ERROR;
 }
 
 
@@ -103,17 +100,27 @@ int entityReadPoolContainer_delete(EntityReadPoolContainer_t* self)
     return ENTITY_OK;
 }
 
-int entityReadPoolContainer_push(EntityReadPoolContainer_t* self, EntityReadParent_t* parent)
+int entityReadPoolContainer_push(EntityReadPoolContainer_t* const self, EntityReadParent_t* const parent)
 {
     M_Assert_BreakSaveCheck((self == NULL || parent == NULL), M_EMPTY, return ENTITY_ERROR, "entityReadPoolContainer_push: no valid input object");
 
-    M_Assert_BreakElseSaveCheck((parent->boardNumber < self->boards_count), {
+    // move to cash all values --------------------------------------------------------------------------------
+    const   EN_BoardReadNode_t*   const     board            = &self->boards[parent->boardNumber];
+    const   EN_EntityReadNode_t*  const     entity           = &board->entities[parent->entityNumber];
+    EntityReadParent_t** const              field            = &entity->fields[parent->fieldNumber];
 
-                                    M_Assert_BreakElseSaveCheck((parent->entityNumber < self->boards[parent->boardNumber].entities_count), {
+    const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)    boards_count    = (self)->boards_count;
+    const TYPEOF_STRUCT(EntityInfo, entities_count)                 entities_count  = board->entities_count;
+    const TYPEOF_STRUCT(Entity, fields_count)                       fields_count    = entity->fields_count;
 
-                                        M_Assert_BreakElseSaveCheck((parent->fieldNumber < self->boards[parent->boardNumber].entities[parent->entityNumber].fields_count), {
+    // do logic --------------------------------------------------------------------------------
+    M_Assert_BreakElseSaveCheck((parent->boardNumber < boards_count), {
 
-                                            self->boards[parent->boardNumber].entities[parent->entityNumber].fields[parent->fieldNumber] = parent;
+                                    M_Assert_BreakElseSaveCheck((parent->entityNumber < entities_count), {
+
+                                        M_Assert_BreakElseSaveCheck((parent->fieldNumber < fields_count), {
+
+                                            *field = parent;
                                             return ENTITY_OK;
 
                                         }, M_EMPTY, M_EMPTY, "entityReadPoolContainer_push: no valid input fieldNumber: %d", parent->fieldNumber);
@@ -125,33 +132,51 @@ int entityReadPoolContainer_push(EntityReadPoolContainer_t* self, EntityReadPare
     return ENTITY_ERROR;
 }
 
-EntityReadParent_t* entityReadPoolContainer_getParent(EntityReadPoolContainer_t* self,
-                                                      TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boardNumber, TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+EntityReadParent_t* entityReadPoolContainer_getParent(EntityReadPoolContainer_t* const self,
+                                                      const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boardNumber, const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return NULL, "entityReadPoolContainer_getParent: no valid input object");
 
-    if(boardNumber < self->boards_count) {
-        if(entityNumber < self->boards[boardNumber].entities_count) {
-            if(fieldNumber < self->boards[boardNumber].entities[entityNumber].fields_count) {
-                return self->boards[boardNumber].entities[entityNumber].fields[fieldNumber];
-            }
-        }
+    // move to cash all values --------------------------------------------------------------------------------
+    const   EN_BoardReadNode_t*   const     board             = &self->boards[boardNumber];
+    const   EN_EntityReadNode_t*  const     entity            = &board->entities[entityNumber];
+    EntityReadParent_t*   const             field             = entity->fields[fieldNumber];
+
+    const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)    boards_count    = (self)->boards_count;
+    const TYPEOF_STRUCT(EntityInfo, entities_count)                 entities_count  = board->entities_count;
+    const TYPEOF_STRUCT(Entity, fields_count)                       fields_count    = entity->fields_count;
+
+    // do logic -----------------------------------------------------------------------------------------------
+    if((boardNumber < boards_count) && (entityNumber < entities_count) && (fieldNumber < fields_count)) {
+        return field;
     }
 
     return NULL;
 }
 
-void entityReadPool_foreach(EntityReadPoolContainer_t* self, int (* predicate)(EntityReadParent_t* self, void* ctx), void* ctx)
+void entityReadPool_foreach(EntityReadPoolContainer_t* const self, int (* const predicate)(EntityReadParent_t* field, void* ctx), void* const ctx)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "entityReadPool_foreach: no valid input object");
     M_Assert_BreakSaveCheck((predicate == NULL), M_EMPTY, return, "entityReadPool_foreach: no valid input predicate");
 
-    for(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) board = 0; board < (self)->boards_count; ++board) {                                 // board`s counting
-        for(TYPEOF_STRUCT(EntityInfo, entities_count) entity = 0; entity < (self)->boards[board].entities_count; ++entity) {                       // entities counting
-            for(TYPEOF_STRUCT(Entity, fields_count) field = 0; field < (self)->boards[board].entities[entity].fields_count; ++field) {             // field`s counting
+    const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count = (self)->boards_count;
 
-                if((self)->boards[board].entities[entity].fields[field] != NULL) {
-                    predicate((self)->boards[board].entities[entity].fields[field], ctx);
+    for(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) board = 0; board != boards_count; ++board) {                     // board`s counting
+        const   EN_BoardReadNode_t*   const   board_ptr                 = &self->boards[board];         // move to cash
+        const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count  = board_ptr->entities_count;    // move to cash
+
+        for(TYPEOF_STRUCT(EntityInfo, entities_count) entity = 0; entity != entities_count; ++entity) {                         // entities counting
+            const   EN_EntityReadNode_t*  const   entity_ptr            = &board_ptr->entities[entity]; // move to cash
+            const TYPEOF_STRUCT(Entity, fields_count) fields_count      = entity_ptr->fields_count;     // move to cash
+
+            for(TYPEOF_STRUCT(Entity, fields_count) field = 0; field != fields_count; ++field) {                                // field`s counting
+
+                EntityReadParent_t* const field_ptr = entity_ptr->fields[field];                        // move to cash
+
+                if(field_ptr != NULL) {
+                    if(predicate(field_ptr, ctx)) {
+                        return;
+                    }
                 }
 
             }

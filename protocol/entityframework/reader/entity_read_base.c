@@ -33,10 +33,14 @@ int ENTITY_READ_PARENT_SET_FUNC(sreg) (EntityReadParent_t * const self, u8* inpu
 
     ENTITY_BYTE_CPY(self->size, input, self->data);
     // copy sign
-    u8 sign = (input[self->size - 1] & 0x80U);
-    for(reg i = self->size; i < sizeof(i64); ++i) {
-        ((u8*)(self->data))[i] = sign ? 0xFFU : 0x00U;
+    u64 sign = (input[self->size - 1] & 0x80U) ? 0 : UINT64_MAX;
+
+    reg i = self->size;
+    while(i != sizeof(i64)) {
+       ((u8*)(self->data))[i] = ((u8*)(&sign))[i];
+        ++i;
     }
+
     return ENTITY_OK;
 }
 
@@ -48,8 +52,11 @@ int ENTITY_READ_PARENT_SET_FUNC(reg)(EntityReadParent_t * const self, u8* input,
     }
 
     ENTITY_BYTE_CPY(self->size, input, self->data);
-    for(reg i = self->size; i < sizeof(u64); ++i) {
-        ((u8*)(self->data))[i] = 0x00U;
+    // other fill to 0
+    reg i = self->size;
+    while(i != sizeof(i64)) {
+       ((u8*)(self->data))[i] = 0x00U;
+        ++i;
     }
     return ENTITY_OK;
 }

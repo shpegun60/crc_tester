@@ -30,7 +30,7 @@ EntityMailService_t* entityMailService_new(void)
     return m;
 }
 
-int entityMailService_init(EntityMailService_t* self)
+int entityMailService_init(EntityMailService_t* const self)
 {
     M_Assert_BreakSaveCheck(self == NULLPTR(EntityMailService_t*), M_EMPTY, return ENTITY_ERROR, "entityMailService_init: no valid input object");
 
@@ -41,9 +41,9 @@ int entityMailService_init(EntityMailService_t* self)
     return ENTITY_OK;
 }
 
-static IntrusiveSListNode *find_TheSameLetter(IntrusiveSList * head,
-                                              TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber,
-                                              TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
+static IntrusiveSListNode *find_TheSameLetter(IntrusiveSList* const head,
+                                              const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber,
+                                              const TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
     islist_for_each(position, head) {
         EntityMailNode_t *letter = islist_entry_of_position(position, EntityMailNode_t, link);
@@ -54,9 +54,9 @@ static IntrusiveSListNode *find_TheSameLetter(IntrusiveSList * head,
     return NULLPTR(IntrusiveSListNode*);
 }
 
-int EntityMailService_subscribe(EntityMailService_t* self,
-                                TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
-                                TYPEOF_STRUCT(Entity, fields_count)         fieldNumber, u32 updateTimeMs, u32 time)
+int EntityMailService_subscribe(EntityMailService_t* const self,
+                                const TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
+                                const TYPEOF_STRUCT(Entity, fields_count)         fieldNumber, u32 updateTimeMs, u32 time)
 {
     M_Assert_Break(self == NULLPTR(EntityMailService_t*), M_EMPTY, return ENTITY_ERROR, "EntityMailService_subscribe: no valid input object");
     M_Assert_WarningSaveCheck(entityPositionIsExists(entityNumber, fieldNumber) != ENTITY_OK, M_EMPTY, return ENTITY_ERROR, "EntityMailService_subscribe: subscribing entity is not exists, entity: %d, field: %d", entityNumber, fieldNumber);
@@ -88,9 +88,9 @@ int EntityMailService_subscribe(EntityMailService_t* self,
     return ENTITY_OK;
 }
 
-int EntityMailService_unsubscribe(EntityMailService_t* self,
-                                  TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
-                                  TYPEOF_STRUCT(Entity, fields_count)         fieldNumber)
+int EntityMailService_unsubscribe(EntityMailService_t* const self,
+                                  const TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber,
+                                  const TYPEOF_STRUCT(Entity, fields_count)         fieldNumber)
 {
     M_Assert_Break(self == NULLPTR(EntityMailService_t*), M_EMPTY, return ENTITY_ERROR, "EntityMailService_unsubscribe: no valid input object");
 
@@ -107,7 +107,8 @@ int EntityMailService_unsubscribe(EntityMailService_t* self,
 }
 
 
-void EntityMailService_getStream(EntityMailService_t* self, u32 time, u8* outputBuffer, reg * size, reg maxOutBufferSize)
+void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
+                                 u8* const outputBuffer, reg* const size, const reg maxOutBufferSize)
 {
     M_Assert_Break(self == NULLPTR(EntityMailService_t*) || (maxOutBufferSize < (1 + sizeof(time))) , M_EMPTY, return, "EntityMailService_getStream: no valid input object");
 
@@ -122,12 +123,15 @@ void EntityMailService_getStream(EntityMailService_t* self, u32 time, u8* output
 
     while((packetCnt != ENTITY_MAIL_MTU) && (position->next != NULL)) {
 
-        EntityMailNode_t *letter = islist_entry_of_position(position, EntityMailNode_t, link);
+        EntityMailNode_t* const letter = islist_entry_of_position(position, EntityMailNode_t, link);
 
         if((time - letter->lastUpdateTimeMs) > letter->updateTimeMs) {
             // read field to out buffer
-            reg typeLen = getMYCTypeLen(entityInfo.entities[letter->entityNumber]->fields[letter->entityNumber].type);
-            void * data_ptr = (entityInfo.entities[letter->entityNumber]->pointer + entityInfo.entities[letter->entityNumber]->fields[letter->fieldNumber].shift);
+            const Entity*       const entity    = entityInfo.entities[letter->entityNumber];                                    // move to cash (read-only parameter)
+            const EntityField*  const field     = &entityInfo.entities[letter->entityNumber]->fields[letter->entityNumber];     // move to cash (read-only parameter)
+
+            reg typeLen = getMYCTypeLen(field->type);
+            void * data_ptr = (entity->pointer + field->shift);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > maxOutBufferSize), M_EMPTY, return, "EntityMailService_getStream: field read size more than buffer");
 
@@ -146,7 +150,7 @@ void EntityMailService_getStream(EntityMailService_t* self, u32 time, u8* output
             Wpos += ENTITY_FIELD_SIZEOF;
 #endif /* (MAX_NUBER_OF_FIELDS < 256U) */
 
-            proceedReadEntity(entityInfo.entities[letter->entityNumber]->fields[letter->fieldNumber].bitFlags, data_ptr, &outputBuffer[Wpos], typeLen);
+            proceedReadEntity(field->bitFlags, data_ptr, &outputBuffer[Wpos], typeLen);
             Wpos += typeLen;
 
             letter->lastUpdateTimeMs = time;
