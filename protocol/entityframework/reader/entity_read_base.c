@@ -1,17 +1,48 @@
 #include "entity_read_base.h"
 
-
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
 
 #ifdef USE_ENTITY_READ_SERVICE
 
 #include <stdlib.h>
 
+
 /*
  * ****************************************************************
  * Parent implement section
  * ****************************************************************
  */
+
+EntityWritePoolContainer_t* entityWritePoolContainer_new(const reg pointerCount)
+{
+    if(pointerCount == 0) {
+        return NULL;
+    }
+
+    EntityWritePoolContainer_t* m = calloc(1, sizeof(EntityWritePoolContainer_t));
+    if(m == NULL) {
+        return NULL;
+    }
+    entityWritePoolContainer_init(m, pointerCount);
+    return m;
+}
+
+int entityWritePoolContainer_init(EntityWritePoolContainer_t* const self, const reg pointerCount)
+{
+    if(self == NULL || pointerCount == 0) {
+        return ENTITY_ERROR;
+    }
+
+    self->writePool = calloc(pointerCount, sizeof(EntityReadParent_t*));
+    if(self->writePool == NULL) {
+        return ENTITY_ERROR;
+    }
+
+    self->allocatedFields = pointerCount;
+    self->counter = 0;
+    return ENTITY_OK;
+}
+
 
  // universal write to parrent function
 int setEntityReadParent_uni(EntityReadParent_t * const self, u8* input, const reg inputSize)
@@ -70,25 +101,32 @@ int ENTITY_READ_PARENT_SET_FUNC(reg)(EntityReadParent_t * const self, u8* input,
 
 #define DECLARE_ORDINARY_ENTITY_READ_CHIELD_FUNCTIONS(type) DECLARE_ENTITY_READ_CHIELD_FUNCTIONS(type, type)
 #define DECLARE_ENTITY_READ_CHIELD_FUNCTIONS(type, opType)                                              \
-    int ENTITY_READ_CHIELD_CTOR_FUNC(type) (ENTITY_READ_CHIELD(type) *const self) {                     \
-        free(self->parent.data);                                                                        \
-        self->parent.data = calloc(1, sizeof(opType));                                                  \
-        if(self->parent.data == NULL) {                                                                 \
-            return ENTITY_ERROR;                                                                        \
-        }                                                                                               \
-        return ENTITY_OK;                                                                               \
-    }                                                                                                   \
-                                                                                                        \
+    /* get / set (inside chield) */                                                                     \
     opType ENTITY_READ_CHIELD_GET_FUNC(type) (ENTITY_READ_CHIELD(type)* const self) {                   \
-        return *((opType*)self->parent.data);                                                           \
+        return self->data;                                                                              \
     }                                                                                                   \
                                                                                                         \
     void ENTITY_READ_CHIELD_SET_FUNC(type) (ENTITY_READ_CHIELD(type)* const self, const opType val) {   \
         if(self->parent.bitFlags & ENTITY_READ_ONLY_MSK) {                                              \
             return;                                                                                     \
         }                                                                                               \
-        *((opType*)self->parent.data) = val;                                                            \
-        self->parent.onValueUpdated = 1;                                                                \
+                                                                                                        \
+        self->data = val;                                                                               \
+                                                                                                        \
+        /* --------------------------------------------------------------------------- */               \
+        /* Write parent to container */                                                                 \
+        /* --------------------------------------------------------------------------- */               \
+                                                                                                        \
+        /* move to cash */                                                                              \
+        EntityWritePoolContainer_t *const writeCont = self->parent.writeContainer;                      \
+        reg* const counter = &writeCont->counter;                                                       \
+                                                                                                        \
+        /* do logic */                                                                                  \
+        if (((*counter) < writeCont->allocatedFields) && self->parent.onValueNotUpdated) {              \
+            writeCont->writePool[(*counter)] = &self->parent;                                           \
+            self->parent.onValueNotUpdated = 0;                                                         \
+            ++(*counter);                                                                               \
+        }                                                                                               \
     }
 
 // read chields declaration--------------------------------------------------------

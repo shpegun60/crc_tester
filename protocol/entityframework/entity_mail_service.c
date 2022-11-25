@@ -81,7 +81,7 @@ int EntityMailService_subscribe(EntityMailService_t* const self,
         islist_init(&(letter->link));
         islist_insert_back(&self->head, &(letter->link));
     } else {
-        EntityMailNode_t *letter   = islist_entry_of_position(same_position, EntityMailNode_t, link);
+        EntityMailNode_t *letter        = islist_entry_of_position(same_position, EntityMailNode_t, link);
         letter->updateTimeMs            = updateTimeMs;
         letter->lastUpdateTimeMs        = time;
     }
@@ -110,7 +110,7 @@ int EntityMailService_unsubscribe(EntityMailService_t* const self,
 void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
                                  u8* const outputBuffer, reg* const size, const reg maxOutBufferSize)
 {
-    M_Assert_Break(self == NULLPTR(EntityMailService_t*) || (maxOutBufferSize < (1 + sizeof(time))) , M_EMPTY, return, "EntityMailService_getStream: no valid input object");
+    M_Assert_Break(self == NULLPTR(EntityMailService_t*) || (maxOutBufferSize < (2 + sizeof(time))) , M_EMPTY, return, "EntityMailService_getStream: no valid input object");
 
     if(self->mailDis || islist_is_empty(&self->head)) {
         (*size) = 0;
@@ -118,7 +118,7 @@ void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
     }
 
     u8 packetCnt = 0;
-    reg Wpos = (1 + sizeof(time));
+    reg Wpos = (2 + sizeof(time));
     IntrusiveSListNode *position = self->lastStream;
 
     while((packetCnt != ENTITY_MAIL_MTU) && (position->next != NULL)) {
@@ -168,9 +168,10 @@ void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
 
     if(packetCnt != 0) {
         // write entity cnt
-        outputBuffer[0] = packetCnt;
+        outputBuffer[0] = ENTITY_MAIL_SERVICE_PACK;
+        outputBuffer[1] = packetCnt;
         // write time
-        ENTITY_BYTE_CPY(sizeof(time), (u8*)&time, &outputBuffer[1]);
+        ENTITY_BYTE_CPY(sizeof(time), (u8*)&time, &outputBuffer[2]);
         (*size) = Wpos;
     } else {
         (*size) = 0;

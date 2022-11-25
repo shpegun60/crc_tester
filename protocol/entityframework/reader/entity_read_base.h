@@ -17,6 +17,18 @@
 #define ENTITY_READ_PARENT_SET_FUNC(type) setEntityReadParent_ ## type
 
 typedef struct EntityReadParent EntityReadParent_t;
+
+// container for writed fiedld`s
+typedef struct {
+    reg counter;
+    reg allocatedFields;
+    EntityReadParent_t** writePool;
+} EntityWritePoolContainer_t;
+
+EntityWritePoolContainer_t* entityWritePoolContainer_new(const reg pointerCount);
+int entityWritePoolContainer_init(EntityWritePoolContainer_t* const self, const reg pointerCount);
+
+// main parent
 struct EntityReadParent {
     const u16 boardNumber;
     const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber;
@@ -24,11 +36,13 @@ struct EntityReadParent {
 
     const TYPEOF_STRUCT(EntityField, type) type;
     const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags;
-    b onValueUpdated;
+    EntityWritePoolContainer_t* const writeContainer;
+    b onValueNotUpdated;
     const reg size;
-    void* data;
+    void* const data;
 
-    int (* const set)(EntityReadParent_t * const self, u8* input, const reg inputSize);
+    // set function (inside parent)
+    int (* const set )(EntityReadParent_t * const self, u8* input, const reg inputSize);
 };
 
 int setEntityReadParent_uni(EntityReadParent_t * const self, u8* input, const reg inputSize);
@@ -59,8 +73,8 @@ int ENTITY_READ_PARENT_SET_FUNC(reg)(EntityReadParent_t * const self, u8* input,
  * Chield section
  * ****************************************************************
  */
+
 #define ENTITY_READ_CHIELD(type) EntityReadChield_ ## type ## _t
-#define ENTITY_READ_CHIELD_CTOR_FUNC(type) ctorEntityReadChield_ ## type
 #define ENTITY_READ_CHIELD_GET_FUNC(type) getEntityReadChield_ ## type
 #define ENTITY_READ_CHIELD_SET_FUNC(type) setEntityReadChield_ ## type
 
@@ -69,11 +83,11 @@ int ENTITY_READ_PARENT_SET_FUNC(reg)(EntityReadParent_t * const self, u8* input,
     typedef struct EntityReadChield_ ## type       ENTITY_READ_CHIELD(type);                            \
     struct EntityReadChield_ ## type {                                                                  \
         EntityReadParent_t parent;                                                                      \
-        int     (* const ctor)(ENTITY_READ_CHIELD(type) * const);                                       \
+        opType data;                                                                                    \
         opType  (* const get)(ENTITY_READ_CHIELD(type) * const);                                        \
         void    (* const set)(ENTITY_READ_CHIELD(type) * const, const opType);                          \
     };                                                                                                  \
-    int ENTITY_READ_CHIELD_CTOR_FUNC(type) (ENTITY_READ_CHIELD(type) *const self);                      \
+    /* get / set (inside chield) */                                                                     \
     opType ENTITY_READ_CHIELD_GET_FUNC(type) (ENTITY_READ_CHIELD(type)* const self);                    \
     void ENTITY_READ_CHIELD_SET_FUNC(type) (ENTITY_READ_CHIELD(type)* const self, const opType val);
 
@@ -114,16 +128,58 @@ DECLARE_ENTITY_READ_CHIELD_TYPE(sreg, i64);
  */
 
 // init chield without external size
-#define ENTITY_CREATE_READ_CHIELD(type, name, boardNumber, entityNumber, fieldNumber, bitFlags) ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type))
+#define ENTITY_CREATE_READ_CHIELD(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, path, writeContainerPath) ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type), path, writeContainerPath)
+#define ENTITY_CREATE_READ_CHIELD_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, path, writeContainerPath) ENTITY_CREATE_READ_CHIELD_SIZE_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type), path, writeContainerPath)
 // init chield with external size
-#define ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size)                                                          \
+#define ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size, path, writeContainerPath)                                \
     ENTITY_READ_CHIELD(type) name = {                                                                                                                               \
     /* parent initialization */                                                                                                                                     \
-{boardNumber, entityNumber, fieldNumber, MY_CTYPE_GET_TYPE_ID(type), bitFlags, 0, size, NULL, ENTITY_READ_PARENT_SET_FUNC(type)},                                   \
+    {                                                                                                                                                               \
+        boardNumber,                                                                                                                                                \
+        entityNumber,                                                                                                                                               \
+        fieldNumber,                                                                                                                                                \
+        MY_CTYPE_GET_TYPE_ID(type),                                                                                                                                 \
+        bitFlags,                                                                                                                                                   \
+        writeContainerPath,                                                                                                                                         \
+        1,                                                                                                                                                          \
+        size,                                                                                                                                                       \
+        path,                                                                                                                                                       \
+        ENTITY_READ_PARENT_SET_FUNC(type)                                                                                                                           \
+    },                                                                                                                                                              \
     /* chield initialization */                                                                                                                                     \
-    ENTITY_READ_CHIELD_CTOR_FUNC(type),                                                                                                                             \
+    ((type)0),                                                                                                                                                      \
     ENTITY_READ_CHIELD_GET_FUNC(type),                                                                                                                              \
-    ENTITY_READ_CHIELD_SET_FUNC(type)}
+    ENTITY_READ_CHIELD_SET_FUNC(type)                                                                                                                               \
+}
+
+#define ENTITY_CREATE_READ_CHIELD_SIZE_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size, path, writeContainerPath)                           \
+.name = (ENTITY_READ_CHIELD(type))                                                                                                                                  \
+{                                                                                                                                                                   \
+    /* parent initialization */                                                                                                                                     \
+    .parent = (EntityReadParent_t){                                                                                                                                 \
+        boardNumber,                                                                                                                                                \
+        entityNumber,                                                                                                                                               \
+        fieldNumber,                                                                                                                                                \
+        MY_CTYPE_GET_TYPE_ID(type),                                                                                                                                 \
+        bitFlags,                                                                                                                                                   \
+        writeContainerPath,                                                                                                                                         \
+        1,                                                                                                                                                          \
+        size,                                                                                                                                                       \
+        path,                                                                                                                                                       \
+        ENTITY_READ_PARENT_SET_FUNC(type)                                                                                                                           \
+    },                                                                                                                                                              \
+    /* chield initialization */                                                                                                                                     \
+    ((type)0),                                                                                                                                                      \
+    ENTITY_READ_CHIELD_GET_FUNC(type),                                                                                                                              \
+    ENTITY_READ_CHIELD_SET_FUNC(type)                                                                                                                               \
+}
+
+// extern type name for .h files
+#define EXTERN_ENTITY_READ_CHIELD(type, name) extern ENTITY_READ_CHIELD(type) name
+#define ENTITY_READ_CHIELD_DECL(type, name) ENTITY_READ_CHIELD(type) name
+
+
+
 
 #endif /* USE_ENTITY_READ_SERVICE */
 

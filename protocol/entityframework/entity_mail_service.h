@@ -40,9 +40,14 @@ int EntityMailService_unsubscribe(EntityMailService_t* const self,
 
 void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
                                  u8* const outputBuffer, reg* const size, const reg maxOutBufferSize);
+
+
+// user defines check --------------------------------------------------
 #if ENTITY_MAIL_MTU > 255
-#error ENTITY_MAIL_MTU must be less than 255
+#   error ENTITY_MAIL_MTU must be less than 255
 #endif /* ENTITY_MAIL_MTU > 255 */
+//----------------------------------------------------------------------
+
 
 #endif /* USE_ENTITY_MAIL_SERVICE */
 

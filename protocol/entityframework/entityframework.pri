@@ -8,7 +8,8 @@ SOURCES += \
     $$PWD/entity_packet.c \
     $$PWD/entity_tests.c \
     $$PWD/reader/entity_read_base.c \
-    $$PWD/reader/entity_read_parent_pool.c
+    $$PWD/reader/entity_read_parent_pool.c \
+    $$PWD/reader/entity_read_system.c
 
 HEADERS += \
     $$PWD/entity_atomic.h \
@@ -18,5 +19,7 @@ HEADERS += \
     $$PWD/entity_packet.h \
     $$PWD/entity_port.h \
     $$PWD/entity_tests.h \
+    $$PWD/reader/entity_non-blocking.h \
     $$PWD/reader/entity_read_base.h \
-    $$PWD/reader/entity_read_parent_pool.h
+    $$PWD/reader/entity_read_parent_pool.h \
+    $$PWD/reader/entity_read_system.h

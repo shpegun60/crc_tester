@@ -11,26 +11,26 @@
  *  null pointer macro if not declarated upper
  */
 #ifndef NULL
-#define NULL ((void *)0)
+#   define NULL ((void *)0)
 #endif /* NULL */
 
 #ifndef MIN
-    #define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#   define MIN(a,b) (((a) < (b)) ? (a) : (b))
 #endif /* MIN */
 
 #ifndef MAX
-    #define MAX(a,b) (((a) < (b)) ? (b) : (a))
+#   define MAX(a,b) (((a) < (b)) ? (b) : (a))
 #endif /* MAX */
 
 #ifndef ABS
-    #define ABS(N) (((N) < 0.0) ? (-1.0 * (N)) : (N))
+#   define ABS(N) (((N) < 0.0) ? (-1.0 * (N)) : (N))
 #endif /* ABS */
 
 /************************************************************************************
  *  macro for cast null pointer to user type
  */
 #ifndef NULLPTR
-    #define NULLPTR(type) ((type)NULL)
+#   define NULLPTR(type) ((type)NULL)
 #endif /* NULLPTR */
 
 /************************************************************************************
@@ -39,7 +39,7 @@
  *
  */
 #ifndef SIZEOF_STRUCT
-    #define SIZEOF_STRUCT(structName, field) ((size_t) sizeof(((structName *)0)->field))
+#   define SIZEOF_STRUCT(structName, field) ((size_t) sizeof(((structName *)0)->field))
 #endif /* SIZEOF_STRUCT */
 
 /************************************************************************************
@@ -50,7 +50,7 @@
  *  Type evaluation at compile time for type abstraction in C
  */
 #ifndef TYPEOF_STRUCT
-    #define TYPEOF_STRUCT(structName, field) __typeof__(((structName *)0)->field)
+#   define TYPEOF_STRUCT(structName, field) __typeof__(((structName *)0)->field)
 #endif /* TYPEOF_STRUCT */
 
 /************************************************************************************
@@ -61,7 +61,7 @@
  *  Type evaluation at compile time
  */
 #ifndef TYPEOF_DATA
-    #define TYPEOF_DATA(data) __typeof__(data)
+#   define TYPEOF_DATA(data) __typeof__(data)
 #endif /* TYPEOF_DATA */
 
 
@@ -69,8 +69,15 @@
  *  macro for declare unused variable in function
  */
 #ifndef UNUSED
-    #define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+#   define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
 #endif /* UNUSED */
+
+/************************************************************************************
+ *  macro for getting number of elements from static array
+ */
+#ifndef ARRAY_COUNT
+#   define ARRAY_COUNT(arr) (sizeof((arr))/sizeof((arr)[0]))
+#endif /* ARRAY_COUNT */
 
 
 // all types. Commit this if types defines upper--------------------------

@@ -205,7 +205,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
 
-    //entityTest(randomSeed, testCnt);
+    entityTest(randomSeed, testCnt);
 
 
 
