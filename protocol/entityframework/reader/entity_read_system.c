@@ -1,3 +1,5 @@
+/*--------------------------------------- FILE MUST BE GENERATED --------------------------------------------*/
+
 #include "entity_read_system.h"
 
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
@@ -14,21 +16,14 @@
 
 EntityReadSystem_t ersys = {
     /* BEGIN GENERATION CODE */
-
-    .name =
-    {
-        .parent = {0, 1, 2, 1, 3, &ersys.writePool, 1,
-                                       sizeof(u8), &ersys.name.data,
-                                       setEntityReadParent_uni},
-        0,
-        getEntityReadChield_u8,
-        setEntityReadChield_u8},
-    ENTITY_CREATE_READ_CHIELD_BODY(u16, name1, 0, 1, 2, 3, &ersys.name1.data,
-    &ersys.writePool),
+    ENTITY_CREATE_READ_CHIELD_BODY(u8, name, 0, 1, 2, 3, &ersys.name.data, &ersys.writePool),
+    ENTITY_CREATE_READ_CHIELD_BODY(u16, name1, 0, 1, 2, 3, &ersys.name1.data, &ersys.writePool),
 
     /* END GENERATION CODE */
-    .writePool = {0, 0, NULL},
-    .readPool = {0, NULL}};
+    .writePool  = {0, 0, NULL},
+    .readPool   = {0, NULL}
+};
+
 
 static int parentPointersCheck(EntityReadParent_t* field, void* ctx)
 {
@@ -81,3 +76,4 @@ int initEntityReadSystem(void)
 #endif /* USE_ENTITY_READ_SERVICE */
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */
+/*--------------------------------------- FILE MUST BE GENERATED --------------------------------------------*/

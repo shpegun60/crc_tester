@@ -1,3 +1,4 @@
+/*--------------------------------------- FILE MUST BE GENERATED (DO NOT EDIT!!!) --------------------------------------------*/
 #ifndef ENTITY_READ_SYSTEM_H
 #define ENTITY_READ_SYSTEM_H
 
@@ -34,3 +35,4 @@ int initEntityReadSystem(void);
 
 
 #endif /* ENTITY_READ_SYSTEM_H */
+/*--------------------------------------- FILE MUST BE GENERATED (DO NOT EDIT!!!) --------------------------------------------*/
