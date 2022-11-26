@@ -26,6 +26,10 @@
 #   define ABS(N) (((N) < 0.0) ? (-1.0 * (N)) : (N))
 #endif /* ABS */
 
+#ifndef NOT_IS_POWER_OF_2
+#   define NOT_IS_POWER_OF_2(val) (((val - 1) & val) || (val == 0))
+#endif /* NOT_IS_POWER_OF_2 */
+
 /************************************************************************************
  *  macro for cast null pointer to user type
  */

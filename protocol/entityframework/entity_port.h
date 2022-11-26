@@ -174,12 +174,6 @@
 #   define USE_ENTITY_MAIL_SERVICE
 #endif /* USE_ENTITY_MAIL_SERVICE */
 
-#ifdef USE_ENTITY_MAIL_SERVICE
-#   define ENTITY_MAIL_SERVICE_PACK 0x33
-#endif /* USE_ENTITY_MAIL_SERVICE */
-
-
-
 
 #ifndef USE_ENTITY_READ_SERVICE
 #   define USE_ENTITY_READ_SERVICE
@@ -211,6 +205,17 @@
 #define ENTITY_NUMBER_ERROR     0x00010000UL
 //------------------------------------
 
+/* **********************************************************************************************************************************
+ *  COMMANDS macro
+ */
+#define READ_ENTITY_DESCRIPTIONS 	0x00U
+#define READ_ENTITY_FIELDS 			0x01U
+#define READ_FIELD_VALUE 			0x02U
+#define WRITE_FIELD_VALUE 			0x03U
+#define READ_SEVERAL_VALUES 		0x04U
+#define WRITE_SEVERAL_VALUES 		0x05U
+#define ENTITY_FLASH_OPERATION 		0x06U
+#define ENTITY_MAIL_SERVICE_PACK    0x33U
 
 
 /* **********************************************************************************************************************************

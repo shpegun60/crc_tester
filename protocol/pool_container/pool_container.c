@@ -8,7 +8,7 @@ pool_container_t *poolContainer_new(const u16 rows, const u16 columns)
     M_Assert_BreakSaveCheck((columns == 0 || rows == 0), M_EMPTY, return NULL, "poolContainer_new: Give me positive values for dimensions genius");
     M_Assert_BreakSaveCheck((columns & (columns - 1)), M_EMPTY, return NULL, "poolContainer_new: columns is not power of 2, val: %d", columns);
     M_Assert_BreakSaveCheck((rows & (rows - 1)), M_EMPTY, return NULL, "poolContainer_new: rows is not power of 2, val: %d", rows);
-    M_Assert_BreakSaveCheck((rows  > 16384 || columns > 16384), M_EMPTY, return NULL, "poolContainer_new: rows or calls is too long, RAW: %d, COL: %d", rows, columns);
+    M_Assert_BreakSaveCheck((rows  > 16384 || columns > 16384), M_EMPTY, return NULL, "poolContainer_new: rows or colls is too long, RAW: %d, COL: %d", rows, columns);
 
     pool_container_t* self = (pool_container_t *)calloc(1, sizeof(pool_container_t));
     M_Assert_BreakSaveCheck(self == (pool_container_t *)NULL, M_EMPTY, return self, "poolContainer_new: No memory for allocation ");
@@ -23,12 +23,12 @@ void poolContainer_init(pool_container_t * const self, const u16 rows, const u16
     M_Assert_BreakSaveCheck((columns == 0 || rows == 0), M_EMPTY, return, "poolContainer_init: Give me positive values for dimensions genius");
     M_Assert_BreakSaveCheck((columns & (columns - 1)), M_EMPTY, return, "poolContainer_init: columns is not power of 2, val: %d", columns);
     M_Assert_BreakSaveCheck((rows & (rows - 1)), M_EMPTY, return, "poolContainer_init: rows is not power of 2, val: %d", rows);
-    M_Assert_BreakSaveCheck((rows  > 16384 || columns > 16384), M_EMPTY, return, "poolContainer_init: rows or calls is too long, RAW: %d, COL: %d", rows, columns);
+    M_Assert_BreakSaveCheck((rows  > 16384 || columns > 16384), M_EMPTY, return, "poolContainer_init: rows or colls is too long, RAW: %d, COL: %d", rows, columns);
 
     self->pool = (u8**)malloc(rows * sizeof(u8*));
     M_Assert_BreakSaveCheck((self->pool == NULL), M_EMPTY, return, "poolContainer_init: no memories for allocation data");
 
-    for (int i = 0; i < rows; ++i) {
+    for (reg i = 0; i < rows; ++i) {
         self->pool[i] = (u8*)malloc(columns * sizeof(u8));
         M_Assert_Break((self->pool[i] == NULL), M_EMPTY, return, "poolContainer_init: no memories for allocation");
     }
@@ -74,7 +74,7 @@ int poolContainer_delete(pool_container_t **self, u8 isHeap)
     /* Code for further processing and free the
        dynamically allocated memory */
 
-    for(int i = 0; i < (*self)->rows; ++i) {
+    for(reg i = 0; i < (*self)->rows; ++i) {
         free((*self)->pool[i]);
     }
 

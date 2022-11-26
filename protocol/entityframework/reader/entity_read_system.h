@@ -10,6 +10,9 @@
 
 #include "entity_read_parent_pool.h"
 
+#define ENTITY_READ_SYSTEM_BOARD_COUNT 2
+
+
 typedef struct {
 
     /* BEGIN GENERATION CODE */

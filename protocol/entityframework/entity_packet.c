@@ -278,7 +278,7 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
 #if (MAX_NUBER_OF_FIELDS < 256U)
         fieldNumber = inputData[Rpos++];
 #else
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF, &inputData[Rpos], (u8*)&fieldNumber);
+        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &inputData[Rpos], (u8*)&fieldNumber);
         fieldNumber &= 0x0000FFFFUL;
         Rpos += ENTITY_FIELD_SIZEOF;
 #endif /* (MAX_NUBER_OF_FIELDS < 256U) */
@@ -325,7 +325,11 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
         Wpos = 0;
         outputData[Wpos++] = ENTITY_ERROR;
         ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
+        Wpos += ENTITIES_SIZEOF;
+
         ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
+        Wpos += ENTITY_FIELD_SIZEOF;
+
         (*size) = Wpos;
         return ENTITY_ERROR;
 }
@@ -398,7 +402,7 @@ int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const
 #if (MAX_NUBER_OF_FIELDS < 256U)
         fieldNumber = inputData[Rpos++];
 #else
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF, &inputData[Rpos], (u8*)&fieldNumber);
+        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &inputData[Rpos], (u8*)&fieldNumber);
         fieldNumber &= 0x0000FFFFUL;
         Rpos += ENTITY_FIELD_SIZEOF;
 #endif /* (MAX_NUBER_OF_FIELDS < 256U) */
@@ -447,7 +451,11 @@ int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const
         Wpos = 0;
         outputData[Wpos++] = ENTITY_ERROR;
         ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
+        Wpos += ENTITIES_SIZEOF;
+
         ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
+        Wpos += ENTITY_FIELD_SIZEOF;
+
         (*size) = Wpos;
         return ENTITY_ERROR;
 }

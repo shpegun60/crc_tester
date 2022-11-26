@@ -8,25 +8,13 @@
 #ifdef USE_ENTITY_READ_SERVICE
 
 #include "entity_manager.h"
-
+#include "entity_write_parent_pool.h"
 /*
  * ****************************************************************
  * Parent section
  * ****************************************************************
  */
 #define ENTITY_READ_PARENT_SET_FUNC(type) setEntityReadParent_ ## type
-
-typedef struct EntityReadParent EntityReadParent_t;
-
-// container for writed fiedld`s
-typedef struct {
-    reg counter;
-    reg allocatedFields;
-    EntityReadParent_t** writePool;
-} EntityWritePoolContainer_t;
-
-EntityWritePoolContainer_t* entityWritePoolContainer_new(const reg pointerCount);
-int entityWritePoolContainer_init(EntityWritePoolContainer_t* const self, const reg pointerCount);
 
 // main parent
 struct EntityReadParent {
@@ -38,6 +26,7 @@ struct EntityReadParent {
     const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags;
     EntityWritePoolContainer_t* const writeContainer;
     b onValueNotUpdated;
+    b readEnable;
     const reg size;
     void* const data;
 
@@ -128,10 +117,10 @@ DECLARE_ENTITY_READ_CHIELD_TYPE(sreg, i64);
  */
 
 // init chield without external size
-#define ENTITY_CREATE_READ_CHIELD(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, path, writeContainerPath) ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type), path, writeContainerPath)
-#define ENTITY_CREATE_READ_CHIELD_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, path, writeContainerPath) ENTITY_CREATE_READ_CHIELD_SIZE_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type), path, writeContainerPath)
+#define ENTITY_CREATE_READ_CHIELD(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, path, writeContainerPath, readEna) ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type), path, writeContainerPath, readEna)
+#define ENTITY_CREATE_READ_CHIELD_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, path, writeContainerPath, readEna) ENTITY_CREATE_READ_CHIELD_SIZE_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, sizeof(type), path, writeContainerPath, readEna)
 // init chield with external size
-#define ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size, path, writeContainerPath)                                \
+#define ENTITY_CREATE_READ_CHIELD_SIZE(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size, path, writeContainerPath, readEna)                       \
     ENTITY_READ_CHIELD(type) name = {                                                                                                                               \
     /* parent initialization */                                                                                                                                     \
     {                                                                                                                                                               \
@@ -142,6 +131,7 @@ DECLARE_ENTITY_READ_CHIELD_TYPE(sreg, i64);
         bitFlags,                                                                                                                                                   \
         writeContainerPath,                                                                                                                                         \
         1,                                                                                                                                                          \
+        readEna,                                                                                                                                                    \
         size,                                                                                                                                                       \
         path,                                                                                                                                                       \
         ENTITY_READ_PARENT_SET_FUNC(type)                                                                                                                           \
@@ -152,11 +142,11 @@ DECLARE_ENTITY_READ_CHIELD_TYPE(sreg, i64);
     ENTITY_READ_CHIELD_SET_FUNC(type)                                                                                                                               \
 }
 
-#define ENTITY_CREATE_READ_CHIELD_SIZE_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size, path, writeContainerPath)                           \
+#define ENTITY_CREATE_READ_CHIELD_SIZE_BODY(type, name, boardNumber, entityNumber, fieldNumber, bitFlags, size, path, writeContainerPath, readEna)                  \
 .name = (ENTITY_READ_CHIELD(type))                                                                                                                                  \
 {                                                                                                                                                                   \
     /* parent initialization */                                                                                                                                     \
-    .parent = (EntityReadParent_t){                                                                                                                                 \
+    {                                                                                                                                                               \
         boardNumber,                                                                                                                                                \
         entityNumber,                                                                                                                                               \
         fieldNumber,                                                                                                                                                \
@@ -164,6 +154,7 @@ DECLARE_ENTITY_READ_CHIELD_TYPE(sreg, i64);
         bitFlags,                                                                                                                                                   \
         writeContainerPath,                                                                                                                                         \
         1,                                                                                                                                                          \
+        readEna,                                                                                                                                                    \
         size,                                                                                                                                                       \
         path,                                                                                                                                                       \
         ENTITY_READ_PARENT_SET_FUNC(type)                                                                                                                           \

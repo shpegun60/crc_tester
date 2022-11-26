@@ -146,7 +146,7 @@ void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
 #if (MAX_NUBER_OF_FIELDS < 256U)
             outputBuffer[Wpos++] = letter->fieldNumber;
 #else
-            ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&letter->fieldNumber, &outputBuffer[Wpos]);
+            ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&letter->fieldNumber, &outputBuffer[Wpos]);
             Wpos += ENTITY_FIELD_SIZEOF;
 #endif /* (MAX_NUBER_OF_FIELDS < 256U) */
 
