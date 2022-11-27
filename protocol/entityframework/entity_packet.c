@@ -266,23 +266,7 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
 
     while((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) < (*size)) {
 
-#if (MAX_NUBER_OF_ENTITIES < 256U)
-        entityNumber = inputData[Rpos++];
-#else
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF, &inputData[Rpos], (u8*)&entityNumber);
-        entityNumber &= 0x0000FFFFUL;
-        Rpos += ENTITIES_SIZEOF;
-#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
-
-
-#if (MAX_NUBER_OF_FIELDS < 256U)
-        fieldNumber = inputData[Rpos++];
-#else
-        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &inputData[Rpos], (u8*)&fieldNumber);
-        fieldNumber &= 0x0000FFFFUL;
-        Rpos += ENTITY_FIELD_SIZEOF;
-#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
-
+        readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
 
         Entity* const entity = entityInfo.entities[entityNumber];
         EntityField* const field = &entity->fields[fieldNumber];
@@ -390,22 +374,7 @@ int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const
 
     while((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) < (*size)) {
 
-#if (MAX_NUBER_OF_ENTITIES < 256U)
-        entityNumber = inputData[Rpos++];
-#else
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF, &inputData[Rpos], (u8*)&entityNumber);
-        entityNumber &= 0x0000FFFFUL;
-        Rpos += ENTITIES_SIZEOF;
-#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
-
-
-#if (MAX_NUBER_OF_FIELDS < 256U)
-        fieldNumber = inputData[Rpos++];
-#else
-        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &inputData[Rpos], (u8*)&fieldNumber);
-        fieldNumber &= 0x0000FFFFUL;
-        Rpos += ENTITY_FIELD_SIZEOF;
-#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
+        readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
 
         Entity* const entity = entityInfo.entities[entityNumber];
         EntityField* const field = &entity->fields[fieldNumber];

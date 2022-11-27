@@ -1,9 +1,10 @@
 #include "entity_non-block_api.h"
 
+
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
 
 #ifdef USE_ENTITY_READ_SERVICE
-
+#include "entity_packet.h"
 #include "smart_assert.h"
 
 
@@ -46,20 +47,9 @@ void entityNonBlockReadLoop(u8* const outBuffer[ENTITY_READ_SYSTEM_BOARD_COUNT],
                 // write data to out buffer
                 ENTITY_DBG_ASSERT_BUF(((Wpos[boardNumber] + parent->size + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > outBufferSize), M_EMPTY, return, "entityNonBlockReadLoop: field write size more than outBuffer");
 
-#if (MAX_NUBER_OF_ENTITIES < 256U)
-                data[Wpos[boardNumber]++] = parent->entityNumber;
-#else
-                ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&parent->entityNumber, &data[Wpos[boardNumber]]);
-                Wpos[boardNumber] += ENTITIES_SIZEOF;
-#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
-
-
-#if (MAX_NUBER_OF_FIELDS < 256U)
-                data[Wpos[boardNumber]++] = parent->fieldNumber;
-#else
-                ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&parent->fieldNumber, &data[Wpos[boardNumber]]);
-                Wpos[boardNumber] += ENTITY_FIELD_SIZEOF;
-#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
+                writeEntityFieldNumbersToBuf(parent->entityNumber, parent->fieldNumber, data, &Wpos[boardNumber]);
+                ENTITY_BYTE_CPY(parent->size, parent->data, &data[Wpos[boardNumber]]);
+                Wpos[boardNumber] += parent->size;
 
                 ++(packCnt[boardNumber]);
             }
@@ -86,6 +76,7 @@ void entityNonBlockReadLoop(u8* const outBuffer[ENTITY_READ_SYSTEM_BOARD_COUNT],
 
     }
 
+    UNUSED(outBufferSize);
 #undef NON_BLOCK_READ_TRANSACTION
 #undef NON_BLOCK_WRITE_TRANSACTION
 }

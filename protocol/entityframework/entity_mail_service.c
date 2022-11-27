@@ -130,25 +130,12 @@ void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
             const Entity*       const entity    = entityInfo.entities[letter->entityNumber];                                    // move to cash (read-only parameter)
             const EntityField*  const field     = &entityInfo.entities[letter->entityNumber]->fields[letter->entityNumber];     // move to cash (read-only parameter)
 
-            reg typeLen = getMYCTypeLen(field->type);
-            void * data_ptr = (entity->pointer + field->shift);
+            const reg typeLen = getMYCTypeLen(field->type);
+            void* const data_ptr = (entity->pointer + field->shift);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > maxOutBufferSize), M_EMPTY, return, "EntityMailService_getStream: field read size more than buffer");
 
-#if (MAX_NUBER_OF_ENTITIES < 256U)
-            outputBuffer[Wpos++] = letter->entityNumber;
-#else
-            ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&letter->entityNumber, &outputBuffer[Wpos]);
-            Wpos += ENTITIES_SIZEOF;
-#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
-
-
-#if (MAX_NUBER_OF_FIELDS < 256U)
-            outputBuffer[Wpos++] = letter->fieldNumber;
-#else
-            ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&letter->fieldNumber, &outputBuffer[Wpos]);
-            Wpos += ENTITY_FIELD_SIZEOF;
-#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
+            writeEntityFieldNumbersToBuf(letter->entityNumber, letter->fieldNumber, outputBuffer, &Wpos);
 
             proceedReadEntity(field->bitFlags, data_ptr, &outputBuffer[Wpos], typeLen);
             Wpos += typeLen;
