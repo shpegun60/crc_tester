@@ -19,9 +19,9 @@ typedef struct {
 EntityNonBlockPacketTable_t readNonBlockPackTable = {};
 
 
-static int countReadFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx))
+static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx))
 {
-    // gettting context
+    // getting context
     PREPROCESSOR_CTX_GET(ctx,
                                  EntityNonBlockReadLoopVariables_t* const var,
                                  reg* const packCnt,
@@ -72,7 +72,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
 
 
 
-        if(entityReadPool_foreach_startsAfter(readPool, readNonBlockPackTable.lastField, countReadFields, PREPROCESSOR_CTX_CAPTURE({var, &packCnt[0], &Wpos[0]}))) {
+        if(entityReadPool_foreach_startsAfter(readPool, readNonBlockPackTable.lastField, makeRequestFields, PREPROCESSOR_CTX_CAPTURE({var, &packCnt[0], &Wpos[0]}))) {
             readNonBlockPackTable.lastField = NULL;
         }
 

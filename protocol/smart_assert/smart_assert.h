@@ -77,7 +77,7 @@ void __M_Warning(const char* const expr_str, const unsigned char expr, const cha
             trueExpr;                                                                                                                   \
         } else { /* ignored else expression if NDEBUG */                                                                                \
             falseBeforeExpr;                                                                                                            \
-            __M_Error("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##__VA_ARGS__);                      \
+            __M_Error("if " #Expr " not confirmed: passed to else", (Expr), (__FILE__), (__LINE__), (Msg), ##__VA_ARGS__);              \
             falseAfterExpr;                                                                                                             \
         }                                                                                                                               \
     }while(0L)
