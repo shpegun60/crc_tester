@@ -12,7 +12,8 @@
  *
  *      PREPROCESSOR_CTX_TYPE(ctx)       // expands to --> void* const * const ctx
  */
-#define PREPROCESSOR_CTX_TYPE(name) void* const * const name
+#define PREPROCESSOR_CTX_TYPE_GET() void* const * const
+#define PREPROCESSOR_CTX_TYPE(name) PREPROCESSOR_CTX_TYPE_GET() name
 #define PREPROCESSOR_CTX_TYPE_CAST(name) ((void** const) name)
 
 
