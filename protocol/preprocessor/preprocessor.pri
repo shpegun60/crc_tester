@@ -13,6 +13,7 @@ HEADERS += \
     $$PWD/preprocessor_comparison.h \
     $$PWD/preprocessor_complement.h \
     $$PWD/preprocessor_concatenation.h \
+    $$PWD/preprocessor_ctx.h \
     $$PWD/preprocessor_cycle.h \
     $$PWD/preprocessor_detection.h \
     $$PWD/preprocessor_div.h \

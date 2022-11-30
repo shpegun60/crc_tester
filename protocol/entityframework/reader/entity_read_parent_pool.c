@@ -154,10 +154,10 @@ EntityReadParent_t* entityReadPoolContainer_getParent(EntityReadPoolContainer_t*
     return NULL;
 }
 
-void entityReadPool_foreach(EntityReadPoolContainer_t* const self, int (* const predicate)(EntityReadParent_t* field, void* ctx), void* const ctx)
+int entityReadPool_foreach(EntityReadPoolContainer_t* const self, int (* const predicate)(EntityReadParent_t* const field, void* ctx), void* const ctx)
 {
-    M_Assert_Break((self == NULL), M_EMPTY, return, "entityReadPool_foreach: no valid input object");
-    M_Assert_BreakSaveCheck((predicate == NULL), M_EMPTY, return, "entityReadPool_foreach: no valid input predicate");
+    M_Assert_Break((self == NULL) || (self->boards == NULL), M_EMPTY, return 0, "entityReadPool_foreach: no valid input object");
+    M_Assert_BreakSaveCheck((predicate == NULL), M_EMPTY, return 0, "entityReadPool_foreach: no valid input predicate");
 
     const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count = (self)->boards_count;
 
@@ -175,13 +175,75 @@ void entityReadPool_foreach(EntityReadPoolContainer_t* const self, int (* const 
 
                 if(field_ptr != NULL) {
                     if(predicate(field_ptr, ctx)) {
-                        return;
+
+                        if( (field == (fields_count - 1)) && (entity == (entities_count - 1)) && (board == (boards_count - 1)) ) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+
                     }
                 }
 
             }
         }
     }
+
+    return 1;
+}
+
+int entityReadPool_foreach_startsAfter(EntityReadPoolContainer_t* const self, EntityReadParent_t* const startField, int (* const predicate)(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx))
+{
+    M_Assert_Break((self == NULL) || (self->boards == NULL), M_EMPTY, return 0, "entityReadPool_foreach: no valid input object");
+    M_Assert_BreakSaveCheck((predicate == NULL), M_EMPTY, return 0, "entityReadPool_foreach: no valid input predicate");
+
+    TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)    board_start       ;
+    TYPEOF_STRUCT(EntityInfo, entities_count)                 entitity_start    ;
+    TYPEOF_STRUCT(Entity, fields_count)                       field_start       ;
+
+    // check if element is last or NULL, than start from head
+    if(startField == NULL) {
+        board_start         = 0;
+        entitity_start      = 0;
+        field_start         = 0;
+    } else {
+        board_start         = startField->boardNumber;
+        entitity_start      = startField->entityNumber;
+        field_start         = startField->fieldNumber;
+    }
+
+
+    const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count = (self)->boards_count;
+
+    for(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) board = board_start; board < boards_count; ++board) {                     // board`s counting
+        const   EN_BoardReadNode_t*   const   board_ptr                 = &self->boards[board];         // move to cash
+        const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count  = board_ptr->entities_count;    // move to cash
+
+        for(TYPEOF_STRUCT(EntityInfo, entities_count) entity = entitity_start; entity < entities_count; ++entity) {                         // entities counting
+            const   EN_EntityReadNode_t*  const   entity_ptr            = &board_ptr->entities[entity]; // move to cash
+            const TYPEOF_STRUCT(Entity, fields_count) fields_count      = entity_ptr->fields_count;     // move to cash
+
+            for(TYPEOF_STRUCT(Entity, fields_count) field = field_start; field < fields_count; ++field) {                                // field`s counting
+
+                EntityReadParent_t* const field_ptr = entity_ptr->fields[field];                        // move to cash
+
+                if(field_ptr != NULL) {
+                    if(predicate(field_ptr, ctx)) {
+
+                        if( (field == (fields_count - 1)) && (entity == (entities_count - 1)) && (board == (boards_count - 1)) ) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+
+    return 1;
 }
 
 #endif /* USE_ENTITY_READ_SERVICE */

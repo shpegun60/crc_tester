@@ -279,10 +279,8 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
                                      goto error;
                                   }, "readSeveralFieldsValues: field size more than buffer");
 
-
             ptr = (entity->pointer + field->shift);
             proceedReadEntity(field->bitFlags, ptr, &outputData[Wpos], typeLen);
-
 
 
 #ifdef USE_ENTITY_READ_CALLBACK

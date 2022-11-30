@@ -6,8 +6,8 @@
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
 
 #ifdef USE_ENTITY_READ_SERVICE
-
 #include "entity_read_base.h"
+#include "preprocessor_ctx.h"
 
 /// declarating container nodes
 typedef struct {
@@ -45,8 +45,9 @@ int entityReadPoolContainer_push(EntityReadPoolContainer_t* const self, EntityRe
 EntityReadParent_t* entityReadPoolContainer_getParent(EntityReadPoolContainer_t* const self,
                                                       const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boardNumber, const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber);
 
-void entityReadPool_foreach(EntityReadPoolContainer_t* const self, int (* const predicate)(EntityReadParent_t* field, void* ctx), void* const ctx);
-
+// foreach functions return 1 if the last element is handled
+int entityReadPool_foreach(EntityReadPoolContainer_t* const self, int (* const predicate)(EntityReadParent_t* const field, void* ctx), void* const ctx);
+int entityReadPool_foreach_startsAfter(EntityReadPoolContainer_t* const self, EntityReadParent_t* const startField, int (* const predicate)(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx));
 
 
 #endif /* USE_ENTITY_READ_SERVICE */

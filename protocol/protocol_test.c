@@ -10,6 +10,7 @@
 
 #include "callback_container.h"
 
+#include "reader/entity_read_system.h"
 
 void callback(void ** context)
 {
@@ -188,6 +189,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
     printf("COMPILER VERSION: %s %ld\n", PREDEF_COMPILER_NAME, __STDC_VERSION__);
     printf("ENTITY VERSION: %d, %s\n", C_ENTITY_FRAMEWORK_LIB_VERSION, C_ENTITY_FRAMEWORK_LIB_VERSION_INFO);
+    // printf("ENTITY PACK SIZE: %d\n", sizeof(EntityPacketTable_t));
 
 //    u32 data;
 //    if (__builtin_types_compatible_p(int, MY_CTYPE_GET_TYPE(INT32_TYPE))) {
