@@ -14,7 +14,7 @@
  */
 #define PREPROCESSOR_CTX_TYPE_GET() void* const * const
 #define PREPROCESSOR_CTX_TYPE(name) PREPROCESSOR_CTX_TYPE_GET() name
-#define PREPROCESSOR_CTX_TYPE_CAST(name) ((void** const) name)
+#define PREPROCESSOR_CTX_TYPE_CAST(name) ((void* const) name)
 
 
 /*********************************************************************************************************************
@@ -26,7 +26,7 @@
  *
  *      PREPROCESSOR_CTX_CAPTURE({&dta, &val1, &val2, &val3})       // expands to --> (void* []){&dta, &val1, &val2, &val3}
  */
-#define PREPROCESSOR_CTX_CAPTURE(...) (void* []) __VA_ARGS__
+#define PREPROCESSOR_CTX_CAPTURE(...) (void* const []) __VA_ARGS__
 
 
 /*********************************************************************************************************************
