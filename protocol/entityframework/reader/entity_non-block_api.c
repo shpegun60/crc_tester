@@ -18,36 +18,40 @@ typedef struct {
 
 EntityNonBlockPacketTable_t readNonBlockPackTable = {};
 
-static int countReadFields(EntityReadParent_t *const field,
-                           void *const *const ctx) {
-    // gettting context
-    PREPROCESSOR_CTX_GET(ctx, EntityNonBlockReadLoopVariables_t *const var,
-                         reg *const packCnt, reg *const Wpos)
 
-            // move to cash some values
-            const u16 boardNumber = field->boardNumber;
-    u8 *const data = var->outBuffer[field->boardNumber];
+static int countReadFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx))
+{
+    // gettting context
+    PREPROCESSOR_CTX_GET(ctx,
+                                 EntityNonBlockReadLoopVariables_t* const var,
+                                 reg* const packCnt,
+                                 reg* const Wpos)
+
+
+
+    // move to cash some values
+    const u16 boardNumber = field->boardNumber;
+    u8* const data = var->outBuffer[field->boardNumber];
 
     // check if board number is valid and read enable
-    if ((boardNumber < ENTITY_READ_SYSTEM_BOARD_COUNT) && field->readEnable) {
+    if((boardNumber < ENTITY_READ_SYSTEM_BOARD_COUNT) && field->readEnable) {
 
-        ENTITY_DBG_ASSERT_BUF(
-                    ((Wpos[boardNumber] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) >
-                     var->outBufferSize),
-                    M_EMPTY, return 1,
-                    "countReadFields: field request size more than outBuffer");
-        writeEntityFieldNumbersToBuf(field->entityNumber, field->fieldNumber, data,
-                                     &Wpos[boardNumber]);
+
+
+
+        ENTITY_DBG_ASSERT_BUF(((Wpos[boardNumber] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize), M_EMPTY, return 1, "countReadFields: field request size more than outBuffer");
+        writeEntityFieldNumbersToBuf(field->entityNumber, field->fieldNumber, data, &Wpos[boardNumber]);
         ++(packCnt[boardNumber]);
     }
 
     readNonBlockPackTable.lastField = field;
 
-    if (packCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
+    if(packCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
         return 1;
     }
     return 0;
 }
+
 
 void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
 {
