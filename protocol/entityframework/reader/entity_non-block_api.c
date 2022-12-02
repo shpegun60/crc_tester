@@ -8,8 +8,9 @@
 #include "entity_packet.h"
 #include "smart_assert.h"
 
-#define NON_BLOCK_REQUESTS_FIND_POSITION 0
-#define NON_BLOCK_REQUESTS_FILL_TABLE 1
+#define NON_BLOCK_REQUESTS_FILL_TABLE 0
+#define NON_BLOCK_REQUESTS_FIND_POSITION 1
+
 
 
 typedef struct {
@@ -40,6 +41,8 @@ static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_T
     const u16 boardNumber = field->boardNumber;
     u8* const data = var->outBuffer[field->boardNumber];
 
+    requestNonBlockPackTable.lastField = field;
+
     // check if board number is valid and read enable
     if((boardNumber < ENTITY_READ_SYSTEM_BOARD_COUNT) && field->readEnable) {
 
@@ -69,12 +72,9 @@ static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_T
             requestNonBlockPackTable.len[boardNumber][requestTablePos] = ++requestCnt[boardNumber];
 
             if(requestCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
-                requestNonBlockPackTable.lastField = field;
                 return 1;
             }
     }
-
-    requestNonBlockPackTable.lastField = field;
     return 0;
 }
 
