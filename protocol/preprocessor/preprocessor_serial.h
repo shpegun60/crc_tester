@@ -8,7 +8,7 @@
 #define __PREPROCESSOR_SERIAL_H__ 1
 
 /* -- Headers -- */
-#include <preprocessor/preprocessor_concatenation.h>
+#include "preprocessor_concatenation.h"
 
 #ifdef __cplusplus
 extern "C" {

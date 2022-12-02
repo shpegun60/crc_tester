@@ -8,7 +8,7 @@
 #define __PREPROCESSOR_BOOLEAN_H__ 1
 
 /* -- Headers -- */
-#include <preprocessor/preprocessor_detection.h>
+#include "preprocessor_detection.h"
 
 #ifdef __cplusplus
 extern "C" {

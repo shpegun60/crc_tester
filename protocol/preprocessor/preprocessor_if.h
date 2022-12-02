@@ -9,8 +9,8 @@
 
 /* -- Headers -- */
 
-#include <preprocessor/preprocessor_boolean.h>
-#include <preprocessor/preprocessor_concatenation.h>
+#include "preprocessor_boolean.h"
+#include "preprocessor_concatenation.h"
 
 #ifdef __cplusplus
 extern "C" {

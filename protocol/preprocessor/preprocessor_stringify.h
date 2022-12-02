@@ -19,12 +19,12 @@ extern "C" {
 #if defined(_MSC_VER) && !defined(__clang__)
     #define PREPROCESSOR_STRINGIFY_IMPL_II(...) #__VA_ARGS__
     #define PREPROCESSOR_STRINGIFY_IMPL(...)                      \
-        PREPROCESSOR_IF(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__), \
+        PREPROCESSOR_IF_ELSE(PREPROCESSOR_ARGS_NOT_EMPTY(__VA_ARGS__))( \
             PREPROCESSOR_STRINGIFY_IMPL_II(__VA_ARGS__),          \
             "")
 #else
 	#define PREPROCESSOR_STRINGIFY_IMPL(expr) #expr
-#endif
+#endif /* defined(_MSC_VER) && !defined(__clang__) */
 
 #if defined(__MWERKS__)
     #define PREPROCESSOR_STRINGIFY_IMPL_I(tuple) PREPROCESSOR_STRINGIFY_IMPL##tuple
@@ -34,7 +34,7 @@ extern "C" {
     #define PREPROCESSOR_STRINGIFY(expr)		 PREPROCESSOR_STRINGIFY_IMPL_I((expr))
 #else
     #define PREPROCESSOR_STRINGIFY(expr) PREPROCESSOR_STRINGIFY_IMPL(expr)
-#endif
+#endif /* defined(__MWERKS__) */
 
 #define PREPROCESSOR_STRINGIFY_VARIADIC(...) \
     PREPROCESSOR_FOR_EACH(PREPROCESSOR_STRINGIFY, PREPROCESSOR_EMPTY, __VA_ARGS__)

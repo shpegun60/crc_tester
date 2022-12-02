@@ -9,7 +9,7 @@
 
 /* -- Headers -- */
 
-#include <preprocessor/preprocessor_arguments.h>
+#include "preprocessor_arguments.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +32,17 @@ extern "C" {
 #define PREPROCESSOR_IS_PROBE(...) _PREPROCESSOR_IS_PROBE(__VA_ARGS__) // expand all arguments
 #define _PREPROCESSOR_IS_PROBE(...) PREPROCESSOR_ARGS_SND(__VA_ARGS__, 0)
 #define PREPROCESSOR_PROBE() ~, 1
+
+
+// #define PREPROCESSOR_UNT(...) __VA_ARGS__
+
+// #define PREPROCESSOR_ARGS_SND1(_x, ...)   PREPROCESSOR_ARGS_SND_IMPL1(_x, __VA_ARGS__, ~)
+// #define PREPROCESSOR_ARGS_SND_IMPL1(_x, ...) PREPROCESSOR_GET_ARG(1) _x
+
+
+// #define PREPROCESSOR_IS_PROBE(x) PREPROCESSOR_ARGS_SND1((bbb), 0)
+// #define PREPROCESSOR_PROBE() (~, 1)
+
 
 /************************************************************************************************************************************************************
  * Detection for parenthesis --> ()

@@ -7,7 +7,7 @@
 #ifndef __PREPROCESSOR_BASE_H__
 #define __PREPROCESSOR_BASE_H__ 1
 
-#include <preprocessor/preprocessor_symbol.h>
+#include "preprocessor_symbol.h"
 
 
 /************************************************************************************************************************************************************
@@ -19,8 +19,8 @@
  * PREPROCESSOR DEBUG EXPRESSIONS
  */
 
-#define PREPROCESSOR_MACRO_DEBUG(x) _MACRO_DEBUG(_MACRO_DEBUG(x))
-#define _MACRO_DEBUG(x) PREPROCESSOR_EXPAND(#x)
+#define PREPROCESSOR_MACRO_DEBUG(...) _MACRO_DEBUG(_MACRO_DEBUG(__VA_ARGS__))
+#define _MACRO_DEBUG(...) PREPROCESSOR_EXPAND(#__VA_ARGS__)
 
 
 /************************************************************************************************************************************************************

@@ -10,7 +10,7 @@
 
 #include "entity_read_parent_pool.h"
 
-#define ENTITY_READ_SYSTEM_BOARD_COUNT 2
+#define ENTITY_READ_SYSTEM_BOARD_COUNT 1
 
 
 typedef struct {

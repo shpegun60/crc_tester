@@ -10,9 +10,9 @@
 
 /* -- Headers -- */
 
-#include <preprocessor/preprocessor_complement.h>
-#include <preprocessor/preprocessor_concatenation.h>
-#include <preprocessor/preprocessor_boolean.h>
+#include "preprocessor_complement.h"
+#include "preprocessor_concatenation.h"
+#include "preprocessor_boolean.h"
 
 
 #ifdef __cplusplus
@@ -96,7 +96,7 @@ extern "C" {
  * Simple preprocessor BINARY operation (other implementation):
  * Logical XOR. Simply performs a lookup.
  */
-#define PREPROCESSOR_XOR(x, y) PREPROCESSOR_CONCAT3(_PREPROCESSOR__XOR_, x, y)
+#define PREPROCESSOR_XOR(x, y) PREPROCESSOR_CONCAT3(_PREPROCESSOR_XOR_, x, y)
 #define _PREPROCESSOR_XOR_00    0
 #define _PREPROCESSOR_XOR_01    1
 #define _PREPROCESSOR_XOR_10    1

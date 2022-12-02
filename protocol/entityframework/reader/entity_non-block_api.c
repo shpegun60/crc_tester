@@ -8,26 +8,33 @@
 #include "entity_packet.h"
 #include "smart_assert.h"
 
+#define NON_BLOCK_REQUESTS_FIND_POSITION 0
+#define NON_BLOCK_REQUESTS_FILL_TABLE 1
+
+
 typedef struct {
-    u32 time            [ENTITY_READ_SYSTEM_BOARD_COUNT][ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE];
+    u32 lastTime        [ENTITY_READ_SYSTEM_BOARD_COUNT][ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE];
     u8  packCounter     [ENTITY_READ_SYSTEM_BOARD_COUNT];
+    u8  packState       [ENTITY_READ_SYSTEM_BOARD_COUNT];
     u8  len             [ENTITY_READ_SYSTEM_BOARD_COUNT][ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE];
     u32 entityTable     [ENTITY_READ_SYSTEM_BOARD_COUNT][ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE][ENTITY_READ_NONBLOCK_API_MTU];
     EntityReadParent_t* lastField;
 } EntityNonBlockPacketTable_t;
 
-EntityNonBlockPacketTable_t readNonBlockPackTable = {};
+EntityNonBlockPacketTable_t requestNonBlockPackTable; // in .bss
 
+void entityNonBlock_init(void)
+{
+    pointerInit(sizeof(requestNonBlockPackTable), (u8*)&requestNonBlockPackTable);
+}
 
 static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx))
 {
     // getting context
     PREPROCESSOR_CTX_GET(ctx,
                                  EntityNonBlockReadLoopVariables_t* const var,
-                                 reg* const packCnt,
+                                 reg* const requestCnt,
                                  reg* const Wpos)
-
-
 
     // move to cash some values
     const u16 boardNumber = field->boardNumber;
@@ -36,19 +43,38 @@ static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_T
     // check if board number is valid and read enable
     if((boardNumber < ENTITY_READ_SYSTEM_BOARD_COUNT) && field->readEnable) {
 
+        TYPEOF_STRUCT(EntityNonBlockPacketTable_t, packCounter[0]) requestTablePos = requestNonBlockPackTable.packCounter[boardNumber];
 
+        if(requestNonBlockPackTable.packState[boardNumber] == NON_BLOCK_REQUESTS_FIND_POSITION) {
+            TYPEOF_STRUCT(EntityNonBlockPacketTable_t, packCounter[0]) const requestTablePos_saved = requestTablePos;
 
+            do {
 
-        ENTITY_DBG_ASSERT_BUF(((Wpos[boardNumber] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize), M_EMPTY, return 1, "countReadFields: field request size more than outBuffer");
-        writeEntityFieldNumbersToBuf(field->entityNumber, field->fieldNumber, data, &Wpos[boardNumber]);
-        ++(packCnt[boardNumber]);
+                if((requestNonBlockPackTable.len[boardNumber][requestTablePos] == 0) || ((var->time - requestNonBlockPackTable.lastTime[boardNumber][requestTablePos]) > ENTITY_READ_NONBLOCK_MAX_TIME_REQUEST)) {
+                    requestNonBlockPackTable.packCounter[boardNumber] = requestTablePos;
+                    requestNonBlockPackTable.packState[boardNumber] = NON_BLOCK_REQUESTS_FILL_TABLE;
+                    goto read_request;
+                }
+                requestTablePos = (requestTablePos + 1) & ENTITY_READ_NONBLOCK_MSK;
+            } while( requestTablePos != requestTablePos_saved );
+
+            return 0; // return bacause table is full
+        }
+
+        read_request:
+            ENTITY_DBG_ASSERT_BUF(((Wpos[boardNumber] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize), M_EMPTY, return 1, "countReadFields: field request size more than outBuffer");
+
+            writeEntityFieldNumbersToBuf(field->entityNumber, field->fieldNumber, data, &Wpos[boardNumber]);
+            requestNonBlockPackTable.entityTable[boardNumber][requestTablePos][requestCnt[boardNumber]] = ((field->entityNumber & 0x0000FFFFU) << 16U) | (field->fieldNumber & 0x0000FFFFU);
+            requestNonBlockPackTable.len[boardNumber][requestTablePos] = ++requestCnt[boardNumber];
+
+            if(requestCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
+                requestNonBlockPackTable.lastField = field;
+                return 1;
+            }
     }
 
-    readNonBlockPackTable.lastField = field;
-
-    if(packCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
-        return 1;
-    }
+    requestNonBlockPackTable.lastField = field;
     return 0;
 }
 
@@ -61,7 +87,6 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
     static u8 nonBlockLoopState = NON_BLOCK_WRITE_TRANSACTION;
     reg packCnt[ENTITY_READ_SYSTEM_BOARD_COUNT]         = {0};
     reg Wpos[ENTITY_READ_SYSTEM_BOARD_COUNT]            = {1};
-    //int ssize = sizeof(EntityNonBlockPacketTable_t);
 
     M_Assert_Break((var == NULL || var->outBuffer == NULL || var->outBufferSize == 0 || var->size == NULL), M_EMPTY, return, "entityNonBlockReadLoop: No valid input!!!");
 
@@ -70,17 +95,17 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
     case(NON_BLOCK_READ_TRANSACTION): {
         EntityReadPoolContainer_t* const readPool = &ersys.readPool;
 
-
-
-        if(entityReadPool_foreach_startsAfter(readPool, readNonBlockPackTable.lastField, makeRequestFields, PREPROCESSOR_CTX_CAPTURE({var, &packCnt[0], &Wpos[0]}))) {
-            readNonBlockPackTable.lastField = NULL;
+        if(entityReadPool_foreach_startsAfter(readPool, requestNonBlockPackTable.lastField, makeRequestFields, PREPROCESSOR_CTX_CAPTURE({var, &packCnt[0], &Wpos[0]}))) {
+            requestNonBlockPackTable.lastField = NULL;
         }
 
         // write sizes & head to buffers
         for(reg i = ENTITY_READ_SYSTEM_BOARD_COUNT; i--;) {
-            if(packCnt[0] != 0) {
+            if(packCnt[i] != 0) {
                 var->outBuffer[i][0] = READ_SEVERAL_VALUES;
                 *(var->size[i]) = Wpos[i];
+                requestNonBlockPackTable.packState[i] = NON_BLOCK_REQUESTS_FIND_POSITION;
+                requestNonBlockPackTable.lastTime[i][requestNonBlockPackTable.packCounter[i]] = var->time;
             } else {
                 *(var->size[i]) = 0;
             }
@@ -126,7 +151,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
 
         // write sizes & head to buffers
         for(reg i = ENTITY_READ_SYSTEM_BOARD_COUNT; i--;) {
-            if(packCnt[0] != 0) {
+            if(packCnt[i] != 0) {
                 var->outBuffer[i][0] = WRITE_SEVERAL_VALUES;
                 *(var->size[i]) = Wpos[i];
             } else {

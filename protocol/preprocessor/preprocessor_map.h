@@ -7,10 +7,10 @@
 #ifndef __PREPROCESSOR_MAP_H__
 #define __PREPROCESSOR_MAP_H__ 1
 
-#include <preprocessor/preprocessor_arguments.h>
-#include <preprocessor/preprocessor_if.h>
-#include <preprocessor/preprocessor_concatenation.h>
-#include <preprocessor/preprocessor_boolean.h>
+#include "preprocessor_arguments.h"
+#include "preprocessor_if.h"
+#include "preprocessor_concatenation.h"
+#include "preprocessor_boolean.h"
 
 
 /************************************************************************************************************************************************************

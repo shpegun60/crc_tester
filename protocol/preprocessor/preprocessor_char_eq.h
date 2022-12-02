@@ -7,8 +7,8 @@
 #ifndef __PREPROCESSOR_CHAR_EQ_H__
 #define __PREPROCESSOR_CHAR_EQ_H__ 1
 
-#include <preprocessor/preprocessor_tuple.h>
-#include <preprocessor/preprocessor_logical.h>
+#include "preprocessor_tuple.h"
+#include "preprocessor_logical.h"
 
 /*********************************************************************************************************************
  *  LOWER CHAR detector macro

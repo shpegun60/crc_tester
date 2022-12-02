@@ -12,7 +12,7 @@
  * C/C++ type detector macro
  *
  *      PREPROCESSOR_TYPE_EQ(int, int)       // expands to 1
- *      PREPROCESSOR_TYPE_EQ(float, float)   // expands to 0
+ *      PREPROCESSOR_TYPE_EQ(float, int)   // expands to 0
  *      PREPROCESSOR_TYPE_DETECT(int)        // expands to 1
  */
 //#define PREPROCESSOR_TYPE_EQ(x, y)           PREPROCESSOR_IS_TUPLE_FAST(PREPROCESSOR_C_TYPE_DETECTOR_##x##_##y)

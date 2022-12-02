@@ -2,7 +2,8 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD	
 
 SOURCES += \
-
+	$$PWD/preprocessor_test.c
+	
 HEADERS += \
     $$PWD/preprocessor.h \
     $$PWD/preprocessor_arguments.h \
@@ -28,4 +29,5 @@ HEADERS += \
     $$PWD/preprocessor_symbol.h \
     $$PWD/preprocessor_template.h \
     $$PWD/preprocessor_tuple.h \
-    $$PWD/preprocessor_template.h
+    $$PWD/preprocessor_template.h\
+	$$PWD/preprocessor_test.h

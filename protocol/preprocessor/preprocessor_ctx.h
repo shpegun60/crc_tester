@@ -6,7 +6,7 @@
 #ifndef __PREPROCESSOR_CTX_H__
 #define __PREPROCESSOR_CTX_H__ 1
 
-#include <preprocessor/preprocessor_map.h>
+#include "preprocessor_map.h"
 /*********************************************************************************************************************
  *  PREPROCESSOR CONTEXT TYPE
  *

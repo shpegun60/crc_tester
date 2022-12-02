@@ -7,8 +7,8 @@
 #ifndef __PREPROCESSOR_TEMPLATE_H__
 #define __PREPROCESSOR_TEMPLATE_H__ 1
 
-#include <preprocessor/preprocessor_map.h>
-#include <preprocessor/preprocessor_symbol.h>
+#include "preprocessor_map.h"
+#include "preprocessor_symbol.h"
 
 /************************************************************************************************************************************************************
  * PREPROCESSOR TEMPLATE EMULATION ON C99

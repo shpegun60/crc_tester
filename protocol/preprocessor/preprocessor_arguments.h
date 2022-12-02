@@ -10,12 +10,12 @@
 
 /* -- Headers -- */
 
-#include <preprocessor/preprocessor_arithmetic.h>
-#include <preprocessor/preprocessor_boolean.h>
-#include <preprocessor/preprocessor_symbol.h>
-#include <preprocessor/preprocessor_concatenation.h>
-#include <preprocessor/preprocessor_if.h>
-#include <preprocessor/preprocessor_tuple.h>
+#include "preprocessor_arithmetic.h"
+#include "preprocessor_boolean.h"
+#include "preprocessor_symbol.h"
+#include "preprocessor_concatenation.h"
+#include "preprocessor_if.h"
+#include "preprocessor_tuple.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,14 +83,16 @@ extern "C" {
  *      PREPROCESSOR_ARGS_SND(x,y,z)  // expands to y
  *
  */
-#define PREPROCESSOR_ARGS_HEAD(...)        PREPROCESSOR_ARGS_IMPL(__VA_ARGS__, ~)
-#define PREPROCESSOR_ARGS_IMPL(x, ...) x
 
-#define PREPROCESSOR_ARGS_TAIL(...)         PREPROCESSOR_ARGS_TAIL_IMPL(__VA_ARGS__)
-#define PREPROCESSOR_ARGS_TAIL_IMPL(_x, ...) __VA_ARGS__
+#   define PREPROCESSOR_ARGS_HEAD(...)        PREPROCESSOR_ARGS_IMPL(__VA_ARGS__, ~)
+#   define PREPROCESSOR_ARGS_IMPL(x, ...) x
+#
+#   define PREPROCESSOR_ARGS_TAIL(...)         PREPROCESSOR_ARGS_TAIL_IMPL(__VA_ARGS__)
+#   define PREPROCESSOR_ARGS_TAIL_IMPL(_x, ...) __VA_ARGS__
+#
+#   define PREPROCESSOR_ARGS_SND(...)            PREPROCESSOR_ARGS_SND_IMPL(__VA_ARGS__, ~)
+#   define PREPROCESSOR_ARGS_SND_IMPL(_x, y, ...) y
 
-#define PREPROCESSOR_ARGS_SND(...)            PREPROCESSOR_ARGS_SND_IMPL(__VA_ARGS__, ~)
-#define PREPROCESSOR_ARGS_SND_IMPL(_x, y, ...) y
 
 
 /************************************************************************************************************************************************************

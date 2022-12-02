@@ -8,7 +8,7 @@
 #define __PREPROCESSOR_NAT_EQ_H__ 1
 
 
-#include <preprocessor/preprocessor_tuple.h>
+#include "preprocessor_tuple.h"
 
 /*********************************************************************************************************************
  * MAXIMUM DIGIT FOR EQUALUATIONS
