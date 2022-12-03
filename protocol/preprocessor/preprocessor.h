@@ -1,8 +1,8 @@
 /*
  *	CREATED BY SHPEGUN60
  *
- *  PREPROCESSOR - CHAOS LIBRARY
- *  
+ *  PREPROCESSOR - a library that allows you to summon the devil or other evil spirits in the programming language C99 or later, and no joke, it allows you to use preprocessor metaprogramming in C
+ *
  *  Supporeted Compilers:
  *      MSVC: After Visual Studio 2019 verion 16.6;	Compiler version after--> msvc v19.26, 
  *             you must add /Zc:preprocessor to your compilation flags.
