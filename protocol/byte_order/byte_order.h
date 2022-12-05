@@ -134,7 +134,7 @@ STATIC_FORCEINLINE void Reverse64_ptr(const u64 * const value, u64 * const to)
  * 16 bit variable reverse function
  * ********************************************************
  */
-STATIC_FORCEINLINE u16 LittleEndianU16(u16 value)
+STATIC_FORCEINLINE u16 LittleEndianU16(const u16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -145,7 +145,7 @@ STATIC_FORCEINLINE u16 LittleEndianU16(u16 value)
 #endif
 }
 
-STATIC_FORCEINLINE i16 LittleEndianI16(i16 value)
+STATIC_FORCEINLINE i16 LittleEndianI16(const i16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -158,7 +158,7 @@ STATIC_FORCEINLINE i16 LittleEndianI16(i16 value)
 #endif
 }
 
-STATIC_FORCEINLINE u16 BigEndianU16(u16 value)
+STATIC_FORCEINLINE u16 BigEndianU16(const u16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse16(value);
@@ -169,11 +169,11 @@ STATIC_FORCEINLINE u16 BigEndianU16(u16 value)
 #endif
 }
 
-STATIC_FORCEINLINE i16 BigEndianI16(i16 value)
+STATIC_FORCEINLINE i16 BigEndianI16(const i16 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     i16 data;
-    Reverse16_ptr((u16 *) &value, (u16 *) &data);
+    Reverse16_ptr((const u16 * const) &value, (u16 *const) &data);
     return data;
 #elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
     return value;
@@ -188,7 +188,7 @@ STATIC_FORCEINLINE i16 BigEndianI16(i16 value)
  * ********************************************************
  */
 
-STATIC_FORCEINLINE u32 LittleEndianU32(u32 value)
+STATIC_FORCEINLINE u32 LittleEndianU32(const u32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -199,7 +199,7 @@ STATIC_FORCEINLINE u32 LittleEndianU32(u32 value)
 #endif
 }
 
-STATIC_FORCEINLINE i32 LittleEndianI32(i32 value)
+STATIC_FORCEINLINE i32 LittleEndianI32(const i32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -212,7 +212,7 @@ STATIC_FORCEINLINE i32 LittleEndianI32(i32 value)
 #endif
 }
 
-STATIC_FORCEINLINE u32 BigEndianU32(u32 value)
+STATIC_FORCEINLINE u32 BigEndianU32(const u32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse32(value);
@@ -223,7 +223,7 @@ STATIC_FORCEINLINE u32 BigEndianU32(u32 value)
 #endif
 }
 
-STATIC_FORCEINLINE i32 BigEndianI32(i32 value)
+STATIC_FORCEINLINE i32 BigEndianI32(const i32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     i32 data;
@@ -243,7 +243,7 @@ STATIC_FORCEINLINE i32 BigEndianI32(i32 value)
  * ********************************************************
  */
 
-STATIC_FORCEINLINE u64 LittleEndianU64(u64 value)
+STATIC_FORCEINLINE u64 LittleEndianU64(const u64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -254,7 +254,7 @@ STATIC_FORCEINLINE u64 LittleEndianU64(u64 value)
 #endif
 }
 
-STATIC_FORCEINLINE i64 LittleEndianI64(i64 value)
+STATIC_FORCEINLINE i64 LittleEndianI64(const i64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -267,7 +267,7 @@ STATIC_FORCEINLINE i64 LittleEndianI64(i64 value)
 #endif
 }
 
-STATIC_FORCEINLINE u64 BigEndianU64(u64 value)
+STATIC_FORCEINLINE u64 BigEndianU64(const u64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return Reverse64(value);
@@ -278,7 +278,7 @@ STATIC_FORCEINLINE u64 BigEndianU64(u64 value)
 #endif
 }
 
-STATIC_FORCEINLINE i64 BigEndianI64(i64 value)
+STATIC_FORCEINLINE i64 BigEndianI64(const i64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     i64 data;
@@ -298,7 +298,7 @@ STATIC_FORCEINLINE i64 BigEndianI64(i64 value)
  * ********************************************************
  */
 
-STATIC_FORCEINLINE f32 LittleEndianF32(f32 value)
+STATIC_FORCEINLINE f32 LittleEndianF32(const f32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -311,7 +311,7 @@ STATIC_FORCEINLINE f32 LittleEndianF32(f32 value)
 #endif
 }
 
-STATIC_FORCEINLINE f32 BigEndianF32(f32 value)
+STATIC_FORCEINLINE f32 BigEndianF32(const f32 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     f32 data;
@@ -330,7 +330,7 @@ STATIC_FORCEINLINE f32 BigEndianF32(f32 value)
  * ********************************************************
  */
 
-STATIC_FORCEINLINE f64 LittleEndianF64(f64 value)
+STATIC_FORCEINLINE f64 LittleEndianF64(const f64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     return value;
@@ -343,7 +343,7 @@ STATIC_FORCEINLINE f64 LittleEndianF64(f64 value)
 #endif
 }
 
-STATIC_FORCEINLINE f64 BigEndianF64(f64 value)
+STATIC_FORCEINLINE f64 BigEndianF64(const f64 value)
 {
 #if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
     f64 data;
