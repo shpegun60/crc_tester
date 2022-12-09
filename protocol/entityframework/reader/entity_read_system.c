@@ -16,11 +16,11 @@
 
 EntityReadSystem_t ersys = {
     /* BEGIN GENERATION CODE */
-    ENTITY_CREATE_READ_CHIELD_BODY(u8, name, 0, 1, 2, 3, &ersys.name.data, &ersys.writePool, 1),
-    ENTITY_CREATE_READ_CHIELD_BODY(u16, name1, 0, 1, 2, 3, &ersys.name1.data, &ersys.writePool, 1),
+    ENTITY_CREATE_READ_CHIELD_BODY(u8, name, 0, 1, 2, 3, &ersys.name.data, &ersys.writePool[0], 1),
+    ENTITY_CREATE_READ_CHIELD_BODY(u16, name1, 0, 1, 2, 3, &ersys.name1.data, &ersys.writePool[0], 1),
 
     /* END GENERATION CODE */
-    .writePool  = {0, 0, 1, 0, 0, NULL},
+    //.writePool  = {0, 0, 1, 0, 0, NULL},
     .readPool   = {0, NULL}
 };
 
@@ -73,7 +73,7 @@ int initEntityReadSystem(void)
      * Write container initialization (for only write changed fields)
      */
 
-    EN_RD_SYS_ASSERT( entityWritePoolContainer_init(&ersys.writePool, 2) );
+    EN_RD_SYS_ASSERT( entityWritePoolContainer_init(&ersys.writePool[0], 2) );
 
     /* END GENERATION CODE */
 

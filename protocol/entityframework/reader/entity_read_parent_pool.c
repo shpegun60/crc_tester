@@ -1,8 +1,10 @@
 #include "entity_read_parent_pool.h"
 
+
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
 
 #ifdef USE_ENTITY_READ_SERVICE
+#include "entity_read_system.h"
 #include "smart_assert.h"
 #include <stdlib.h>
 
@@ -246,59 +248,71 @@ int entityReadPool_foreach_startsAfter(EntityReadPoolContainer_t* const self, En
     return 1;
 }
 
-//int entityReadPool_foreach_startsAfter(EntityReadPoolContainer_t* const self, EntityReadParent_t* const startField, int (* const predicate)(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx))
-//{
-//    M_Assert_Break((self == NULL) || (self->boards == NULL), M_EMPTY, return 0, "entityReadPool_foreach: no valid input object");
-//    M_Assert_BreakSaveCheck((predicate == NULL), M_EMPTY, return 0, "entityReadPool_foreach: no valid input predicate");
-
-//    TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)    board_start       ;
-//    TYPEOF_STRUCT(EntityInfo, entities_count)                 entitity_start    ;
-//    TYPEOF_STRUCT(Entity, fields_count)                       field_start       ;
-
-//    // check if element is last or NULL, than start from head
-//    if(startField == NULL) {
-//        board_start         = 0;
-//        entitity_start      = 0;
-//        field_start         = 0;
-//    } else {
-//        board_start         = startField->boardNumber;
-//        entitity_start      = startField->entityNumber;
-//        field_start         = startField->fieldNumber;
-//    }
 
 
-//    const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boards_count = (self)->boards_count;
 
-//    for(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) board = board_start; board < boards_count; ++board) {                     // board`s counting
-//        const   EN_BoardReadNode_t*   const   board_ptr                 = &self->boards[board];         // move to cash
-//        const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count  = board_ptr->entities_count;    // move to cash
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+STATIC_FORCEINLINE int entityReadPool_foreach_board(EntityReadPoolContainer_t* const self, TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) board, EntityReadParent_t* const startField, int (* const predicate)(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx))
+{
+    TYPEOF_STRUCT(EntityInfo, entities_count)                 entitity_start    ;
+    TYPEOF_STRUCT(Entity, fields_count)                       field_start       ;
 
-//        for(TYPEOF_STRUCT(EntityInfo, entities_count) entity = entitity_start; entity < entities_count; ++entity) {                         // entities counting
-//            const   EN_EntityReadNode_t*  const   entity_ptr            = &board_ptr->entities[entity]; // move to cash
-//            const TYPEOF_STRUCT(Entity, fields_count) fields_count      = entity_ptr->fields_count;     // move to cash
+    // check if element is last or NULL, than start from head
+    if(startField == NULL) {
+        entitity_start      = 0;
+        field_start         = 0;
+    } else {
+        entitity_start      = startField->entityNumber;
+        field_start         = startField->fieldNumber + 1;
+    }
 
-//            for(TYPEOF_STRUCT(Entity, fields_count) field = field_start; field < fields_count; ++field) {                                // field`s counting
 
-//                EntityReadParent_t* const field_ptr = entity_ptr->fields[field];                        // move to cash
+    const   EN_BoardReadNode_t*   const   board_ptr                 = &self->boards[board];         // move to cash
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count  = board_ptr->entities_count;    // move to cash
 
-//                if(field_ptr != NULL) {
-//                    if(predicate(field_ptr, ctx)) {
+    for(TYPEOF_STRUCT(EntityInfo, entities_count) entity = entitity_start; entity < entities_count; ++entity) {                        // entities counting
+        const   EN_EntityReadNode_t*  const   entity_ptr            = &board_ptr->entities[entity]; // move to cash
+        const TYPEOF_STRUCT(Entity, fields_count) fields_count      = entity_ptr->fields_count;     // move to cash
 
-//                        if( (field == (fields_count - 1)) && (entity == (entities_count - 1)) && (board == (boards_count - 1)) ) {
-//                            return 1;
-//                        } else {
-//                            return 0;
-//                        }
+        for(TYPEOF_STRUCT(Entity, fields_count) field = field_start; field < fields_count; ++field) {                                  // field`s counting
 
-//                    }
-//                }
+            EntityReadParent_t* const field_ptr = entity_ptr->fields[field];                        // move to cash
 
-//            }
-//        }
-//    }
+            if(field_ptr != NULL) {
+                if(predicate(field_ptr, ctx)) {
 
-//    return 1;
-//}
+                    if( (field == (fields_count - 1)) && (entity == (entities_count - 1)) && (board == (ENTITY_READ_SYSTEM_BOARD_COUNT - 1)) ) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+
+                }
+            }
+
+        }
+    }
+
+    return 1;
+}
+
+
+void entityReadPool_foreach_boards_separation(EntityReadPoolContainer_t* const self, EntityReadParent_t* startFields [ENTITY_READ_SYSTEM_BOARD_COUNT], int (* const predicate)(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx))
+{
+    M_Assert_Break((self == NULL) || (self->boards == NULL) || (startFields == NULL), M_EMPTY, return, "entityReadPool_foreach: no valid input object");
+    M_Assert_Break((ENTITY_READ_SYSTEM_BOARD_COUNT > self->boards_count), M_EMPTY, return, "entityReadPool_foreach: no valid input boards count");
+    M_Assert_BreakSaveCheck((predicate == NULL), M_EMPTY, return, "entityReadPool_foreach: no valid input predicate");
+
+
+
+    for(TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) board = 0; board < ENTITY_READ_SYSTEM_BOARD_COUNT; ++board) {     // board`s counting
+
+        if(entityReadPool_foreach_board(self, board, startFields[board], predicate, ctx)) {
+            startFields[board] = NULL;
+        }
+
+    }
+}
 
 
 #endif /* USE_ENTITY_READ_SERVICE */

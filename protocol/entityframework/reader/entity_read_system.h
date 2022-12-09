@@ -22,8 +22,8 @@ typedef struct {
 
     /* END GENERATION CODE */
 
-    EntityWritePoolContainer_t writePool;   // for transmitting only changed fields
-    EntityReadPoolContainer_t  readPool;    // for fast searching fields by boardNumber, entityNumber and fieldNumber if data is received
+    EntityWritePoolContainer_t writePool[ENTITY_READ_SYSTEM_BOARD_COUNT];   // for transmitting only changed fields
+    EntityReadPoolContainer_t  readPool;                                    // for fast searching fields by boardNumber, entityNumber and fieldNumber if data is received
 } EntityReadSystem_t;
 
 extern EntityReadSystem_t ersys;

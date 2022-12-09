@@ -72,14 +72,14 @@ int endiansTest();
 
 STATIC_FORCEINLINE u16 Reverse16(const u16 value)
 {
-    return (u16)( 0
+    return (const u16)( 0
                        | ((value & 0x00ffU) << 8U)
                        | ((value & 0xff00U) >> 8U) );
 }
 
 STATIC_FORCEINLINE u32 Reverse32(const u32 value)
 {
-    return (u32)( 0
+    return (const u32)( 0
                        | ((value & 0x000000ffUL) << 24U)
                        | ((value & 0x0000ff00UL) << 8U)
                        | ((value & 0x00ff0000UL) >> 8U)
@@ -88,7 +88,7 @@ STATIC_FORCEINLINE u32 Reverse32(const u32 value)
 
 STATIC_FORCEINLINE u64 Reverse64(const u64 value)
 {
-    return (u64)( 0
+    return (const u64)( 0
                        | ((value & 0x00000000000000ffULL) << 56U)
                        | ((value & 0x000000000000ff00ULL) << 40U)
                        | ((value & 0x0000000000ff0000ULL) << 24U)
@@ -102,14 +102,14 @@ STATIC_FORCEINLINE u64 Reverse64(const u64 value)
 // pointrs input ----------------------------------------------
 STATIC_FORCEINLINE void Reverse16_ptr(const u16 * const value, u16 * const to)
 {
-    *to = (u16)( 0
+    *to = (const u16)( 0
                        | (((*value) & 0x00ff) << 8U)
                        | (((*value) & 0xff00) >> 8U) );
 }
 
 STATIC_FORCEINLINE void Reverse32_ptr(const u32 * const value, u32 * const to)
 {
-    *to = (u32)( 0
+    *to = (const u32)( 0
                        | (((*value) & 0x000000ffUL) << 24U)
                        | (((*value) & 0x0000ff00UL) << 8U)
                        | (((*value) & 0x00ff0000UL) >> 8U)
@@ -118,7 +118,7 @@ STATIC_FORCEINLINE void Reverse32_ptr(const u32 * const value, u32 * const to)
 
 STATIC_FORCEINLINE void Reverse64_ptr(const u64 * const value, u64 * const to)
 {
-    *to = (u64)( 0
+    *to = (const u64)( 0
                        | (((*value) & 0x00000000000000ffULL) << 56U)
                        | (((*value) & 0x000000000000ff00ULL) << 40U)
                        | (((*value) & 0x0000000000ff0000ULL) << 24U)
@@ -131,7 +131,7 @@ STATIC_FORCEINLINE void Reverse64_ptr(const u64 * const value, u64 * const to)
 
 /*
  * ********************************************************
- * 16 bit variable reverse function
+ * 16 bit variable reverse functions
  * ********************************************************
  */
 STATIC_FORCEINLINE u16 LittleEndianU16(const u16 value)
@@ -184,7 +184,7 @@ STATIC_FORCEINLINE i16 BigEndianI16(const i16 value)
 
 /*
  * ********************************************************
- * 32 bit variable reverse function
+ * 32 bit variable reverse functions
  * ********************************************************
  */
 
@@ -239,7 +239,7 @@ STATIC_FORCEINLINE i32 BigEndianI32(const i32 value)
 
 /*
  * ********************************************************
- * 64 bit variable reverse function
+ * 64 bit variable reverse functions
  * ********************************************************
  */
 
@@ -294,7 +294,7 @@ STATIC_FORCEINLINE i64 BigEndianI64(const i64 value)
 
 /*
  * ********************************************************
- * f32 32 bit variable reverse function
+ * f32 32 bit variable reverse functions
  * ********************************************************
  */
 
@@ -326,7 +326,7 @@ STATIC_FORCEINLINE f32 BigEndianF32(const f32 value)
 
 /*
  * ********************************************************
- * f64 64 bit variable reverse function
+ * f64 64 bit variable reverse functions
  * ********************************************************
  */
 

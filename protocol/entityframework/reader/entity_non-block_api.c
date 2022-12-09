@@ -33,9 +33,9 @@ static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_T
 {
     // getting context
     PREPROCESSOR_CTX_GET(ctx,
-                                 EntityNonBlockReadLoopVariables_t* const var,
-                                 reg* const requestCnt,
-                                 reg* const Wpos)
+                         EntityNonBlockReadLoopVariables_t* const var,
+                         reg* const requestCnt,
+                         reg* const Wpos)
 
     // move to cash some values
     const u16 boardNumber = field->boardNumber;
@@ -64,16 +64,16 @@ static int makeRequestFields(EntityReadParent_t* const field, PREPROCESSOR_CTX_T
             return 0; // return bacause table is full
         }
 
-        read_request:
-            ENTITY_DBG_ASSERT_BUF(((Wpos[boardNumber] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize), M_EMPTY, return 1, "countReadFields: field request size more than outBuffer");
+read_request:
+        ENTITY_DBG_ASSERT_BUF(((Wpos[boardNumber] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize), M_EMPTY, return 1, "countReadFields: field request size more than outBuffer");
 
-            writeEntityFieldNumbersToBuf(field->entityNumber, field->fieldNumber, data, &Wpos[boardNumber]);
-            requestNonBlockPackTable.entityTable[boardNumber][requestTablePos][requestCnt[boardNumber]] = ((field->entityNumber & 0x0000FFFFU) << 16U) | (field->fieldNumber & 0x0000FFFFU);
-            requestNonBlockPackTable.len[boardNumber][requestTablePos] = ++requestCnt[boardNumber];
+        writeEntityFieldNumbersToBuf(field->entityNumber, field->fieldNumber, data, &Wpos[boardNumber]);
+        requestNonBlockPackTable.entityTable[boardNumber][requestTablePos][requestCnt[boardNumber]] = ((field->entityNumber & 0x0000FFFFU) << 16U) | (field->fieldNumber & 0x0000FFFFU);
+        requestNonBlockPackTable.len[boardNumber][requestTablePos] = ++requestCnt[boardNumber];
 
-            if(requestCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
-                return 1;
-            }
+        if(requestCnt[boardNumber] == ENTITY_READ_NONBLOCK_API_MTU) {
+            return 1;
+        }
     }
     return 0;
 }
@@ -114,7 +114,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
         break;}
 
     case(NON_BLOCK_WRITE_TRANSACTION): {
-        EntityWritePoolContainer_t* const writePool = &ersys.writePool; // move to cash pointer
+        EntityWritePoolContainer_t* const writePool = &ersys.writePool[0]; // move to cash pointer
 
         if(writePool->rdEmpty) {
             nonBlockLoopState = NON_BLOCK_READ_TRANSACTION;
