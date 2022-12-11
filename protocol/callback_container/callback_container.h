@@ -57,7 +57,7 @@ TEMPLATE(CallbackContainer, rT, cT)* TEMPLATE(newCallbackContainerUser, rT, cT) 
     TEMPLATE(CallbackContainer, rT, cT) * m_container = (TEMPLATE(CallbackContainer, rT, cT) *) malloc(sizeof(TEMPLATE(CallbackContainer, rT, cT)));                        \
     if(m_container == NULL) {                                                                                                                                               \
         *ok = 0;                                                                                                                                                            \
-        return m_container;                                                                                                                                                 \
+        return NULL;                                                                                                                                                        \
     }                                                                                                                                                                       \
                                                                                                                                                                             \
     m_container->callback = callback;                                                                                                                                       \
@@ -72,7 +72,7 @@ TEMPLATE(CallbackContainer, rT, cT)* TEMPLATE(newCallbackContainerHeap, rT, cT) 
     TEMPLATE(CallbackContainer, rT, cT) * m_container = (TEMPLATE(CallbackContainer, rT, cT) *) malloc(sizeof(TEMPLATE(CallbackContainer, rT, cT)));                        \
     if(m_container == NULL) {                                                                                                                                               \
         *ok = 0;                                                                                                                                                            \
-        return m_container;                                                                                                                                                 \
+        return NULL;                                                                                                                                                        \
     }                                                                                                                                                                       \
                                                                                                                                                                             \
     m_container->context = (TYPEOF_STRUCT(TEMPLATE(CallbackContainer, rT, cT), context))calloc(1, heapContextSize);                                                         \
@@ -80,7 +80,7 @@ TEMPLATE(CallbackContainer, rT, cT)* TEMPLATE(newCallbackContainerHeap, rT, cT) 
         free(m_container);                                                                                                                                                  \
         m_container = NULL;                                                                                                                                                 \
         *ok = 0;                                                                                                                                                            \
-        return m_container;                                                                                                                                                 \
+        return NULL;                                                                                                                                                        \
     }                                                                                                                                                                       \
     m_container->callback = callback;                                                                                                                                       \
     *ok = 1;                                                                                                                                                                \

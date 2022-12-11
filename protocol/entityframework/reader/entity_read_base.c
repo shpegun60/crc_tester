@@ -33,11 +33,11 @@ int ENTITY_READ_PARENT_SET_FUNC(sreg) (EntityReadParent_t * const self, u8* inpu
 
     ENTITY_BYTE_CPY(self->size, input, self->data);
     // copy sign
-    u64 sign = (input[self->size - 1] & 0x80U) ? 0 : UINT64_MAX;
+    const u8 sign = (input[self->size - 1] & 0x80U) ? 0x00U : 0xFFU;
 
     reg i = self->size;
     while(i != sizeof(i64)) {
-       ((u8*)(self->data))[i] = ((u8*)(&sign))[i];
+       ((u8*)(self->data))[i] = sign;
         ++i;
     }
 

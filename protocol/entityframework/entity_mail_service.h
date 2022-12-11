@@ -21,7 +21,7 @@
 
 typedef struct {
     reg               mailDis;
-    IntrusiveSList* lastStream;
+    IntrusiveSListNode* lastStream;
     IntrusiveSList  head;
 } EntityMailService_t;
 

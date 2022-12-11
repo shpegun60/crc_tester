@@ -9,7 +9,6 @@
 #include "entity_read_system.h"
 
 #define ENTITY_READ_NONBLOCK_MAX_TIME_REQUEST 100
-#define ENTITY_READ_NONBLOCK_API_MTU 10
 #define ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE 4
 #define ENTITY_READ_NONBLOCK_MSK (ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE - 1)
 
@@ -23,7 +22,16 @@ typedef struct {
 
 void entityNonBlock_init(void);
 void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var);
-void entityNonBlockReceivePacket(u8* const inBuffer, const reg inBufferSize);
+void entityNonBlockReceivePacket(const u16 boardNumber, u8* const inBuffer, const reg inBufferSize);
+
+
+#if ((ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE - 1) & ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE)
+#   error ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE must be is power of 2
+#endif //check if power of 2 ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE
+
+#if (ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE > 256)
+#   error ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE must less than 256
+#endif //check if power of 2 ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE
 
 
 #endif /* USE_ENTITY_READ_SERVICE */

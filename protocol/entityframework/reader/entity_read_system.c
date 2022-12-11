@@ -6,7 +6,7 @@
 
 #ifdef USE_ENTITY_READ_SERVICE
 
-
+#include "preprocessor_ctx.h"
 #include "smart_assert.h"
 
 #define EN_RD_SYS_ASSERT(expr)                  \
@@ -20,16 +20,19 @@ EntityReadSystem_t ersys = {
     ENTITY_CREATE_READ_CHIELD_BODY(u16, name1, 0, 1, 2, 3, &ersys.name1.data, &ersys.writePool[0], 1),
 
     /* END GENERATION CODE */
-    //.writePool  = {0, 0, 1, 0, 0, NULL},
+    .writePool  = {},
     .readPool   = {0, NULL}
 };
 
 
-static int parentPointersCheck(EntityReadParent_t* const field, void* ctx)
+static int parentPointersCheck(EntityReadParent_t* const field, PREPROCESSOR_CTX_TYPE(ctx))
 {
     M_Assert_BreakSaveCheck(field == NULL || ctx == NULL, M_EMPTY, return 1, "parentPointersCheck: pointer or context data is null!!!");
-    int* errorInit = ctx;
+    PREPROCESSOR_CTX_GET(ctx,
+                                 int* const errorInit,
+                                 int* const allfieldsIsNull);
 
+    *allfieldsIsNull = 0;
 
     M_Assert_BreakSaveCheck(    field->writeContainer == NULL
                                 ||  field->writeContainer->allocatedFields == 0
@@ -79,7 +82,12 @@ int initEntityReadSystem(void)
 
     // check all pointers--------------------------------------------------------------------------------------------------------------
     int errorInit = 0;
-    entityReadPool_foreach(&ersys.readPool, parentPointersCheck, &errorInit);
+    int allfieldsIsNull = 1;
+    entityReadPool_foreach(&ersys.readPool, parentPointersCheck, PREPROCESSOR_CTX_CAPTURE({&errorInit, &allfieldsIsNull}));
+
+    if(allfieldsIsNull) {
+        return ENTITY_ERROR;
+    }
 
     if(errorInit == 0) {
         return ENTITY_OK;

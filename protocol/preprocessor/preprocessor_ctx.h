@@ -32,7 +32,7 @@
 /*********************************************************************************************************************
  *  PREPROCESSOR CONTEXT GET
  *
- *          PREPROCESSOR_CTX_CAPTURE_GET(ctx,
+ *          PREPROCESSOR_CTX_GET(ctx,
  *                               uint8_t  *val1,
  *                               uint16_t *val2,
  *                               uint32_t *val3)
