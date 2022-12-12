@@ -6,7 +6,6 @@
 #ifdef USE_ENTITY_READ_SERVICE
 
 #include "IntrusiveLinkedList.h"
-#include "preprocessor_ctx.h"
 #include "entity_packet.h"
 #include "smart_assert.h"
 
@@ -38,9 +37,10 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
     reg Wpos[ENTITY_READ_SYSTEM_BOARD_COUNT]                    = {2};
     reg writeReqHead[ENTITY_READ_SYSTEM_BOARD_COUNT]            = {0};
 
-    M_Assert_Break((var == NULL || var->outBuffer == NULL || var->outBufferSize == 0 || var->size == NULL), M_EMPTY, return, "entityNonBlockReadLoop: No valid input!!!");
+    M_Assert_Break((var == NULL || var->outBuffer == NULL || var->size == NULL), M_EMPTY, return, "entityNonBlockReadLoop: No valid input!!!");
 
     for(reg i = ENTITY_READ_SYSTEM_BOARD_COUNT; i--;) {
+
         u8* const data = var->outBuffer[i];
 
         // write request fields ---------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -49,16 +49,17 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
         while((!writePool->rdEmpty) && (writeRequestCnt[i] != ENTITY_WRITE_API_MTU)) {
             // move to cash values
             EntityReadParent_t* const parent = entityWritePoolContainer_readParent(writePool); // get pointer to parent;
+            const reg parentSize = parent->size;
             M_Assert_Break((parent == NULL), M_EMPTY, return, "entityNonBlockReadLoop: No valid parent!!!");
 
 
             // write data to out buffer
-            ENTITY_DBG_ASSERT_BUF(((Wpos[i] + parent->size + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize),
+            ENTITY_DBG_ASSERT_BUF(((Wpos[i] + parentSize + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize[i]),
                                   M_EMPTY, return, "entityNonBlockReadLoop: field write size more than outBuffer");
 
             writeEntityFieldNumbersToBuf(parent->entityNumber, parent->fieldNumber, data, &Wpos[i]);
-            ENTITY_BYTE_CPY(parent->size, parent->data, &data[Wpos[i]]);
-            Wpos[i] += parent->size;
+            ENTITY_BYTE_CPY(parentSize, parent->data, &data[Wpos[i]]);
+            Wpos[i] += parentSize;
 
             parent->onValueNotUpdated = 1;
             ++(writeRequestCnt[i]);
@@ -66,7 +67,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
 
         // write sizes & head to buffers
         if(writeRequestCnt[i] != 0) {
-            var->outBuffer[i][0] = WRITE_SEVERAL_VALUES;
+            var->outBuffer[i][0] = WRITE_SEVERAL_VALUES_GLUED;
             var->outBuffer[i][1] = writeRequestCnt[i];
             writeReqHead[i] = Wpos[i];
             Wpos[i] += 3;
@@ -95,7 +96,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
                         EntityReadParent_t* const parent = readNode->field;
                         M_Assert_Break((parent == NULL), M_EMPTY, return, "entityNonBlockReadLoop: No valid parent!!!");
 
-                        ENTITY_DBG_ASSERT_BUF(((Wpos[i] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize), M_EMPTY, return, "entityNonBlockReadLoop: field request size more than outBuffer");
+                        ENTITY_DBG_ASSERT_BUF(((Wpos[i] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > var->outBufferSize[i]), M_EMPTY, return, "entityNonBlockReadLoop: field request size more than outBuffer");
                         writeEntityFieldNumbersToBuf(parent->entityNumber, parent->fieldNumber, data, &Wpos[i]);
                         requestNonBlockPackTable.entityTable[i][requestTablePos][readRequestCnt[i]] = parent;
 
@@ -117,7 +118,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
         // write sizes & head to buffers
         if(readRequestCnt[i] != 0) {
 
-            var->outBuffer[i][writeReqHead[i]] = READ_SEVERAL_VALUES;
+            var->outBuffer[i][writeReqHead[i]] = READ_SEVERAL_VALUES_GLUED;
             var->outBuffer[i][writeReqHead[i] + 1] = readRequestCnt[i];
             var->outBuffer[i][writeReqHead[i] + 2] = requestTablePos;
             *(var->size[i]) = Wpos[i];
@@ -132,7 +133,7 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
 
 void entityNonBlockReceivePacket(const u16 boardNumber, u8* const inBuffer, const reg inBufferSize)
 {
-    M_Assert_Break((inBuffer == NULL || inBufferSize == 0), M_EMPTY, return, "entityNonBlockReceivePacket: No valid input!!!");
+    M_Assert_Break((inBuffer == NULL || inBufferSize < 2 || boardNumber < ENTITY_READ_SYSTEM_BOARD_COUNT), M_EMPTY, return, "entityNonBlockReceivePacket: No valid input!!!");
 
     const u8 cmd = inBuffer[0];
 
@@ -140,13 +141,41 @@ void entityNonBlockReceivePacket(const u16 boardNumber, u8* const inBuffer, cons
 
     case ENTITY_MAIL_SERVICE_PACK: {
 
+        break;}
 
+    case READ_SEVERAL_VALUES_GLUED: {
+        // move to cash
+        reg      Rpos               = 3;
+        const u8 requestLenRx       =  inBuffer[1];
+        const u8 requestTablePosRx  = (inBuffer[2] & ENTITY_READ_NONBLOCK_MSK);
+        const TYPEOF_STRUCT(EntityNonBlockPacketTable_t, len[0][0]) requestLenTable = requestNonBlockPackTable.len[boardNumber][requestTablePosRx];
 
+        // do logic
+        if((requestLenRx == 0) || (requestLenTable == 0) || (requestLenRx != requestLenTable)) {
+            return;
+        }
+
+        u8 requestCnt = 0;
+        while(requestCnt != requestLenRx) {
+            EntityReadParent_t* const parent = requestNonBlockPackTable.entityTable[boardNumber][requestTablePosRx][requestCnt];
+            M_Assert_Break((parent == NULL), M_EMPTY, return, "entityNonBlockReceivePacket: No valid parent!!!");
+            const reg parentSize = parent->size;
+
+            ENTITY_DBG_ASSERT_BUF(((Rpos + parentSize) > inBufferSize), M_EMPTY, return, "entityNonBlockReceivePacket: parent size more than input buffer");
+            ENTITY_BYTE_CPY(parentSize, &inBuffer[Rpos], parent->data);
+            Rpos += parentSize;
+
+            ++requestCnt;
+        }
+
+        requestNonBlockPackTable.len[boardNumber][requestTablePosRx] = 0;
         break;}
 
     default:
         break;
     }
+
+    UNUSED(inBufferSize);
 }
 
 

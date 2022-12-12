@@ -61,7 +61,7 @@ u16 slow_crc16_t10_dif_array(u8 * data, unsigned int len)
     while (len--) {
         crc ^= *data++ << 8U;
 
-        for (int bit = 0; bit < 8; ++bit) {
+        for (unsigned bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x8000U) ? ((crc << 1U) ^ CRC16POLY) : (crc << 1U);
         }
     }
@@ -73,7 +73,7 @@ u16 slow_crc16_t10_dif_byte(u16 crc, const u8 data)
 {
     crc ^= data << 8U;
 
-    for (int bit = 0; bit < 8; ++bit) {
+    for (unsigned bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x8000U) ? ((crc << 1U) ^ CRC16POLY) : (crc << 1U);
     }
 

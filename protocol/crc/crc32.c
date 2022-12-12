@@ -79,7 +79,7 @@ u32 slow_crc32b_array(const u8 * data, reg len)
     while(len--) {
         crc = crc ^ (*data++);
 
-        for(int bit = 0; bit < 8; ++bit) {
+        for(unsigned bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x01UL) ? ((crc >> 1UL) ^ CRC32POLY) : (crc >> 1UL);
         }
     }
@@ -91,7 +91,7 @@ u32 slow_crc32b_byte(u32 crc, const u8 data) // must ~crc if last byte
 {
     crc = crc ^ data;
 
-    for(int bit = 0; bit < 8; ++bit) {
+    for(unsigned bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x01UL) ? ((crc >> 1UL) ^ CRC32POLY) : (crc >> 1UL);
     }
 

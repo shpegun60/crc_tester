@@ -114,7 +114,7 @@ int crc_test(unsigned int randomSeed, int randomTestCnt)
         printf("\n\nEXIT, SOME CRC is NOT MATCHED WITH TEST VALUE \n");
         printf("CRC TEST PASSED: 0\n");
         fflush(stdout);
-        return 0;
+        return 1;
     }
 
     not_passed8 = 0;

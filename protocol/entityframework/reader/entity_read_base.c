@@ -16,26 +16,29 @@
  // universal write to parrent function
 int setEntityReadParent_uni(EntityReadParent_t * const self, u8* input, const reg inputSize)
 {
-    if(self->size > inputSize) {
+    const reg parentSize = self->size;
+
+    if(parentSize > inputSize) {
         return ENTITY_ERROR;
     }
 
-    ENTITY_BYTE_CPY(self->size, input, self->data);
+    ENTITY_BYTE_CPY(parentSize, input, self->data);
     return ENTITY_OK;
 }
 
 // unique function for sreg type
 int ENTITY_READ_PARENT_SET_FUNC(sreg) (EntityReadParent_t * const self, u8* input, const reg inputSize)
 {
-    if(self->size > inputSize) {
+    const reg parentSize = self->size;
+    if(parentSize > inputSize) {
         return ENTITY_ERROR;
     }
 
-    ENTITY_BYTE_CPY(self->size, input, self->data);
+    ENTITY_BYTE_CPY(parentSize, input, self->data);
     // copy sign
-    const u8 sign = (input[self->size - 1] & 0x80U) ? 0x00U : 0xFFU;
+    const u8 sign = (input[parentSize - 1] & 0x80U) ? 0x00U : 0xFFU;
 
-    reg i = self->size;
+    reg i = parentSize;
     while(i != sizeof(i64)) {
        ((u8*)(self->data))[i] = sign;
         ++i;
@@ -47,13 +50,15 @@ int ENTITY_READ_PARENT_SET_FUNC(sreg) (EntityReadParent_t * const self, u8* inpu
 // unique function for reg type
 int ENTITY_READ_PARENT_SET_FUNC(reg)(EntityReadParent_t * const self, u8* input, const reg inputSize)
 {
-    if(self->size > inputSize) {
+    const reg parentSize = self->size;
+
+    if(parentSize > inputSize) {
         return ENTITY_ERROR;
     }
 
-    ENTITY_BYTE_CPY(self->size, input, self->data);
+    ENTITY_BYTE_CPY(parentSize, input, self->data);
     // other fill to 0
-    reg i = self->size;
+    reg i = parentSize;
     while(i != sizeof(i64)) {
        ((u8*)(self->data))[i] = 0x00U;
         ++i;

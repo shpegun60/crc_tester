@@ -57,7 +57,7 @@ u8 slow_crc8_maxim_array(u8 * data, unsigned int len)
     while (len--) {
         crc ^= *data++;
 
-        for (int bit = 0; bit < 8; ++bit) {
+        for (unsigned bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x80U) ? ((crc << 1U) ^ CRC8POLY) : (crc << 1U);
 		}
     }
@@ -69,7 +69,7 @@ u8 slow_crc8_maxim_byte(u8 crc, const u8 data)
 {
     crc ^= data;
 
-    for (int bit = 0; bit < 8; ++bit) {
+    for (unsigned bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x80U) ? ((crc << 1U) ^ CRC8POLY) : (crc << 1U);
 	}
 	
@@ -84,7 +84,7 @@ u8 slow_crc8_maxim_byte(u8 crc, const u8 data)
 
 #include <stdio.h>
 
-__attribute__((unused)) static uint8_t _proceedCrc_OLD(uint8_t crc, uint8_t ch) { // original crc from old protocol
+static uint8_t _proceedCrc_OLD(uint8_t crc, uint8_t ch) { // original crc from old protocol
     crc ^= ch;
     for (int i = 0; i < 8; i++)
         crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;

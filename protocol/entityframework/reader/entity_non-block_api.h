@@ -15,9 +15,8 @@
 typedef struct {
     u8* const outBuffer[ENTITY_READ_SYSTEM_BOARD_COUNT];
     reg* const size[ENTITY_READ_SYSTEM_BOARD_COUNT];
-    const reg outBufferSize;
+    const reg outBufferSize[ENTITY_READ_SYSTEM_BOARD_COUNT];
     const u32 time;
-    void* const user_ctx;
 } EntityNonBlockReadLoopVariables_t;
 
 void entityNonBlock_init(void);
@@ -32,6 +31,14 @@ void entityNonBlockReceivePacket(const u16 boardNumber, u8* const inBuffer, cons
 #if (ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE > 256)
 #   error ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE must less than 256
 #endif //check if power of 2 ENTITY_READ_NONBLOCK_READ_PACKETS_QUEUE
+
+#if (ENTITY_READ_API_MTU > 256)
+#   error ENTITY_READ_API_MTU must less than 256
+#endif //check if power of 2 ENTITY_READ_API_MTU
+
+#if (ENTITY_WRITE_API_MTU > 256)
+#   error ENTITY_WRITE_API_MTU must less than 256
+#endif //check if power of 2 ENTITY_WRITE_API_MTU
 
 
 #endif /* USE_ENTITY_READ_SERVICE */

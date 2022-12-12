@@ -73,7 +73,7 @@ u64 slow_crc64jones_array(const u8 * data, reg len)
 
         crc = crc ^ (*data++);
 
-        for(int bit = 0; bit < 8; ++bit) {
+        for(unsigned bit = 0; bit < 8; ++bit) {
             crc = (crc & 0x01ULL) ? (crc >> 1ULL) ^ CRC64POLY : (crc >> 1ULL);
         }
     }
@@ -84,7 +84,7 @@ u64 slow_crc64jones_byte(u64 crc, const u8 data)
 {
     crc = crc ^ data;
 
-    for(int bit = 0; bit < 8; ++bit) {
+    for(unsigned bit = 0; bit < 8; ++bit) {
         crc = (crc & 0x01ULL) ? (crc >> 1ULL) ^ CRC64POLY : (crc >> 1ULL);
     }
 
