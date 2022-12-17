@@ -9,12 +9,30 @@
 #include "entity_manager.h"
 
 #include "callback_container.h"
+#include "static_callback_container.h"
 
 #include "reader/entity_read_system.h"
 
 void callback(void ** context)
 {
     (void)(context);
+    return;
+}
+
+void static_callback(PREPROCESSOR_CTX_TYPE(context))
+{
+    PREPROCESSOR_CTX_GET(context,
+                         const int* const a,
+                         void* const alloc);
+
+    (void)a;
+    free(alloc);
+    return;
+}
+
+void receive_callback(const TEMPLATE(StaticCallbackContainer, void) rcv)
+{
+    SCC_SAFE_CALL_DESC(&rcv);
     return;
 }
 
@@ -206,6 +224,8 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     CC_CALL(&callback_ibj);
 
 
+    int a = -1234345;
+    receive_callback((const TEMPLATE(StaticCallbackContainer, void)){static_callback, PREPROCESSOR_CTX_CAPTURE({&a, malloc(10)})});
 
     entityTest(randomSeed, testCnt);
 

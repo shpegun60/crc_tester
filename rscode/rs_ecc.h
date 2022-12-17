@@ -82,12 +82,12 @@ typedef struct {
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 } rscode_driver;
 
-void rscode_init(rscode_driver * driver);
-void rscode_encode(rscode_driver * driver, unsigned char *msg, int nbytes, unsigned char *dst);
-int rscode_decode(rscode_driver * driver, unsigned char *data, int nbytes);
+void rscode_init(rscode_driver* const driver);
+void rscode_encode(rscode_driver * const driver, unsigned char * const msg, const int nbytes, unsigned char * const dst);
+int rscode_decode(rscode_driver * const driver, unsigned char * const data, const int nbytes);
 
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-int rscode_decode_with_erasures(rscode_driver * driver, unsigned char *data, int nbytes, int nerasures, int * erasures);
+int rscode_decode_with_erasures(rscode_driver * const driver, unsigned char * const data, const int nbytes, const int nerasures, int * const erasures);
 #endif
 
 #ifdef __cplusplus

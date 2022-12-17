@@ -7,9 +7,9 @@ extern "C" {
 
 #include "rs_ecc.h"
 
-int gexp(rscode_driver * driver, int z);
-int gmult(rscode_driver * driver, int x, int y);
-int ginv(rscode_driver * driver, int elt);
+int gexp(rscode_driver* const driver, const int z);
+int gmult(rscode_driver* const driver, const int x, int y);
+int ginv (rscode_driver* const  driver, const int elt);
 
 
 #ifdef __cplusplus

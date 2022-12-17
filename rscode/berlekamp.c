@@ -37,6 +37,7 @@
 
 
 #include "rs_ecc.h"
+#include "my_ctypes.h"
 
 #ifdef RSCODE_DEBUG
 #include <stdio.h>
@@ -45,58 +46,62 @@
 #include "galois.h"
 
 /* local ANSI declarations */
-static int compute_discrepancy(rscode_driver * driver, int lambda[], int S[], int L, int n);
-static void init_gamma(rscode_driver * driver, int gamma[]);
-static void compute_modified_omega (rscode_driver * driver);
+static int compute_discrepancy (rscode_driver* const driver, const int lambda[], const int S[], const int L, const int n);
+static void init_gamma (rscode_driver* const driver, int gamma[]);
+static void compute_modified_omega (rscode_driver* const driver);
 
 /********** polynomial arithmetic *******************/
 
-void add_polys (__attribute__((unused)) rscode_driver * driver, int dst[], int src[])
+void add_polys (rscode_driver* const driver, int dst[], const int src[])
 {
-    int i;
+    unsigned i;
     for (i = 0; i < MAXDEG; ++i) {
         dst[i] ^= src[i];
     }
+    UNUSED(driver);
 }
 
-void copy_poly (__attribute__((unused)) rscode_driver * driver, int dst[], int src[])
+void copy_poly (rscode_driver* const driver, int dst[], const int src[])
 {
-    int i;
+    unsigned i;
     for (i = 0; i < MAXDEG; ++i) {
         dst[i] = src[i];
     }
+    UNUSED(driver);
 }
 
-void scale_poly (rscode_driver * driver, int k, int poly[])
+void scale_poly (rscode_driver* const driver, const int k, int poly[])
 { 
-    int i;
+    unsigned i;
     for (i = 0; i < MAXDEG; ++i) {
         poly[i] = gmult(driver, k, poly[i]);
     }
 }
 
 
-void zero_poly (__attribute__((unused)) rscode_driver * driver, int poly[])
+void zero_poly (rscode_driver* const driver, int poly[])
 {
-    int i;
+    unsigned i;
     for (i = 0; i < MAXDEG; ++i) {
         poly[i] = 0;
     }
+    UNUSED(driver);
 }
 
 
 /* multiply by z, i.e., shift right by 1 */
-static void mul_z_poly (__attribute__((unused)) rscode_driver * driver, int src[])
+static void mul_z_poly (rscode_driver* const driver, int src[])
 {
-    int i;
-    for (i = MAXDEG-1; i > 0; --i) {
+    unsigned i;
+    for (i = (MAXDEG - 1); i > 0; --i) {
         src[i] = src[i-1];
     }
     src[0] = 0;
+    UNUSED(driver);
 }
 
 /* polynomial multiplication */
-void mult_polys (rscode_driver * driver, int dst[], int p1[], int p2[])
+void mult_polys (rscode_driver* const driver, int dst[], const int p1[], const int p2[])
 {
     int i, j;
     int tmp1[MAXDEG*2];
@@ -132,7 +137,7 @@ void mult_polys (rscode_driver * driver, int dst[], int p1[], int p2[])
 }
 
 /* From  Cain, Clark, "Error-Correction Coding For Digital Communications", pp. 216. */
-void Modified_Berlekamp_Massey (rscode_driver * driver)
+void Modified_Berlekamp_Massey (rscode_driver* const driver)
 {	
     int n, L, L2, k, d, i;
     int psi[MAXDEG], psi2[MAXDEG], D[MAXDEG];
@@ -154,9 +159,10 @@ void Modified_Berlekamp_Massey (rscode_driver * driver)
     L = 0;
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
+    TYPEOF_DATA(driver->synBytes[0])* const synBytes = driver->synBytes;
     for (n = L/*driver->NErasures*/; n < RSCODE_NPAR; ++n) {
 
-        d = compute_discrepancy(driver, psi, driver->synBytes, L, n);
+        d = compute_discrepancy(driver, psi, synBytes, L, n);
 
         if (d != 0) {
 
@@ -185,8 +191,9 @@ void Modified_Berlekamp_Massey (rscode_driver * driver)
         mul_z_poly(driver, D);
     }
 
+    TYPEOF_DATA(driver->Lambda[0])* const Lambda = driver->Lambda;
     for(i = 0; i < MAXDEG; ++i) {
-        driver->Lambda[i] = psi[i];
+        Lambda[i] = psi[i];
     }
     compute_modified_omega(driver);
 }
@@ -195,22 +202,23 @@ void Modified_Berlekamp_Massey (rscode_driver * driver)
    compute the combined erasure/error evaluator polynomial as
    Psi*S mod z^4
   */
-void compute_modified_omega (rscode_driver * driver)
+static void compute_modified_omega (rscode_driver* const driver)
 {
-    int i;
+    unsigned i;
     int product[MAXDEG*2];
+    TYPEOF_DATA(driver->Omega[0])* const Omega = driver->Omega;
 
     mult_polys(driver, product, driver->Lambda, driver->synBytes);
-    zero_poly(driver, driver->Omega);
+    zero_poly(driver, Omega);
     for(i = 0; i < RSCODE_NPAR; ++i) {
-        driver->Omega[i] = product[i];
+        Omega[i] = product[i];
     }
 }
 
 /* gamma = product (1-z*a^Ij) for erasure locs Ij */
-void init_gamma (rscode_driver * driver, int gamma[])
+static void init_gamma (rscode_driver* const driver, int gamma[])
 {
-#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS 
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
     int e;
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
     int tmp[MAXDEG];
@@ -219,10 +227,13 @@ void init_gamma (rscode_driver * driver, int gamma[])
     zero_poly(driver, tmp);
     gamma[0] = 1;
 
-#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS	
-    for (e = 0; e < driver->NErasures; ++e) {
+#ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+    const TYPEOF_DATA(driver->NErasures) NErasures = driver->NErasures;
+    TYPEOF_DATA(driver->ErasureLocs[0])* const ErasureLocs = driver->ErasureLocs;
+
+    for (e = 0; e < NErasures; ++e) {
         copy_poly(driver, tmp, gamma);
-        scale_poly(driver, gexp(driver,driver->ErasureLocs[e]), tmp);
+        scale_poly(driver, gexp(driver, ErasureLocs[e]), tmp);
         mul_z_poly(driver, tmp);
         add_polys(driver, gamma, tmp);
     }
@@ -230,19 +241,7 @@ void init_gamma (rscode_driver * driver, int gamma[])
 }
 
 
-#if 0
-void 
-compute_next_omega (rscode_driver * driver, int d, int A[], int dst[], int src[])
-{
-    int i;
-    for ( i = 0; i < MAXDEG;  i++) {
-        dst[i] = src[i] ^ gmult(driver, d, A[i]);
-    }
-}
-#endif
-
-
-int compute_discrepancy (rscode_driver * driver, int lambda[], int S[], int L, int n)
+static int compute_discrepancy (rscode_driver* const driver, const int lambda[], const int S[], const int L, const int n)
 {
     int i, sum=0;
 
@@ -259,25 +258,30 @@ int compute_discrepancy (rscode_driver * driver, int lambda[], int S[], int L, i
  */
 
 
-void Find_Roots (rscode_driver * driver)
+void Find_Roots (rscode_driver* const driver)
 {
     int sum, r, k;
-    driver->NErrors = 0;
+    TYPEOF_DATA(driver->NErrors) NErrors = 0;
+    TYPEOF_DATA(driver->Lambda[0])* const Lambda = driver->Lambda;
+    TYPEOF_DATA(driver->ErrorLocs[0])* const ErrorLocs = driver->ErrorLocs;
 
     for (r = 1; r < 256; ++r) {
         sum = 0;
         /* evaluate lambda at r */
-        for (k = 0; k < RSCODE_NPAR+1; ++k) {
-            sum ^= gmult(driver, gexp(driver,(k*r)%255), driver->Lambda[k]);
+        for (k = 0; k < (RSCODE_NPAR + 1); ++k) {
+            sum ^= gmult(driver, gexp(driver,(k*r)%255), Lambda[k]);
         }
 
         if (sum == 0) {
-            driver->ErrorLocs[driver->NErrors] = (255-r); driver->NErrors++;
+            ErrorLocs[NErrors] = (255-r);
+            ++NErrors;
 #ifdef RSCODE_DEBUG
             fprintf(stderr, "Root found at r = %d, (255-r) = %d\n", r, (255-r));
 #endif /* RSCODE_DEBUG */
         }
     }
+
+    driver->NErrors = NErrors;
 }
 
 /* Combined Erasure And Error Magnitude Computation 
@@ -294,9 +298,9 @@ void Find_Roots (rscode_driver * driver)
  */
 
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize, int nerasures, int * erasures) {
+int correct_errors_erasures (rscode_driver* const driver, unsigned char* const codeword, const int csize, const int nerasures, const int* const erasures) {
 #else
-int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize) {
+int correct_errors_erasures (rscode_driver* const driver, unsigned char* const codeword, const int csize) {
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
     int r, i, j, err;
@@ -305,9 +309,11 @@ int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, in
      set driver->NErasures and driver->ErasureLocs[] with the locations of erasures.
      */
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
+    TYPEOF_DATA(driver->ErasureLocs[0])* const ErasureLocs = driver->ErasureLocs;
+
     driver->NErasures = nerasures;
-    for (i = 0; i < driver->NErasures; ++i) {
-        driver->ErasureLocs[i] = erasures[i];
+    for (i = 0; i < nerasures; ++i) {
+        ErasureLocs[i] = erasures[i];
     }
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
@@ -315,16 +321,20 @@ int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, in
     Find_Roots(driver);
 
 
-
+    const TYPEOF_DATA(driver->NErrors) NErrors = driver->NErrors;
 
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-    if (((driver->NErrors <= RSCODE_NPAR) && (driver->NErrors > 0)) && (driver->NErasures <= (2*RSCODE_NPAR))) {
+    if (((NErrors <= RSCODE_NPAR) && (NErrors > 0)) && (driver->NErasures <= (2*RSCODE_NPAR))) {
 #else
-    if ((driver->NErrors <= RSCODE_NPAR) && (driver->NErrors > 0)) {
+    if ((NErrors <= RSCODE_NPAR) && (NErrors > 0)) {
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
         /* first check for illegal error locs */
-        for (r = 0; r < driver->NErrors; ++r) {
-            if (driver->ErrorLocs[r] >= csize) {
+        TYPEOF_DATA(driver->ErrorLocs[0])* const ErrorLocs = driver->ErrorLocs;
+        TYPEOF_DATA(driver->Omega[0])* const Omega = driver->Omega;
+        TYPEOF_DATA(driver->Lambda[0])* const Lambda = driver->Lambda;
+
+        for (r = 0; r < NErrors; ++r) {
+            if (ErrorLocs[r] >= csize) {
 #ifdef RSCODE_DEBUG
                 fprintf(stderr, "Error loc i=%d outside of codeword length %d\n", i, csize);
 #endif /* RSCODE_DEBUG */
@@ -332,20 +342,20 @@ int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, in
             }
         }
 
-        for (r = 0; r < driver->NErrors; ++r) {
+        for (r = 0; r < NErrors; ++r) {
             int num, denom;
-            i = driver->ErrorLocs[r];
+            i = ErrorLocs[r];
             /* evaluate driver->Omega at alpha^(-i) */
 
             num = 0;
             for (j = 0; j < MAXDEG; ++j) {
-                num ^= gmult(driver, driver->Omega[j], gexp(driver, ((255-i)*j) % 255));
+                num ^= gmult(driver, Omega[j], gexp(driver, ((255-i)*j) % 255));
             }
 
             /* evaluate driver->Lambda' (derivative) at alpha^(-i) ; all odd powers disappear */
             denom = 0;
             for (j = 1; j < MAXDEG; j += 2) {
-                denom ^= gmult(driver, driver->Lambda[j], gexp(driver,((255-i)*(j-1)) % 255));
+                denom ^= gmult(driver, Lambda[j], gexp(driver,((255-i)*(j-1)) % 255));
             }
 
             err = gmult(driver, num, ginv(driver, denom));
@@ -358,7 +368,9 @@ int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, in
         return(1);
     } else {
 #ifdef RSCODE_DEBUG
-        if (driver->NErrors) fprintf(stderr, "Uncorrectable codeword\n");
+        if (NErrors) {
+            fprintf(stderr, "Uncorrectable codeword\n");
+        }
 #endif /* RSCODE_DEBUG */
         return(0);
     }

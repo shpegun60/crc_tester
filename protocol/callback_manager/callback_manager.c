@@ -3,87 +3,62 @@
 
 #include <stdlib.h>
 
-CallbackManager_t * CallbackManager_new(void * const parser)
+#define LIB "callback manager"
+#define ENA 1
+
+CallbackManager_t * CallbackManager_new(void)
 {
     CallbackManager_t * m_manager = malloc(sizeof(CallbackManager_t));
-    M_Assert_BreakSaveCheck(m_manager == (CallbackManager_t *)NULL, M_EMPTY, return m_manager, "CallbackManager_new: No memory for allocation ");
-    M_Assert_BreakSaveCheck(parser == NULL, M_EMPTY, return m_manager, "CallbackManager_init: parser must not be NULL");
+    M_Assert_BreakSaveCheck(m_manager == (CallbackManager_t *)NULL, M_EMPTY, return m_manager, M_LIB_DATA_DEF "CallbackManager_new: No memory for allocation ", ENA, LIB);
 
-    CallbackManager_init(m_manager, parser);
+    CallbackManager_init(m_manager);
     return m_manager;
 }
 
-void CallbackManager_init(CallbackManager_t * const self, void * const parser)
+void CallbackManager_init(CallbackManager_t * const self)
 {
-    M_Assert_BreakSaveCheck(self == (CallbackManager_t *)NULL, M_EMPTY, return, "CallbackManager_init: no valid input data");
-    M_Assert_BreakSaveCheck(parser == NULL, M_EMPTY, return, "CallbackManager_init: parser must not be NULL");
-    for (int i = 0; i < CALL_B_MAN_MAX_COMMAND_FUNCTIONS; ++i) {
+    M_Assert_BreakSaveCheck(self == (CallbackManager_t *)NULL, M_EMPTY, return, M_LIB_DATA_DEF "CallbackManager_init: no valid input data", ENA, LIB);
+    for (unsigned i = 0; i < CALL_B_MAN_MAX_COMMAND_FUNCTIONS; ++i) {
         self->workers[i] = (CallbackWorker)NULL;
-
-#ifdef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
-        self->context[i] = NULL;
-#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
     }
-
-#ifndef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
-    self->context = NULL;
-#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
-
-     self->parser = parser;
 }
 
 int CallbackManager_delete(CallbackManager_t ** self)
 {
-    M_Assert_BreakSaveCheck((self == NULL) || (*self == NULL), M_EMPTY, return 1, "CallbackManager_delete: No allocated memory");
+    M_Assert_BreakSaveCheck((self == NULL) || (*self == NULL), M_EMPTY, return 1, M_LIB_DATA_DEF "CallbackManager_delete: No allocated memory", ENA, LIB);
     free(*self);
     *self = NULL;
 
     return 0;
 }
 
-void CallbackManager_addWorker(CallbackManager_t * const self, const CallBManIdType id, const CallbackWorker worker, void * const context)
+void CallbackManager_addWorker(CallbackManager_t * const self, const CallBManIdType id, const CallbackWorker worker)
 {
-    M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return, "CallbackManager_addWorker: no valid input data");
+    M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return, M_LIB_DATA_DEF "CallbackManager_addWorker: no valid input data", ENA, LIB);
 
 #if !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL))
-    M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return, "CallbackManager_addWorker: no valid input id");
+    M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return, M_LIB_DATA_DEF "CallbackManager_addWorker: no valid input id", ENA, LIB);
 #endif /* !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL)) */
 
     self->workers[id] = worker;
-
-#ifdef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
-    self->context[id] = context;
-#else
-    self->context = context;
-#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
 }
 
 
 //**********************************************************************************************************************************************************************
-int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time)
+int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u8* const data, reg* const size, u32 time, PREPROCESSOR_CTX_TYPE(ctx))
 {
-    M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return 0, "CallbackManager_proceed: no valid input data");
-    M_Assert_Break(self->parser == NULL, M_EMPTY, return 0, "CallbackManager_proceed: parser must not be NULL, call CallbackManager_init function before");
+    M_Assert_Break(self == (CallbackManager_t *)NULL, M_EMPTY, return 0, M_LIB_DATA_DEF "CallbackManager_proceed: no valid input data", ENA, LIB);
 
 #if !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL))
-    M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return 0, "CallbackManager_proceed: no valid input id");
+    M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return 0, M_LIB_DATA_DEF "CallbackManager_proceed: no valid input id", ENA, LIB);
 #endif /* !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL)) */
 
-
-#ifdef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
     M_Assert_SafeFunctionCall((self->workers[id] != (CallbackWorker)NULL),  {
-                                  self->workers[id](self->parser, self->context[id], time);
+                                  self->workers[id](data, size, time, ctx);
                                   return 1;
                               });
-#else
-    M_Assert_SafeFunctionCall((self->workers[id] != (CallbackWorker)NULL),  {
-                                  self->workers[id](self->parser, self->context, time);
-                                  return 1;
-                              });
-#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
     return 0;
 }
 
-
-
-
+#undef LIB
+#undef ENA

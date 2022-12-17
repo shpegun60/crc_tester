@@ -9,19 +9,19 @@ extern "C" {
 
 
 /* polynomial arithmetic */
-void copy_poly(rscode_driver * driver, int dst[], int src[]);
+void copy_poly (rscode_driver* const driver, int dst[], const int src[]);
 
-void add_polys(rscode_driver * driver, int dst[], int src[]) ;
-void scale_poly(rscode_driver * driver, int k, int poly[]);
-void mult_polys(rscode_driver * driver, int dst[], int p1[], int p2[]);
+void add_polys (rscode_driver* const driver, int dst[], const int src[]);
+void scale_poly (rscode_driver* const driver, const int k, int poly[]);
+void mult_polys (rscode_driver* const driver, int dst[], const int p1[], const int p2[]);
 
-void zero_poly(rscode_driver * driver, int poly[]);
+void zero_poly (rscode_driver* const driver, int poly[]);
 
 /* Error location routines */
 #ifndef RSCODE_DISABLE_ERASURES_FUNCTIONS
-int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize, int nerasures, int* erasures);
+int correct_errors_erasures (rscode_driver* const driver, unsigned char* const codeword, const int csize, const int nerasures, const int* const erasures);
 #else
-int correct_errors_erasures (rscode_driver * driver, unsigned char* codeword, int csize);
+int correct_errors_erasures (rscode_driver* const driver, unsigned char* const codeword, const int csize);
 #endif /* RSCODE_DISABLE_ERASURES_FUNCTIONS */
 
 #ifdef __cplusplus

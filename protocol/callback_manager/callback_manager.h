@@ -2,6 +2,7 @@
 #define __INC_CALLBACK_MANAGER_H__
 
 #include "my_ctypes.h"
+#include "preprocessor_ctx.h"
 
 #ifndef CALL_B_MAN_TEST_DISABLE
 //#   define CALL_B_MAN_TEST_DISABLE 1
@@ -20,33 +21,21 @@
 #endif /* CALL_B_MAN_MAX_COMMAND_FUNCTIONS type choose*/
 
 
-#ifndef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
-//#   define CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT 1
-#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
-
-typedef void (*CallbackWorker)(void * parser, void * context, u32 time);
+typedef void (*CallbackWorker)(u8* const data, reg* const size, u32 time, PREPROCESSOR_CTX_TYPE(ctx));
 
 typedef struct {
     CallbackWorker workers[CALL_B_MAN_MAX_COMMAND_FUNCTIONS];
-
-#ifdef CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT
-    void * context[CALL_B_MAN_MAX_COMMAND_FUNCTIONS];
-#else
-    void * context;
-#endif /* CALL_B_MAN_ENABLE_DIFFERENCE_CONTEXT */
-
-    void * parser;
 } CallbackManager_t;
 
 
-CallbackManager_t * CallbackManager_new(void * const parser);
-void CallbackManager_init(CallbackManager_t * const self, void * const parser);
-void CallbackManager_addWorker(CallbackManager_t * const self, const CallBManIdType id, const CallbackWorker worker, void * const context);
+CallbackManager_t * CallbackManager_new(void);
+void CallbackManager_init(CallbackManager_t * const self);
+void CallbackManager_addWorker(CallbackManager_t * const self, const CallBManIdType id, const CallbackWorker worker);
 int CallbackManager_delete(CallbackManager_t ** self);
 
 //**********************************************************************************************************************************************************************
 // callback manager call function with warning!!!
-int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u32 time);
+int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManIdType id, u8* const data, reg* const size, u32 time, PREPROCESSOR_CTX_TYPE(ctx));
 
 
 #endif /* __INC_CALLBACK_MANAGER_H__ */

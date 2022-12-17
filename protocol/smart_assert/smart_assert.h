@@ -22,6 +22,7 @@ extern "C" {
 #include <stdio.h>
 
 //#define NDEBUG
+#define M_MESSAGE_ALWAYS_ENABLE 1
 
 #define M_EMPTY     /* ignored expression */
 #define M_ALWAYS 1  /* always proceed expression */

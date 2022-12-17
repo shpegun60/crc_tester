@@ -50,6 +50,8 @@
 #ifdef RSCODE_DEBUG
 #include <stdio.h>
 #endif /* RSCODE_DEBUG */
+#include "my_ctypes.h"
+
 #include <stdlib.h>
 #include "rs_ecc.h"
 
@@ -62,7 +64,7 @@
 #define PRIM_POLY 0435
 #define NWM1 ((1 << 8) - 1)
 
-int gexp(__attribute__((unused)) rscode_driver * driver, int z)
+int gexp(rscode_driver* const driver, const int z)
 {
     int pinit = 0,p1 = 1,p2 = 0,p3 = 0,p4 = 0,p5 = 0,p6 = 0,p7 = 0,p8 = 0;
     int ret = 1;
@@ -80,19 +82,20 @@ int gexp(__attribute__((unused)) rscode_driver * driver, int z)
     }
     ret = p1 + (p2 << 1) + (p3 << 2) + (p4 << 3) + (p5 << 4) + (p6 << 5) + (p7 << 6) + (p8 << 7);
 
-    (void)pinit;
+    UNUSED(pinit);
+    UNUSED(driver);
 
     return ret;
 }
 
-int gmult(__attribute__((unused)) rscode_driver * driver, int x, int y)
+int gmult(rscode_driver* const driver, const int x, int y)
 {
     int prod = 0;
     int i, j, ind;
     int scratch[8];
-    int w = 8;
+    const int w = 8;
 
-    if (x==0 || y == 0) {
+    if (x == 0 || y == 0) {
         return 0;
     }
 
@@ -117,18 +120,18 @@ int gmult(__attribute__((unused)) rscode_driver * driver, int x, int y)
         }
     }
 
+    UNUSED(driver);
     return prod;
 }
 
 /* This will destroy mat, by the way */
 
-void galois_invert_binary_matrix(int *mat, int *inv)
+static void galois_invert_binary_matrix(int* const mat, int* const inv)
 {
-    int rows = 8;
-    int cols, i, j;
+    const int rows = 8;
+    const int cols = rows;
+    int i, j;
     int tmp;
-
-    cols = rows;
 
     for (i = 0; i < rows; ++i) {
         inv[i] = (1 << i);
@@ -168,9 +171,9 @@ void galois_invert_binary_matrix(int *mat, int *inv)
     }
 }
 
-int galois_shift_inverse(int y)
+static int galois_shift_inverse(int y)
 {
-    int w = 8;
+    const int w = 8;
     int mat2[8];
     int inv2[8];
     int i;
@@ -191,8 +194,9 @@ int galois_shift_inverse(int y)
     return inv2[0];
 }
 
-int ginv (__attribute__((unused)) rscode_driver * driver, int elt)
+int ginv (rscode_driver* const  driver, const int elt)
 {
+    UNUSED(driver);
     return galois_shift_inverse(elt);
 }
 

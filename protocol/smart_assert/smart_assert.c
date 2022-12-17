@@ -47,8 +47,10 @@ static inline void __M_SEND_ASSERT_MSG(const char* const header,
 
         }
 
+#if !defined(M_MESSAGE_ALWAYS_ENABLE)
         // send message if enabled message
         if(assertEna) {
+#endif /* !defined(M_MESSAGE_ALWAYS_ENABLE) */
             fprintf(stderr, "\n%s\n", header);
             fprintf(stderr, "Library Name: %s\n", descr);
             fprintf(stderr, "Assert failed:\t");
@@ -58,8 +60,14 @@ static inline void __M_SEND_ASSERT_MSG(const char* const header,
             fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
             fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
             fflush(stderr);
+
+#if !defined(M_MESSAGE_ALWAYS_ENABLE)
         }
+#endif /* !defined(M_MESSAGE_ALWAYS_ENABLE) */
+
+        (void)assertEna;
     } else {
+
         fprintf(stderr, "\n%s\n", header);
         fprintf(stderr, "Assert failed:\t");
         vfprintf(stderr, msg, args);
