@@ -19,10 +19,6 @@
 
 #elif !defined(MY_BYTE_ORDER_DEFINED) /* if not exists system byte-order macro, define other hack */
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wmultichar" // disable warning: multi-character character constant [-Wmultichar]
-
-
     #define MY_BYTE_ORDER_DEFINED
 
     #define MY_LITTLE_ENDIAN   0x41424344UL
@@ -355,11 +351,6 @@ STATIC_FORCEINLINE f64 BigEndianF64(const f64 value)
 #    error unsupported endianness
 #endif
 }
-
-
-#if !defined (__BYTE_ORDER__) && !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__) && !defined(__ORDER_PDP_ENDIAN__)
-#pragma GCC diagnostic pop
-#endif /* !defined (__BYTE_ORDER__) && !defined(__ORDER_LITTLE_ENDIAN__) && !defined(__ORDER_BIG_ENDIAN__) && !defined(__ORDER_PDP_ENDIAN__) */
 
 
 #endif /* __BYTE_ORDER_H__ */

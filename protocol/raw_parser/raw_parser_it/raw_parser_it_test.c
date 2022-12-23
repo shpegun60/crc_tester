@@ -25,7 +25,7 @@ static int receiveTransmittSimpleItTest(RawParser_it_t* desc, u8 * data, reg siz
     int conterNotvalid = 0;
     int it = 0;
     //--------------------------------------------------------------------------------------------------
-    RawParser_it_RXproceedLoop(desc);
+    RawParser_it_RXproceedLoop(desc); // flush last data
 
     while(it < D_RAW_P_IT_TEST_TRYING) {
         for(reg i = 0; i < size; ++i) {

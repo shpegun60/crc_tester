@@ -2,9 +2,9 @@
 #define __INLINE_H__ 1
 /*
  * This library implemented for support external inline linkage for different compilers:
- * - C89                    (GNU, ISO)
- * - C99                    (GNU, ISO)
- * - younger С - compilers  (GNU, ISO)
+ * - C89                    (GNU, ISO      )
+ * - C99                    (GNU, ISO, MSVC)
+ * - younger С - compilers  (GNU, ISO, MSVC)
  * - all С++ compilers
  */
 
@@ -60,7 +60,7 @@
 
 /*
  * *********************************************************************
- * for extern linkage inline coding (not garantee for this foo inlined)
+ * for external linkage inline coding (not garantee for this foo inlined, this function will be the same foreach translation unit)
  * *********************************************************************
  */
 
@@ -96,9 +96,9 @@
  */
 
 /*
- * *********************************************************************
- * static INLINE`s
- * *********************************************************************
+ * *********************************************************************************
+ * static INLINE`s (this function may be different`s foreach translation unit)
+ * *********************************************************************************
  */
 
 // macro for internal (.c) or external (.h) static inlining
