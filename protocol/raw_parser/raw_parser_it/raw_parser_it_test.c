@@ -130,7 +130,7 @@ static int receiveTransmittCollisionItTest(RawParser_it_t* desc, u8 * data, reg 
              return conterNotvalid;
          } else if(RX->size) {
             printf("RAW PARSER IT: collision\n");
-            ++conterNotvalid;
+            conterNotvalid += cTypeStrnCmp(size, (c8*)data, (c8*)RX->data);
             desc->RX.size = 0;
             desc->TX.size = 0;
             return conterNotvalid;

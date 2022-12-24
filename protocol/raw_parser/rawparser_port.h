@@ -40,6 +40,14 @@
     #define D_RAW_P_LEN_SEPARATOR 0xFBU
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
+
+
+#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
+#   define D_RAW_P_CHECK_LEN D_RAW_P_MAX_PROTOCOL_LEN
+#else
+#   define D_RAW_P_CHECK_LEN D_RAW_P_TX_BUF_SIZE
+#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
+
 /*
 ***************************************************************************************************
    SUPPORT REED-SOLOMON ECC CORECTION (ADDS SOME PARITY BYTES TO DATA)
@@ -47,7 +55,7 @@
 */
 
 #ifndef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-    #define D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    //#define D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
@@ -73,7 +81,7 @@ typedef struct {
 ***************************************************************************************************
 */
 
-#define D_RAW_P_CRC_ENA
+//#define D_RAW_P_CRC_ENA
 
 #ifdef D_RAW_P_CRC_ENA
 

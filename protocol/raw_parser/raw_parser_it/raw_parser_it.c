@@ -175,12 +175,10 @@ static void RawParser_it_proceedByte(RawParser_it_t* const self, const u8 ch, co
             const reg rx_len = self->m_receivePackLen = ((ch > self->m_startByte) ? (ch - 1U) : ch);
 #endif /* D_RAW_P_CRC_ENA */
 
-
             self->m_receivePos = 0U;
             self->receiveState = RAW_P_IT_RECEIVE_DATA;
 
 #ifdef D_RAW_P_CRC_ENA
-
             M_Assert_WarningSaveCheck((rx_len > D_RAW_P_RX_BUF_SIZE || rx_len == sizeof(rawP_crc_t)), M_EMPTY, {
                                               self->receiveState = RAW_P_IT_RECEIVE_ERR;
                                           }, "RawParser_it_proceedByte: No valid receive length, rx_len + crc = %d, max_len = %d", rx_len, D_RAW_P_RX_BUF_SIZE);
@@ -188,7 +186,6 @@ static void RawParser_it_proceedByte(RawParser_it_t* const self, const u8 ch, co
             M_Assert_WarningSaveCheck((rx_len > D_RAW_P_RX_BUF_SIZE || rx_len == 0), M_EMPTY, {
                                               self->receiveState = RAW_P_IT_RECEIVE_ERR;
                                           }, "RawParser_it_proceedByte: No valid receive length, rx_len = %d, max_len = %d", rx_len, D_RAW_P_RX_BUF_SIZE);
-
 #endif /* D_RAW_P_CRC_ENA */
 
 
@@ -307,17 +304,25 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
     M_Assert_Break((self->TX.data == NULL), M_EMPTY, return (RawParser_Frame_t*)NULL, "RawParser_it_RXproceedLoop: No valid TX buffer, call function before: -->  rawParser_it_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
 #endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
 
-    if(self->RX.size == 0) { // ignore packet because len equal 0
+    reg RX_size = self->RX.size;
+
+    if(RX_size == 0) { // ignore packet because len equal 0
         return &self->RX;
     }
 
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    u8* const RX_data = self->RX.data;
+#elif defined(D_RAW_P_CRC_ENA) || defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+    const u8* const RX_data = self->RX.data;
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
 #ifdef D_RAW_P_CRC_ENA
 
-    M_Assert_WarningSaveCheck((self->RX.size < (sizeof(rawP_crc_t) + 1U)), M_EMPTY, {
+    M_Assert_WarningSaveCheck((RX_size < (sizeof(rawP_crc_t) + 1U)), M_EMPTY, {
                                   goto error;
-                              }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + crc size, rx len-->&d, need len-->%d", self->RX.size, (sizeof(rawP_crc_t) + 1U));
+                              }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + crc size, rx len-->&d, need len-->%d", RX_size, (sizeof(rawP_crc_t) + 1U));
 
-    reg m_sizeWithoutCRC = (self->RX.size - sizeof(rawP_crc_t));
+    const reg m_sizeWithoutCRC = (RX_size - sizeof(rawP_crc_t));
 
     rawP_crc_t m_calcCrc = D_RAW_P_CRC_INIT;
     D_RAW_P_CRC_START(m_calcCrc);
@@ -337,56 +342,60 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
     }
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
+
     for(reg i = 0; i < m_sizeWithoutCRC; ++i) {
-        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->RX.data[i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, RX_data[i]);
     }
     D_RAW_P_CRC_FINAL(m_calcCrc);
 
 #if defined(D_RAW_P_USE_CRC8)
-    rawP_crc_t m_receiveCrc = self->RX.data[m_sizeWithoutCRC];
+    rawP_crc_t m_receiveCrc = RX_data[m_sizeWithoutCRC];
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC8, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC16)
-    rawP_crc_t m_receiveCrc = LittleEndianU16( *UINT16_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
+    rawP_crc_t m_receiveCrc = LittleEndianU16( *UINT16_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC16, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC32)
-    rawP_crc_t m_receiveCrc = LittleEndianU32( *UINT32_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
+    rawP_crc_t m_receiveCrc = LittleEndianU32( *UINT32_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC32, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC64)
-    rawP_crc_t m_receiveCrc = LittleEndianU64( *UINT64_TYPE_DC(&self->RX.data[m_sizeWithoutCRC]) );
+    rawP_crc_t m_receiveCrc = LittleEndianU64( *UINT64_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC64, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #endif /* byte order selection */
 
-    self->RX.size = m_sizeWithoutCRC;
+    RX_size = m_sizeWithoutCRC;
 
 #endif /* D_RAW_P_CRC_ENA */
 
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-    M_Assert_WarningSaveCheck((self->RX.size < (RSCODE_NPAR + 1U)), M_EMPTY, {
+    M_Assert_WarningSaveCheck((RX_size < (RSCODE_NPAR + 1U)), M_EMPTY, {
                                   goto error;
-                              }, "RawParser_it_RXproceedLoop: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
+                              }, "RawParser_it_RXproceedLoop: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), RX_size);
 
     /* Now decode -- encoded codeword size must be passed */
-    rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);
-    self->RX.size -= RSCODE_NPAR;
+    rscode_decode(&self->rs_ecc, RX_data, RX_size);
+    RX_size -= RSCODE_NPAR;
 
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+    self->RX.size = RX_size;
     return &self->RX;
 
 
+#if defined(D_RAW_P_CRC_ENA) || defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
     // error handling -----------------------------------------------------
     error:
         self->RX.size = 0U;
         return &self->RX;
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 }
 
 
@@ -406,36 +415,23 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 
     M_Assert_Break((len == 0), M_EMPTY, return 0, "RawParser_it_TXpush: No valid input length");
 
-#if D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE
-
 #if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
-    M_Assert_BreakSaveCheck((len + RSCODE_NPAR + sizeof(rawP_crc_t)) > D_RAW_P_MAX_PROTOCOL_LEN, M_EMPTY, return 0, "RawParser_it_TXpush: len more than maximum protocol size, len + rs_code + crc--> %d, protocol--> %d", (len + RSCODE_NPAR + sizeof(rawP_crc_t)), D_RAW_P_MAX_PROTOCOL_LEN);
-#elif defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
-    M_Assert_BreakSaveCheck((len + RSCODE_NPAR) > D_RAW_P_MAX_PROTOCOL_LEN, M_EMPTY, return 0, "RawParser_it_TXpush: len more than maximum protocol size, len + rs_code--> %d, protocol--> %d", (len + RSCODE_NPAR), D_RAW_P_MAX_PROTOCOL_LEN);
+    const reg needLen = (len + RSCODE_NPAR + sizeof(rawP_crc_t));
+    M_Assert_BreakSaveCheck(needLen > D_RAW_P_CHECK_LEN, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer or protocol length, len + rs_code + crc--> %d, buffer--> %d", needLen, D_RAW_P_CHECK_LEN);
 #elif defined(D_RAW_P_CRC_ENA)
-    M_Assert_BreakSaveCheck((len + sizeof(rawP_crc_t)) > D_RAW_P_MAX_PROTOCOL_LEN, M_EMPTY, return 0, "RawParser_it_TXpush: len more than maximum protocol size, len + crc--> %d, protocol--> %d", (len + sizeof(rawP_crc_t), D_RAW_P_MAX_PROTOCOL_LEN);
-#else
-    M_Assert_BreakSaveCheck((len > D_RAW_P_MAX_PROTOCOL_LEN), M_EMPTY, return 0, "RawParser_it_TXpush: len more than maximum protocol size, len--> %d, protocol--> %d", (len), D_RAW_P_MAX_PROTOCOL_LEN);
-#endif /* defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) */
-
-#else
-
-#if defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
-    M_Assert_BreakSaveCheck((len + RSCODE_NPAR + sizeof(rawP_crc_t)) > D_RAW_P_TX_BUF_SIZE, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len + rs_code + crc--> %d, buffer--> %d", (len + RSCODE_NPAR + sizeof(rawP_crc_t)), D_RAW_P_TX_BUF_SIZE);
-#elif defined(D_RAW_P_CRC_ENA)
-    M_Assert_BreakSaveCheck((len + sizeof(rawP_crc_t)) > D_RAW_P_TX_BUF_SIZE, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len + crc--> %d, buffer--> %d", (len + sizeof(rawP_crc_t)), D_RAW_P_TX_BUF_SIZE);
+    const reg needLen = (len + sizeof(rawP_crc_t));
+    M_Assert_BreakSaveCheck(needLen > D_RAW_P_CHECK_LEN, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer or protocol length, len + crc--> %d, buffer--> %d", needLen, D_RAW_P_CHECK_LEN);
 #elif defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
-    M_Assert_BreakSaveCheck((len + RSCODE_NPAR) > D_RAW_P_TX_BUF_SIZE, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len + rs_code--> %d, protocol--> %d", (len + RSCODE_NPAR), D_RAW_P_TX_BUF_SIZE);
+    const reg needLen = (len + RSCODE_NPAR);
+    M_Assert_BreakSaveCheck(needLen > D_RAW_P_CHECK_LEN, M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer or protocol length, len + rs_code--> %d, protocol--> %d", needLen, D_RAW_P_CHECK_LEN);
 #else
-    M_Assert_BreakSaveCheck((len > D_RAW_P_TX_BUF_SIZE), M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer, len--> %d, buffer--> %d", len, D_RAW_P_TX_BUF_SIZE);
+    M_Assert_BreakSaveCheck((len > D_RAW_P_CHECK_LEN), M_EMPTY, return 0, "RawParser_it_TXpush: len more than buffer or protocol length, len--> %d, buffer--> %d", len, D_RAW_P_CHECK_LEN);
 #endif /* defined(D_RAW_P_CRC_ENA) && defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) */
-
-#endif /* D_RAW_P_MAX_PROTOCOL_LEN < D_RAW_P_TX_BUF_SIZE */
-
 
 
 #if defined(D_RAW_P_CRC_ENA) || defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
     reg i;
+    u8* const TX_data = self->TX.data;
 #endif /* defined(D_RAW_P_CRC_ENA) || defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA) */
 
 
@@ -446,7 +442,7 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA // calc reed-solomon parity
-    rs_encode_data_onlyParity(&self->rs_ecc, self->TX.data, len);
+    rs_encode_data_onlyParity(&self->rs_ecc, TX_data, len);
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
 
@@ -475,7 +471,7 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
 
     if(len > D_RAW_P_LEN_SEPARATOR) {
-        rawP_size_t tmp_len = LittleEndianU16(len);
+        const reg tmp_len = LittleEndianU16(len);
         m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, RECEIVE_EXTENDED_LEN_CMD);
         m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)( tmp_len         & 0x000000FFUL));
         m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, (u8)((tmp_len >> 8U)  & 0x000000FFUL));
@@ -493,17 +489,19 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 
 #ifdef D_RAW_P_CRC_ENA // calc crc data
     for (i = 0; i < len; ++i) {
-        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->TX.data[i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, TX_data[i]);
     }
 #endif /* D_RAW_P_CRC_ENA */
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA // add reed-solomon parity to crc and write to data
+    const TYPEOF_DATA(self->rs_ecc.pBytes[0])* const pBytes = self->rs_ecc.pBytes;
+
     for (i = 0; i < RSCODE_NPAR; ++i) {
 #ifdef D_RAW_P_CRC_ENA // crc init
-        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, self->rs_ecc.pBytes[RSCODE_NPAR-1-i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, pBytes[RSCODE_NPAR-1-i]);
 #endif /* D_RAW_P_CRC_ENA */
-        self->TX.data[len++] = self->rs_ecc.pBytes[RSCODE_NPAR-1-i];
+        TX_data[len++] = pBytes[RSCODE_NPAR-1-i];
     }
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
@@ -513,27 +511,27 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
     D_RAW_P_CRC_FINAL(m_calcCrc);
 
 #if defined(D_RAW_P_USE_CRC8)
-    self->TX.data[len++] = m_calcCrc;
+    TX_data[len++] = m_calcCrc;
 #elif defined(D_RAW_P_USE_CRC16)
     m_calcCrc = LittleEndianU16(m_calcCrc);
-    self->TX.data[len++] = (u8)( m_calcCrc        & 0x000000FFUL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 8U) & 0x000000FFUL);
+    TX_data[len++] = (u8)( m_calcCrc        & 0x000000FFUL);
+    TX_data[len++] = (u8)((m_calcCrc >> 8U) & 0x000000FFUL);
 #elif defined(D_RAW_P_USE_CRC32)
     m_calcCrc = LittleEndianU32(m_calcCrc);
-    self->TX.data[len++] = (u8)( m_calcCrc            & 0x000000FFUL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 8U )    & 0x000000FFUL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 16U)    & 0x000000FFUL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 24U)    & 0x000000FFUL);
+    TX_data[len++] = (u8)( m_calcCrc            & 0x000000FFUL);
+    TX_data[len++] = (u8)((m_calcCrc >> 8U )    & 0x000000FFUL);
+    TX_data[len++] = (u8)((m_calcCrc >> 16U)    & 0x000000FFUL);
+    TX_data[len++] = (u8)((m_calcCrc >> 24U)    & 0x000000FFUL);
 #elif defined(D_RAW_P_USE_CRC64)
     m_calcCrc = LittleEndianU64(m_calcCrc);
-    self->TX.data[len++] = (u8)( m_calcCrc            & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 8U )    & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 16U)    & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 24U)    & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 32U)    & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 40U)    & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 48U)    & 0x00000000000000FFULL);
-    self->TX.data[len++] = (u8)((m_calcCrc >> 56U)    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)( m_calcCrc            & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 8U )    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 16U)    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 24U)    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 32U)    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 40U)    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 48U)    & 0x00000000000000FFULL);
+    TX_data[len++] = (u8)((m_calcCrc >> 56U)    & 0x00000000000000FFULL);
 #endif /* byte order & crc selection */
 
 
@@ -545,7 +543,7 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
 }
 
 
-int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch)
+int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8* const ch)
 {
     M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return 0, "RawParser_it_TXproceedIt: No valid input");
 
@@ -565,7 +563,7 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch)
 
     switch(self->transmittState) {
 
-    case RAW_P_IT_TRANSMITT_SB:
+    case RAW_P_IT_TRANSMITT_SB: {
         (*ch) = self->m_startByte;
 
         self->transmissionRepeat = 0;
@@ -578,8 +576,10 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch)
 
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-        if(self->TX.size > D_RAW_P_LEN_SEPARATOR) {
-            self->TX.size = LittleEndianU16(self->TX.size);
+        const reg pack_size = self->TX.size;
+
+        if(pack_size > D_RAW_P_LEN_SEPARATOR) {
+            self->TX.size = LittleEndianU16(pack_size);
             self->transmittState = RAW_P_IT_TRANSMITT_LEN_SEPARATOR;
         } else {
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
@@ -587,7 +587,7 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch)
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
         }
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-        break;
+        break;}
 
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
@@ -623,10 +623,12 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8 * const ch)
     }
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-    case RAW_P_IT_TRANSMITT_LEN:
-        (*ch) = (u8)(((self->TX.size >= self->m_startByte) ? (self->TX.size + 1U) : self->TX.size) & 0x000000FFUL);
+    case RAW_P_IT_TRANSMITT_LEN: {
+        const reg pack_size = self->TX.size;
+
+        (*ch) = (u8)(((pack_size >= self->m_startByte) ? (pack_size + 1U) : pack_size) & 0x000000FFUL);
         self->transmittState = RAW_P_IT_TRANSMITT_DATA;
-        break;
+        break;}
 
     case RAW_P_IT_TRANSMITT_DATA:
         (*ch) = self->TX.data[self->m_transmittPos];
