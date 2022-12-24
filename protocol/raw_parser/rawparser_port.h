@@ -55,7 +55,7 @@
 */
 
 #ifndef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-    //#define D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    #define D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
@@ -81,7 +81,7 @@ typedef struct {
 ***************************************************************************************************
 */
 
-//#define D_RAW_P_CRC_ENA
+#define D_RAW_P_CRC_ENA
 
 #ifdef D_RAW_P_CRC_ENA
 

@@ -109,7 +109,7 @@ STATIC_FORCEINLINE void RawParser_dma_receiveArray(RawParser_dma_t* const self, 
 RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self);
 
 // slow shield functions (slow & more copy)-----------------------------------------------------------------------------------------
-RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* data, reg len); // shield data array before transmitting
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, const u8* data, reg len); // shield data array before transmitting
 // fast shield functions (no copy)-----------------------------------------------------------------------------------------
 void RawParser_dma_startTransmittPacket(RawParser_dma_t* const self, reg predictedLen);
 RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const self);
@@ -202,7 +202,7 @@ STATIC_FORCEINLINE void RawParser_dma_addTxByteCRC(RawParser_dma_t* const self, 
 
 
 // function for use universal macro ---------------------------------------------------------------------------------------------------------
-void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByte, const reg typelenInByte, u8 *data);
+void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByte, const reg typelenInByte, const u8 *data);
 void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte, const reg typelenInByte, u8 *data);
 
 

@@ -498,10 +498,12 @@ int RawParser_it_TXpush(RawParser_it_t* const self, reg len)
     const TYPEOF_DATA(self->rs_ecc.pBytes[0])* const pBytes = self->rs_ecc.pBytes;
 
     for (i = 0; i < RSCODE_NPAR; ++i) {
+        const TYPEOF_DATA(self->rs_ecc.pBytes[0]) pByte = pBytes[RSCODE_NPAR-1-i];
+
 #ifdef D_RAW_P_CRC_ENA // crc init
-        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, pBytes[RSCODE_NPAR-1-i]);
+        m_calcCrc = D_RAW_P_CRC_UPDATE(m_calcCrc, pByte);
 #endif /* D_RAW_P_CRC_ENA */
-        TX_data[len++] = pBytes[RSCODE_NPAR-1-i];
+        TX_data[len++] = pByte;
     }
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
@@ -591,36 +593,36 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8* const ch)
 
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    case RAW_P_IT_TRANSMITT_LEN_SEPARATOR:
+    case RAW_P_IT_TRANSMITT_LEN_SEPARATOR: {
         (*ch) = RECEIVE_EXTENDED_LEN_CMD;
         self->transmittState = RAW_P_IT_TRANSMITT_LEN_LOW;
-        break;
+        break;}
 
     case RAW_P_IT_TRANSMITT_LEN_LOW: {
-        (*ch) = (u8)(self->TX.size & 0x000000FFU);
+        const u8 byte = (u8)(self->TX.size & 0x000000FFU);
+        (*ch) = byte;
 
-        if((self->m_startByte == (*ch)) && !self->transmissionRepeat) {
+        if((self->m_startByte == byte) && !self->transmissionRepeat) {
             self->transmissionRepeat = 1;
         } else {
             self->transmissionRepeat = 0;
             self->transmittState = RAW_P_IT_TRANSMITT_LEN_HIGH;
         }
 
-        break;
-    }
+        break;}
 
     case RAW_P_IT_TRANSMITT_LEN_HIGH: {
-        (*ch) = (u8)((self->TX.size >> 8U) & 0x000000FFU);
+        const u8 byte = (u8)((self->TX.size >> 8U) & 0x000000FFU);
+        (*ch) = byte;
 
-        if((self->m_startByte == (*ch)) && !self->transmissionRepeat) {
+        if((self->m_startByte == byte) && !self->transmissionRepeat) {
             self->transmissionRepeat = 1;
         } else {
             self->transmissionRepeat = 0;
             self->transmittState = RAW_P_IT_TRANSMITT_DATA;
         }
+        break;}
 
-        break;
-    }
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
     case RAW_P_IT_TRANSMITT_LEN: {
@@ -630,10 +632,11 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8* const ch)
         self->transmittState = RAW_P_IT_TRANSMITT_DATA;
         break;}
 
-    case RAW_P_IT_TRANSMITT_DATA:
-        (*ch) = self->TX.data[self->m_transmittPos];
+    case RAW_P_IT_TRANSMITT_DATA: {
+        const u8 byte = self->TX.data[self->m_transmittPos];
+        (*ch) = byte;
 
-        if((self->m_startByte == (*ch)) && !self->transmissionRepeat) {
+        if((self->m_startByte == byte) && !self->transmissionRepeat) {
             self->transmissionRepeat = 1;
         } else {
             self->transmissionRepeat = 0;
@@ -645,7 +648,7 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8* const ch)
             }
         }
 
-        break;
+        break;}
 
     }
     return 1;

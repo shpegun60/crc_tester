@@ -229,7 +229,7 @@ void rs_encode_data(rscode_driver* const driver, unsigned char* const msg, const
     rs_build_codeword(driver, msg, nbytes, dst);
 }
 
-void rs_encode_data_onlyParity(rscode_driver* const driver, unsigned char* const msg, const int nbytes)
+void rs_encode_data_onlyParity(rscode_driver* const driver, const unsigned char* const msg, const int nbytes)
 {
     int i, dbyte, j;
     TYPEOF_DATA(driver->pBytes[0])* const pBytes = driver->pBytes;

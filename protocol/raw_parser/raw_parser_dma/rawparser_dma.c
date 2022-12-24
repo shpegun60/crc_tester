@@ -446,7 +446,7 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
 }
 
 // slow shield functions (slow & more copy)-----------------------------------------------------------------------------------------
-RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, u8* data, reg len)
+RawParser_Frame_t* RawParser_dma_shieldFrame(RawParser_dma_t* const self, const u8* data, reg len)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL), M_EMPTY, return (RawParser_Frame_t*)NULL, "RawParser_dma_shieldFrame: No valid input");
     M_Assert_Break((data == (u8*)NULL) || len == 0, M_EMPTY, {
@@ -580,7 +580,7 @@ RawParser_Frame_t* RawParser_dma_finishTransmittPacket(RawParser_dma_t* const se
 
 
 // function for use universal macro ---------------------------------------------------------------------------------------------------------
-void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByte, const reg typelenInByte, u8 *data)
+void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByte, const reg typelenInByte, const u8 *data)
 {
     M_Assert_Break((self == (RawParser_dma_t*)NULL || data == NULL), M_EMPTY, return, "RawParser_dma_universalWrite: No valid input");
 
