@@ -24,8 +24,8 @@ typedef struct {
     u16 size[STATIC_POOL_CONTAINER_RAWS];
     u8 pool[STATIC_POOL_CONTAINER_RAWS][STATIC_POOL_CONTAINER_COLUMNS];
 
-    reg rd_raw;
-    reg wr_raw;
+    reg tail;
+    reg head;
     u8 wrFull;
     u8 rdEmpty;
 } static_pool_container_t;

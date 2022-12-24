@@ -53,8 +53,12 @@ int CallbackManager_proceed(const CallbackManager_t* const self, const CallBManI
     M_Assert_WarningSaveCheck(id > (CALL_B_MAN_MAX_COMMAND_FUNCTIONS - 1), M_EMPTY, return 0, M_LIB_DATA_DEF "CallbackManager_proceed: no valid input id", ENA, LIB);
 #endif /* !((CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 256U) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 65536UL) || (CALL_B_MAN_MAX_COMMAND_FUNCTIONS == 4294967296UL)) */
 
-    M_Assert_SafeFunctionCall((self->workers[id] != (CallbackWorker)NULL),  {
-                                  self->workers[id](data, size, time, ctx);
+    // move to cash
+    const CallbackWorker worker = self->workers[id];
+
+    // do logic
+    M_Assert_SafeFunctionCall((worker != (CallbackWorker)NULL),  {
+                                  worker(data, size, time, ctx);
                                   return 1;
                               });
     return 0;

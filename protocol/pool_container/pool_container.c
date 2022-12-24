@@ -39,14 +39,15 @@ void poolContainer_init(pool_container_t * const self, const u16 rows, const u16
 
     self->columns = columns;
     self->rows = rows;
+    self->msk = (rows - 1U);
     poolContainer_clear(self);
 }
 
 void poolContainer_clear(pool_container_t * const self)
 {
     M_Assert_BreakSaveCheck(self == (pool_container_t *)NULL, M_EMPTY, return, "poolContainer_clear: No memory allocated");
-    self->rd_raw = 0;
-    self->wr_raw = 0;
+    self->tail = 0;
+    self->head = 0;
     self->wrFull = 0;
     self->rdEmpty = 1;
 }
@@ -61,8 +62,13 @@ STATIC_FORCEINLINE void poolContainer_proceedSignalls(pool_container_t * const s
      *  assign fifo_empty  = ptr_match & (wr_addr[AW]==rd_addr[AW]);
      *
      */
-    self->rdEmpty = (self->wr_raw == self->rd_raw);
-    self->wrFull  = ((self->wr_raw & (self->rows - 1)) == (self->rd_raw & (self->rows - 1))) && (!self->rdEmpty);
+
+    const reg head = self->head;
+    const reg tail = self->tail;
+    const reg msk  = self->msk;
+
+    const u8 rdEmpty = self->rdEmpty = (head == tail);
+    self->wrFull  = ((head & msk) == (tail & msk)) && (!rdEmpty);
 }
 
 
@@ -102,7 +108,7 @@ int poolContainer_writeArr(pool_container_t * const self, u8 * const data, const
     M_Assert_BreakSaveCheck((len > self->columns), M_EMPTY, return 0, "poolContainer_writeArr: len more than buffer");
     M_Assert_WarningSaveCheck(POOL_CONTAINER_IS_FULL(self), M_EMPTY, return 0, "poolContainer_writeArr: buffer is full!!!");
 
-    const reg wr_pos = self->wr_raw & (self->rows - 1);
+    const reg wr_pos = self->head & self->msk;
     u8* const buffer_raw = self->pool[wr_pos];
 
     for(reg i = 0; i != len; ++i) {
@@ -110,8 +116,8 @@ int poolContainer_writeArr(pool_container_t * const self, u8 * const data, const
     }
     self->size[wr_pos] = len;
 
-    ++self->wr_raw;
-    M_Assert_Break((self->pool[self->wr_raw & (self->rows - 1)] == NULL), M_EMPTY, return 0, "poolContainer_writeArr: no allocated memory, pool index");
+    ++self->head;
+    M_Assert_Break((self->pool[self->head & self->msk] == NULL), M_EMPTY, return 0, "poolContainer_writeArr: no allocated memory, pool index");
     poolContainer_proceedSignalls(self);
     return len;
 }
@@ -120,9 +126,9 @@ int poolContainer_writeArr(pool_container_t * const self, u8 * const data, const
 void poolContainer_getWriteMeta(pool_container_t * const self, u8 ** const data, u16 ** const size)
 {
     M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return, "poolContainer_writeArr: incorrect input values");
-    M_Assert_Break((self->pool == NULL || self->size == NULL || self->pool[self->wr_raw & (self->rows - 1)] == NULL), M_EMPTY, return, "poolContainer_writeArr: no allocated memory");
+    M_Assert_Break((self->pool == NULL || self->size == NULL || self->pool[self->head & self->msk] == NULL), M_EMPTY, return, "poolContainer_writeArr: no allocated memory");
 
-    const reg wr_pos = self->wr_raw & (self->rows - 1);
+    const reg wr_pos = self->head & self->msk;
     (*data) = &self->pool[wr_pos][0];
     (*size) = &self->size[wr_pos];
 }
@@ -133,8 +139,8 @@ void poolContainer_nextWritePos(pool_container_t * const self)
     M_Assert_Break((self->pool == NULL || self->size == NULL), M_EMPTY, return, "poolContainer_nextReadPos: no allocated memory");
     M_Assert_WarningSaveCheck(POOL_CONTAINER_IS_FULL(self), M_EMPTY, return, "poolContainer_nextWritePos: buffer is full!!!");
 
-    ++self->wr_raw;
-    M_Assert_Break((self->pool[self->wr_raw & (self->rows - 1)] == NULL), M_EMPTY, return, "poolContainer_nextWritePos: no allocated memory, pool index");
+    ++self->head;
+    M_Assert_Break((self->pool[self->head & self->msk] == NULL), M_EMPTY, return, "poolContainer_nextWritePos: no allocated memory, pool index");
     poolContainer_proceedSignalls(self);
 }
 
@@ -142,9 +148,9 @@ void poolContainer_nextWritePos(pool_container_t * const self)
 u16 poolContainer_readArr(pool_container_t * const self, u8 ** const data)
 {
     M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return 0, "poolContainer_readArr: incorrect input values");
-    M_Assert_Break((self->pool == NULL || self->size == NULL || self->pool[self->rd_raw & (self->rows - 1)] == NULL), M_EMPTY, return 0, "poolContainer_readArr: no allocated memory");
+    M_Assert_Break((self->pool == NULL || self->size == NULL || self->pool[self->tail & self->msk] == NULL), M_EMPTY, return 0, "poolContainer_readArr: no allocated memory");
 
-    const reg rd_pos = self->rd_raw & (self->rows - 1);
+    const reg rd_pos = self->tail & self->msk;
     (*data) = &self->pool[rd_pos][0];
     return self->size[rd_pos];
 }
@@ -155,8 +161,8 @@ void poolContainer_nextReadPos(pool_container_t * const self)
     M_Assert_Break((self->pool == NULL || self->size == NULL), M_EMPTY, return, "poolContainer_nextReadPos: no allocated memory");
     M_Assert_WarningSaveCheck(POOL_CONTAINER_IS_EMPTY(self), M_EMPTY, return, "poolContainer_nextReadPos: buffer is empty!!!");
 
-    ++self->rd_raw;
-    M_Assert_Break((self->pool[self->rd_raw & (self->rows - 1)] == NULL), M_EMPTY, return, "poolContainer_nextReadPos: no allocated memory, pool index");
+    ++self->tail;
+    M_Assert_Break((self->pool[self->tail & self->msk] == NULL), M_EMPTY, return, "poolContainer_nextReadPos: no allocated memory, pool index");
     poolContainer_proceedSignalls(self);
 }
 

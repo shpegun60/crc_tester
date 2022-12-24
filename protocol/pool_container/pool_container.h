@@ -15,8 +15,10 @@ typedef struct {
     u16 columns;
     u16 rows;
 
-    reg rd_raw;
-    reg wr_raw;
+    u16 msk;
+
+    reg tail;
+    reg head;
     u8 wrFull;
     u8 rdEmpty;
 } pool_container_t;

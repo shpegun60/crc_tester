@@ -32,7 +32,13 @@ void static_callback(PREPROCESSOR_CTX_TYPE(context))
 
 void receive_callback(const TEMPLATE(StaticCallbackContainer, void) rcv)
 {
-    SCC_SAFE_CALL_DESC(&rcv);
+    do {
+        const __typeof__((&rcv)->callback) _callback = (&rcv)->callback;
+        const __typeof__((&rcv)->context) _ctx = (&rcv)->context;
+        if (_callback) {
+            _callback(_ctx);
+        }
+    } while (0L);
     return;
 }
 

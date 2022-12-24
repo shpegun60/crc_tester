@@ -16,8 +16,8 @@ static_pool_container_t* staticPoolContainer_new(void)
 void staticPoolContainer_init(static_pool_container_t * const self)
 {
     M_Assert_BreakSaveCheck(self == (static_pool_container_t *)NULL, M_EMPTY, return, "staticPoolContainer_init: No valid input");
-    self->rd_raw  = 0;
-    self->wr_raw  = 0;
+    self->tail  = 0;
+    self->head  = 0;
     self->wrFull  = 0;
     self->rdEmpty = 1;
 }
@@ -46,8 +46,12 @@ STATIC_FORCEINLINE void staticPoolContainer_proceedSignalls(static_pool_containe
      *  assign fifo_empty  = ptr_match & (wr_addr[AW]==rd_addr[AW]);
      *
      */
-    self->rdEmpty = (self->wr_raw == self->rd_raw);
-    self->wrFull  = ((self->wr_raw & (STATIC_POOL_CONTAINER_RAWS - 1)) == (self->rd_raw & (STATIC_POOL_CONTAINER_RAWS - 1))) && (!self->rdEmpty);
+
+    const reg head = self->head;
+    const reg tail = self->tail;
+
+    const u8 rdEmpty = self->rdEmpty = (head == tail);
+    self->wrFull  = ((head & (STATIC_POOL_CONTAINER_RAWS - 1U)) == (tail & (STATIC_POOL_CONTAINER_RAWS - 1U))) && (!rdEmpty);
 }
 
 
@@ -58,7 +62,7 @@ int staticPoolContainer_writeArr(static_pool_container_t * const self, u8 * cons
     M_Assert_BreakSaveCheck((len > STATIC_POOL_CONTAINER_COLUMNS), M_EMPTY, return 0, "staticPoolContainer_writeArr: len more than buffer");
     M_Assert_WarningSaveCheck(STATIC_POOL_CONTAINER_IS_FULL(self), M_EMPTY, return 0, "staticPoolContainer_writeArr: buffer is full!!!");
 
-    const reg wr_pos = self->wr_raw & (STATIC_POOL_CONTAINER_RAWS - 1);
+    const reg wr_pos = self->head & (STATIC_POOL_CONTAINER_RAWS - 1U);
     u8* const buffer_raw = self->pool[wr_pos];
 
     for(reg i = 0; i != len; ++i) {
@@ -66,7 +70,7 @@ int staticPoolContainer_writeArr(static_pool_container_t * const self, u8 * cons
     }
     self->size[wr_pos] = len;
 
-    ++self->wr_raw;
+    ++self->head;
     staticPoolContainer_proceedSignalls(self);
     return len;
 }
@@ -75,7 +79,7 @@ int staticPoolContainer_writeArr(static_pool_container_t * const self, u8 * cons
 void staticPoolContainer_getWriteMeta(static_pool_container_t * const self, u8 ** const data, u16 ** const size)
 {
     M_Assert_Break((self == NULL || data == NULL || size == NULL), M_EMPTY, return, "staticPoolContainer_getWriteMeta: incorrect input values");
-    const reg wr_pos = self->wr_raw & (STATIC_POOL_CONTAINER_RAWS - 1);
+    const reg wr_pos = self->head & (STATIC_POOL_CONTAINER_RAWS - 1U);
     (*data) = &self->pool[wr_pos][0];
     (*size) = &self->size[wr_pos];
 }
@@ -84,7 +88,7 @@ void staticPoolContainer_nextWritePos(static_pool_container_t * const self)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "staticPoolContainer_nextWritePos: incorrect input values");
     M_Assert_WarningSaveCheck(STATIC_POOL_CONTAINER_IS_FULL(self), M_EMPTY, return, "staticPoolContainer_nextWritePos: buffer is full!!!");
-    ++self->wr_raw;
+    ++self->head;
     staticPoolContainer_proceedSignalls(self);
 }
 
@@ -92,7 +96,7 @@ void staticPoolContainer_nextWritePos(static_pool_container_t * const self)
 u16 staticPoolContainer_readArr(static_pool_container_t * const self, u8 ** const data)
 {
     M_Assert_Break((self == NULL || data == NULL), M_EMPTY, return 0, "staticPoolContainer_readArr: incorrect input values");
-    const reg rd_pos = self->rd_raw & (STATIC_POOL_CONTAINER_RAWS - 1);
+    const reg rd_pos = self->tail & (STATIC_POOL_CONTAINER_RAWS - 1U);
     (*data) = &self->pool[rd_pos][0];
     return self->size[rd_pos];
 }
@@ -101,7 +105,7 @@ void staticPoolContainer_nextReadPos(static_pool_container_t * const self)
 {
     M_Assert_Break((self == NULL), M_EMPTY, return, "staticPoolContainer_nextReadPos: incorrect input values");
     M_Assert_WarningSaveCheck(STATIC_POOL_CONTAINER_IS_EMPTY(self), M_EMPTY, return, "staticPoolContainer_nextReadPos: buffer is empty!!!");
-    ++self->rd_raw;
+    ++self->tail;
     staticPoolContainer_proceedSignalls(self);
 }
 

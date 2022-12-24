@@ -149,9 +149,11 @@ b TEMPLATE(initCallbackContainerHeap, rT, cT) (TEMPLATE(CallbackContainer, rT, c
 /* safe invoke callback container */                                                                                                                                        \
 rT TEMPLATE(callbackContainerCall, rT, cT) (TEMPLATE(CallbackContainer, rT, cT)* const self, b* const ok)                                                                   \
 {                                                                                                                                                                           \
-    if((self != NULL) && (self->callback != NULL)) {                                                                                                                        \
+    const TYPEOF_DATA((self)->callback) _callback   = (self)->callback;                                                                                                     \
+    const TYPEOF_DATA((self)->context)  _ctx        = (self)->context;                                                                                                      \
+    if((self != NULL) && (_callback != NULL)) {                                                                                                                             \
         *ok = 1;                                                                                                                                                            \
-        return self->callback(self->context);                                                                                                                               \
+        return _callback(_ctx);                                                                                                                                             \
     }                                                                                                                                                                       \
     *ok = 0;                                                                                                                                                                \
     return ((rT) 0);                                                                                                                                                        \
