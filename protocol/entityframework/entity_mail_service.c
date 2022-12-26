@@ -127,15 +127,18 @@ void EntityMailService_getStream(EntityMailService_t* const self, u32 time,
 
         if((time - letter->lastUpdateTimeMs) > letter->updateTimeMs) {
             // read field to out buffer
-            const Entity*       const entity    = entityInfo.entities[letter->entityNumber];                                    // move to cash (read-only parameter)
-            const EntityField*  const field     = &entityInfo.entities[letter->entityNumber]->fields[letter->entityNumber];     // move to cash (read-only parameter)
+            const TYPEOF_STRUCT(EntityInfo, entities_count)   entityNumber = letter->entityNumber;                      // move to cash (read-only parameter)
+            const TYPEOF_STRUCT(Entity, fields_count)         fieldNumber = letter->fieldNumber;                        // move to cash (read-only parameter)
+
+            const Entity*       const entity    = entityInfo.entities[entityNumber];                                    // move to cash (read-only parameter)
+            const EntityField*  const field     = &entity->fields[fieldNumber];                                         // move to cash (read-only parameter)
 
             const reg typeLen = getMYCTypeLen(field->type);
             void* const data_ptr = (entity->pointer + field->shift);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > maxOutBufferSize), M_EMPTY, return, "EntityMailService_getStream: field read size more than buffer");
 
-            writeEntityFieldNumbersToBuf(letter->entityNumber, letter->fieldNumber, outputBuffer, &Wpos);
+            writeEntityFieldNumbersToBuf(entityNumber, fieldNumber, outputBuffer, &Wpos);
 
             proceedReadEntity(field->bitFlags, data_ptr, &outputBuffer[Wpos], typeLen);
             Wpos += typeLen;

@@ -35,7 +35,7 @@ typedef struct {
         const slip_descriptor_s* descriptor;
 } slip_handler_s;
 
-slip_error_t slip_init(slip_handler_s *slip, const slip_descriptor_s *descriptor);
+slip_error_t slip_init(slip_handler_s* const slip, const slip_descriptor_s* const descriptor);
 slip_error_t slip_read_byte(slip_handler_s * const slip, u8 byte);
 slip_error_t slip_send_message(slip_handler_s * const slip, const u8 * const data, const reg size);
 

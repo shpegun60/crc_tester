@@ -7,4 +7,5 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/slip.h \
+    $$PWD/slip_port.h \
     $$PWD/slip_test.h

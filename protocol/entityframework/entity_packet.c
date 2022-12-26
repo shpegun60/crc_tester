@@ -49,7 +49,7 @@ int readEntitiesSizes(u8* const outputData, reg* const size, const reg maxOutBuf
 
     // system types sizes --------------------------------------------------------------------------------
     outputData[pos++] = TYPE_ARRAY_LENGTH;                      // size array types
-    for(int i = 0; i < TYPE_ARRAY_LENGTH; ++i) {
+    for(unsigned int i = 0; i < TYPE_ARRAY_LENGTH; ++i) {
         outputData[pos++] = typeLengthMappingArray[i];          // copy array types
     }
 
@@ -63,13 +63,15 @@ int readEntitiesDescriptions(const TYPEOF_STRUCT(EntityInfo, entities_count) sta
 
     M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < (2 + ENTITIES_SIZEOF)) || (outputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "readEntitiesDescriptions: No allocated entities or invalid input");
 
-    if(startEntityNumber < entityInfo.entities_count) {
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
+
+    if(startEntityNumber < entities_count) {
         reg pos = 0;
 
         outputData[pos++] = ENTITY_OK;
         outputData[pos++] = ENTITY_DESCRIPTION_SIZE;                // description sizeof /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
-        TYPEOF_STRUCT(EntityInfo, entities_count) tmp = (entityInfo.entities_count - startEntityNumber);
+        const TYPEOF_STRUCT(EntityInfo, entities_count) tmp = (entities_count - startEntityNumber);
         len = MIN(tmp, len);
 
         //#if (MAX_NUBER_OF_ENTITIES < 256U) // WARNING!!!!!!!!! DO NOT this SUPPORT ON OLD VERSION---------------------------------------------------------------------------------------------------------================================================-----===========================-------------------------------------------------------------------
@@ -115,9 +117,11 @@ int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumbe
 
     M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < (1 + (ENTITY_FIELD_SIZEOF << 1))) || (outputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "readEntityFields: No allocated entities or invalid input");
 
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
     const Entity* const entity = entityInfo.entities[entityNumber];
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count = entity->fields_count;
 
-    if((entityNumber < entityInfo.entities_count) && (startFieldNumber < entity->fields_count)) {
+    if((entityNumber < entities_count) && (startFieldNumber < fields_count)) {
         reg pos = 0;
 
         outputData[pos++] = ENTITY_OK;
@@ -125,7 +129,7 @@ int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumbe
 #if (MAX_NUBER_OF_FIELDS < 256U)
         outputData[pos++] = (u8)(startFieldNumber & 0xFFU);                             /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
-        TYPEOF_STRUCT(Entity, fields_count) tmp = (entity->fields_count - startFieldNumber);
+        const TYPEOF_STRUCT(Entity, fields_count) tmp = (fields_count - startFieldNumber);
         len = MIN(tmp, len);
         outputData[pos++] = (u8)(len & 0xFFU);
 
@@ -135,7 +139,7 @@ int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumbe
         pos += ENTITY_FIELD_SIZEOF;
 
         len &= 0xFFFFUL;
-        TYPEOF_STRUCT(Entity, fields_count) tmp = (entity->fields_count - startFieldNumber);
+        const TYPEOF_STRUCT(Entity, fields_count) tmp = (fields_count - startFieldNumber);
         len = MIN(tmp, len);
         ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&len, &outputData[pos]);
         pos += ENTITY_FIELD_SIZEOF;
@@ -203,30 +207,33 @@ int readFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber,
 { //send {0x01 , prt + 0, ... , ptr + getTypeLen(entities[no].fields[fieldNo].type)}
     M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < 2) || (outputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "readFieldValue: No allocated entities or invalid input");
 
-    Entity*         const       entity = entityInfo.entities[entityNumber];
-    EntityField*    const       field = &entity->fields[fieldNumber];
+    Entity*         const       entity  = entityInfo.entities[entityNumber];
+    EntityField*    const       field   = &entity->fields[fieldNumber];
 
-    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count)) {
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count  = entityInfo.entities_count;
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+
+    if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
+        const u8        type    = field->type;
+        const reg       typeLen = getMYCTypeLen(type);
+        void* const     ptr     = (entity->pointer + field->shift);
+
         reg pos = 0;
 
         outputData[pos++] = ENTITY_OK;
-        outputData[pos++] = field->type;    /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
-
-        reg typeLen = getMYCTypeLen(field->type);
+        outputData[pos++] = type;    /////////////////////////////// may be optimize??? ///////////////////////////////////////////////////
 
         ENTITY_DBG_ASSERT_BUF(((pos + typeLen) > maxOutBufferSize), M_EMPTY, {
                                   goto error;
                               }, "readFieldValue: field read size more than buffer");
 
-
-        void* ptr = (entity->pointer + field->shift);
-
         proceedReadEntity(field->bitFlags, ptr, &outputData[pos], typeLen);
 
 
 #ifdef USE_ENTITY_READ_CALLBACK
-        if(field->rdCallback.entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
-            field->rdCallback.entityCallback(entity, field, ptr, field->rdCallback.context);
+        const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->rdCallback.entityCallback;
+        if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+            __entityCallback(entity, field, ptr, field->rdCallback.context);
         }
 #endif /* USE_ENTITY_READ_CALLBACK */
 
@@ -256,24 +263,28 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
 {
     M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < (1 + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF))) || (outputData == NULL) || (inputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "readSeveralFieldsValues: No allocated entities or invalid input");
 
+    const reg inputMsgSize = (*size);
     reg Wpos = 0;
     reg Rpos = 0;
     void* ptr;
+
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
     TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber;
     TYPEOF_STRUCT(Entity, fields_count) fieldNumber;
 
     outputData[Wpos++] = ENTITY_OK;
 
-    while((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) < (*size)) {
+    while((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) < inputMsgSize) {
 
         readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
 
         Entity* const entity = entityInfo.entities[entityNumber];
         EntityField* const field = &entity->fields[fieldNumber];
+        const TYPEOF_STRUCT(Entity, fields_count) fields_count = entity->fields_count;
 
-        if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count)) {
+        if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
 
-            reg typeLen = getMYCTypeLen(field->type);
+            const reg typeLen = getMYCTypeLen(field->type);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, {
                                      goto error;
@@ -284,8 +295,9 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
 
 
 #ifdef USE_ENTITY_READ_CALLBACK
-            if(field->rdCallback.entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
-                field->rdCallback.entityCallback(entity, field, ptr, field->rdCallback.context);
+            const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->rdCallback.entityCallback;
+            if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+                __entityCallback(entity, field, ptr, field->rdCallback.context);
             }
 #endif /* USE_ENTITY_READ_CALLBACK */
 
@@ -328,21 +340,25 @@ int setFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, 
     Entity* const entity = entityInfo.entities[entityNumber];
     EntityField* const field = &entity->fields[fieldNumber];
 
-    if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count) && ((field->bitFlags & ENTITY_READ_ONLY_MSK) == 0)) {
-        void* ptr = (entity->pointer + field->shift);
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count  = entityInfo.entities_count;
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+    const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags             = field->bitFlags;
 
-        reg typeLen = getMYCTypeLen(field->type);
+    if((entityNumber < entities_count) && (fieldNumber < fields_count) && ((bitFlags & ENTITY_READ_ONLY_MSK) == 0)) {
+        void* const ptr = (entity->pointer + field->shift);
+        const reg typeLen = getMYCTypeLen(field->type);
 
         ENTITY_DBG_ASSERT_BUF((typeLen > inputBufferSize), M_EMPTY, {
                                  return ENTITY_ERROR;
                               }, "setFieldValue: field size more than buffer");
 
-        proceedWriteEntity(field->bitFlags, ptr, inputData, typeLen);
+        proceedWriteEntity(bitFlags, ptr, inputData, typeLen);
 
 
 #ifdef USE_ENTITY_WRITE_CALLBACK
-        if(field->wrCallback.entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
-            field->wrCallback.entityCallback(entity, field, ptr, field->wrCallback.context);
+        const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->wrCallback.entityCallback;
+        if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+            __entityCallback(entity, field, ptr, field->wrCallback.context);
         }
 #endif /* USE_ENTITY_WRITE_CALLBACK */
 
@@ -362,41 +378,46 @@ int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const
 {
     M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < (1 + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF))) || (outputData == NULL) || (inputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "setSeveralFieldsValues: No allocated entities or invalid input");
 
+    const reg inputMsgSize = (*size);
     reg Wpos = 0;
     reg Rpos = 0;
     void* ptr;
+
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
     TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber;
     TYPEOF_STRUCT(Entity, fields_count) fieldNumber;
 
     outputData[Wpos++] = ENTITY_OK;
 
-    while((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) < (*size)) {
+    while((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) < inputMsgSize) {
 
         readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
 
         Entity* const entity = entityInfo.entities[entityNumber];
         EntityField* const field = &entity->fields[fieldNumber];
+        const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+        const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags             = field->bitFlags;
 
-        if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count)) {
-            reg typeLen = getMYCTypeLen(field->type);
+        if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
+            const reg typeLen = getMYCTypeLen(field->type);
 
-            ENTITY_DBG_ASSERT_BUF(((Rpos + typeLen) > (*size)), M_EMPTY, {
+            ENTITY_DBG_ASSERT_BUF(((Rpos + typeLen) > inputMsgSize), M_EMPTY, {
                                       goto error;
                                   }, "setSeveralFieldsValues: field read size more than buffer");
 
 
-            if((field->bitFlags & ENTITY_READ_ONLY_MSK) == 0) {
+            if((bitFlags & ENTITY_READ_ONLY_MSK) == 0) {
 
                 ptr = (entity->pointer + field->shift);
-                proceedWriteEntity(field->bitFlags, ptr, &inputData[Rpos], typeLen);
+                proceedWriteEntity(bitFlags, ptr, &inputData[Rpos], typeLen);
 
 
 #ifdef USE_ENTITY_WRITE_CALLBACK
-                if(field->wrCallback.entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
-                    field->wrCallback.entityCallback(entity, field, ptr, field->wrCallback.context);
+                const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->wrCallback.entityCallback;
+                if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+                    __entityCallback(entity, field, ptr, field->wrCallback.context);
                 }
 #endif /* USE_ENTITY_WRITE_CALLBACK */
-
 
             }
 

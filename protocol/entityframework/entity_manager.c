@@ -71,7 +71,9 @@ void deleteEntitityFieldsExternal(const reg entityNumber)
 /// delete all entities and deallocation all memory
 void deleteEntities(void)
 {
-    for(reg i = 0; i < entityInfo.entities_count; ++i) {
+    TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
+
+    for(TYPEOF_STRUCT(EntityInfo, entities_count) i = 0; i < entities_count; ++i) {
         deleteEntitityFieldsInternal(i);
     }
 
@@ -100,20 +102,24 @@ int newEntities(const reg numberOfEntities)
 int initEntity(reg* const entityNumber, const reg NumberOfFields, const reg pointerSize, const char descr[ENTITY_DESCRIPTION_SIZE], const b isCustomSpace, const b isHeap, void* arg)
 {
     M_Assert_BreakSaveCheck((NumberOfFields > MAX_NUBER_OF_FIELDS), M_EMPTY, return ENTITY_ERROR, "initEntity: No valid input number of fields, value: %d, max: %d", NumberOfFields, MAX_NUBER_OF_FIELDS);
-    M_Assert_BreakSaveCheck((entityInfo.entities_count == entityInfo.allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
+
+    TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
+    const TYPEOF_STRUCT(EntityInfo, allocated_entity_pointers) allocated_entity_pointers = entityInfo.allocated_entity_pointers;
+
+    M_Assert_BreakSaveCheck((entities_count >= allocated_entity_pointers), M_EMPTY, return ENTITY_ERROR, "initEntity: There is no free entity for initialization!!!, use /newEntities/ function before");
 
     char str[(ENTITY_DESCRIPTION_SIZE + 8) + 1] = {};
 
     // allocation pointer to Entity--------------------------------------------------------------------------------------------------------------------------------------------------------------
-    entityInfo.entities[entityInfo.entities_count] = (Entity*) calloc(1, sizeof(Entity));
-    M_Assert_BreakSaveCheck(entityInfo.entities[entityInfo.entities_count] == NULLPTR(Entity*), M_EMPTY, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
+    Entity* const new_entity = entityInfo.entities[entities_count] = (Entity*) calloc(1, sizeof(Entity));
+    M_Assert_BreakSaveCheck(new_entity == NULLPTR(Entity*), M_EMPTY, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
 
     // copy entity description-------------------------------------------------------------------------------------------------------------------------------------------------------------------
     if(descr) {
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
+        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)new_entity->descr);
     } else {
-        sprintf(str, "E%d", entityInfo.entities_count);
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)entityInfo.entities[entityInfo.entities_count]->descr);
+        sprintf(str, "E%d", entities_count);
+        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)new_entity->descr);
     }
 
 
@@ -121,42 +127,42 @@ int initEntity(reg* const entityNumber, const reg NumberOfFields, const reg poin
 #ifdef USE_ENTITY_USER_SPACE
 
     if(isCustomSpace) {
-        entityInfo.entities[entityInfo.entities_count]->isHeap  = isHeap;
-        entityInfo.entities[entityInfo.entities_count]->pointer = arg;
+        new_entity->isHeap  = isHeap;
+        new_entity->pointer = arg;
     } else {
-        entityInfo.entities[entityInfo.entities_count]->isHeap  = 1;
-        entityInfo.entities[entityInfo.entities_count]->pointer = calloc(1, pointerSize);
+        new_entity->isHeap  = 1;
+        new_entity->pointer = calloc(1, pointerSize);
     }
 
-    M_Assert_BreakSaveCheck((entityInfo.entities[entityInfo.entities_count]->pointer == NULL), {
-        deleteEntitityFieldsInternal(entityInfo.entities_count);
+    M_Assert_BreakSaveCheck((new_entity->pointer == NULL), {
+        deleteEntitityFieldsInternal(entities_count);
     }, return ENTITY_ERROR, (isCustomSpace ? "newEntities: Invalid user input space" : "newEntities: No memory for allocation Entitity"));
 
 #else
 
-    entityInfo.entities[entityInfo.entities_count]->pointer = calloc(1, pointerSize);
+    new_entity->pointer = calloc(1, pointerSize);
     UNUSED(isCustomSpace);
     UNUSED(isHeap);
     UNUSED(arg);
 
-    M_Assert_BreakSaveCheck((entityInfo.entities[entityInfo.entities_count]->pointer == NULL), {
-        deleteEntitityFieldsInternal(entityInfo.entities_count);
+    M_Assert_BreakSaveCheck((new_entity->pointer == NULL), {
+        deleteEntitityFieldsInternal(entities_count);
     }, return ENTITY_ERROR, "newEntities: No memory for allocation Entitity");
 
 #endif /* USE_ENTITY_USER_SPACE */
 
 
     // allocation pointer to Fields------------------------------------------------------------------------------------------------------------------------------------------------------------
-    entityInfo.entities[entityInfo.entities_count]->fields = (EntityField*) calloc(NumberOfFields, sizeof(EntityField));
-    M_Assert_BreakSaveCheck((entityInfo.entities[entityInfo.entities_count]->fields == NULLPTR(TYPEOF_STRUCT(Entity, fields))), {
-        deleteEntitityFieldsInternal(entityInfo.entities_count);
+    new_entity->fields = (EntityField*) calloc(NumberOfFields, sizeof(EntityField));
+    M_Assert_BreakSaveCheck((new_entity->fields == NULLPTR(TYPEOF_STRUCT(Entity, fields))), {
+        deleteEntitityFieldsInternal(entities_count);
     }, return ENTITY_ERROR, "newEntities: No memory for allocation EntityField");
 
-    entityInfo.entities[entityInfo.entities_count]->fields_count = NumberOfFields;
+    new_entity->fields_count = NumberOfFields;
 
     // initialization Fields-------------------------------------------------------------------------------------------------------------------------------------------------------------------
     for(reg i = 0; i < NumberOfFields; ++i) {
-        EntityField* const    field = &entityInfo.entities[entityInfo.entities_count]->fields[i];
+        EntityField* const    field = &new_entity->fields[i];
 
 #ifdef USE_ENTITY_CALLBACKS
 
@@ -180,9 +186,9 @@ int initEntity(reg* const entityNumber, const reg NumberOfFields, const reg poin
         MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
     }
 
-    (*entityNumber) = entityInfo.entities_count;
-    ++entityInfo.entities_count;
-
+    (*entityNumber) = entities_count;
+    ++entities_count;
+    entityInfo.entities_count = entities_count;
     return ENTITY_OK;
 }
 
@@ -201,8 +207,11 @@ int initField(Entity* const entityInst, reg* const fieldNumber, const TYPEOF_STR
     M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initField: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
 #endif /* USE_ENTITY_REGISTER */
 
-    M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
-                                    EntityField* const    field = &entityInst->fields[(*fieldNumber)];
+    reg fieldNumber_readed = (*fieldNumber);
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entityInst->fields_count;
+
+    M_Assert_BreakElseSaveCheck((fields_count > fieldNumber_readed), {
+                                    EntityField* const    field = &entityInst->fields[fieldNumber_readed];
 
                                     field->bitFlags     = bitFlags;
                                     field->shift        = shift;
@@ -216,9 +225,10 @@ int initField(Entity* const entityInst, reg* const fieldNumber, const TYPEOF_STR
                                         cTypePointerInit(type, (u8 *)field_ptr);
                                     }
 
-                                    ++(*fieldNumber);
+                                    ++fieldNumber_readed;
+                                    (*fieldNumber) = fieldNumber_readed;
                                     return ENTITY_OK;
-                                }, M_EMPTY, M_EMPTY, "initField: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber), entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initField: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber_readed, fields_count);
 
     return ENTITY_ERROR;
 }
@@ -233,12 +243,16 @@ int initFieldArray(Entity* const entityInst, reg* const fieldNumber, TYPEOF_STRU
     M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initFieldArray: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
 #endif /* USE_ENTITY_REGISTER */
 
-    M_Assert_BreakElseSaveCheck((entityInst->fields_count > ((*fieldNumber) + arrayLen)), {
+    reg fieldNumber_readed = (*fieldNumber);
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entityInst->fields_count;
+    const reg typeLen = getMYCTypeLen(type);
+
+    M_Assert_BreakElseSaveCheck((fields_count > (fieldNumber_readed + arrayLen)), {
 
                                     char str[(ENTITY_DESCRIPTION_SIZE + 8) + 1] = {};
                                     bitFlags |= ENTITY_ARRAY_MSK;
                                     for(int i = 0; i < arrayLen; ++i) {
-                                        EntityField* const    field = &entityInst->fields[(*fieldNumber)];
+                                        EntityField* const    field = &entityInst->fields[fieldNumber_readed];
 
                                         field->bitFlags   = bitFlags;
                                         field->shift      = shift;
@@ -246,19 +260,23 @@ int initFieldArray(Entity* const entityInst, reg* const fieldNumber, TYPEOF_STRU
 
                                         if(descr) {
                                             sprintf(str, "%s%d", descr, (i + startNum));
-                                            MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
+                                        } else {
+                                            sprintf(str, ":[%d]", (i + startNum));
                                         }
+                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
 
-                                        shift += getMYCTypeLen(type);
-                                        ++(*fieldNumber);
+                                        shift += typeLen;
+                                        ++fieldNumber_readed;
                                     }
 
                                     if(field_ptr) {
-                                        pointerInit((arrayLen * getMYCTypeLen(type)), field_ptr);
+                                        pointerInit((arrayLen * typeLen), field_ptr);
                                     }
+
+                                    (*fieldNumber) = fieldNumber_readed;
                                     return ENTITY_OK;
 
-                                }, M_EMPTY, M_EMPTY, "initFieldArray: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber) + arrayLen, entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initFieldArray: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber_readed + arrayLen, fields_count);
 
     return ENTITY_ERROR;
 }
@@ -287,12 +305,15 @@ int initFieldFromPtr(EntityField* const fieldInst, const TYPEOF_STRUCT(EntityFie
 int fieldRename(Entity* const entityInst, const reg fieldNumber, const char descr[ENTITY_DESCRIPTION_SIZE])
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || descr == NULLPTR(char *)), M_EMPTY, return ENTITY_ERROR, "fieldRename: No valid input");
-    M_Assert_BreakElseSaveCheck((entityInst->fields_count > fieldNumber), {
+
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entityInst->fields_count;
+
+    M_Assert_BreakElseSaveCheck((fields_count > fieldNumber), {
 
                                     MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[fieldNumber].descr);
                                     return ENTITY_OK;
 
-                                }, M_EMPTY, M_EMPTY, "fieldRename: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber, entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "fieldRename: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber, fields_count);
     return ENTITY_ERROR;
 }
 
@@ -316,9 +337,12 @@ int initFieldCallback(Entity* const  entityInst, reg* const fieldNumber, const T
     M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initFieldCallback: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
 #endif /* USE_ENTITY_REGISTER */
 
-    M_Assert_BreakElseSaveCheck((entityInst->fields_count > (*fieldNumber)), {
+    reg fieldNumber_readed = (*fieldNumber);
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entityInst->fields_count;
 
-                                    EntityField* const    field = &entityInst->fields[(*fieldNumber)];
+    M_Assert_BreakElseSaveCheck((fields_count > fieldNumber_readed), {
+
+                                    EntityField* const    field = &entityInst->fields[fieldNumber_readed];
 
                                     field->bitFlags     = bitFlags;
                                     field->shift        = shift;
@@ -348,9 +372,10 @@ int initFieldCallback(Entity* const  entityInst, reg* const fieldNumber, const T
                                         cTypePointerInit(type, (u8 *)field_ptr);
                                     }
 
-                                    ++(*fieldNumber);
+                                    ++fieldNumber_readed;
+                                    (*fieldNumber) = fieldNumber_readed;
                                     return ENTITY_OK;
-                                }, M_EMPTY, M_EMPTY, "initFieldCallback: fieldNumber: &d,  is too long than allocated fields_count: %d", (*fieldNumber), entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initFieldCallback: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber_readed, fields_count);
 
     return ENTITY_ERROR;
 }
@@ -360,7 +385,10 @@ int entityInitCallback(Entity* const entityInst, const reg filedNumber,
                        const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) readCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) readContext, const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) writeCallback, const TYPEOF_STRUCT(entityCallbackContainer, context) writeContext)
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *)), M_EMPTY, return ENTITY_ERROR, "initCallback: No valid input");
-    M_Assert_BreakElseSaveCheck((entityInst->fields_count > filedNumber), {
+
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entityInst->fields_count;
+
+    M_Assert_BreakElseSaveCheck((fields_count > filedNumber), {
 
                                     EntityField* const    field = &entityInst->fields[filedNumber];
 
@@ -382,7 +410,7 @@ int entityInitCallback(Entity* const entityInst, const reg filedNumber,
 
                                     return ENTITY_OK;
 
-                                }, M_EMPTY, M_EMPTY, "initCallback: fieldNumber: &d,  is too long than allocated fields_count: %d", filedNumber, entityInst->fields_count);
+                                }, M_EMPTY, M_EMPTY, "initCallback: fieldNumber: &d,  is too long than allocated fields_count: %d", filedNumber, fields_count);
     return ENTITY_ERROR;
 }
 
@@ -392,11 +420,14 @@ int entityInitCallback_txt(Entity* const entityInst, const char descr[ENTITY_DES
 {
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *)), M_EMPTY, return ENTITY_ERROR, "initCallback_txt: No valid input");
 
-    for(int it = 0; it < entityInst->fields_count; ++it) {
+    const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entityInst->fields_count;
 
-        if(entityDescrNotCompleate(descr, entityInst->fields[it].descr) == 0) {
+    for(TYPEOF_STRUCT(Entity, fields_count) it = 0; it < fields_count; ++it) {
 
-            EntityField* const    field = &entityInst->fields[it];
+        EntityField* const    field = &entityInst->fields[it];
+        if(entityDescrNotCompleate(descr, field->descr) == 0) {
+
+
 
 #ifdef USE_ENTITY_READ_CALLBACK
             field->rdCallback.entityCallback = readCallback;
@@ -430,14 +461,17 @@ int entityInitCallback_txt(Entity* const entityInst, const char descr[ENTITY_DES
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (* const predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, void* ctx), void* const ctx)
+int foreachEntities(int (* const predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx))
 {
     M_Assert_BreakSaveCheck((predicate == NULLPTR(TYPEOF_DATA(predicate))), M_EMPTY, return ENTITY_ERROR, "foreachEntities: no valid function");
 
-    for(TYPEOF_STRUCT(EntityInfo, entities_count) i = 0; i != entityInfo.entities_count; ++i) {
-        Entity* const entity = entityInfo.entities[i]; // move to cash
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
 
-        for(TYPEOF_STRUCT(Entity, fields_count) j = 0; j != entity->fields_count; ++j) {
+    for(TYPEOF_STRUCT(EntityInfo, entities_count) i = 0; i != entities_count; ++i) {
+        Entity* const entity = entityInfo.entities[i]; // move to cash
+        const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+
+        for(TYPEOF_STRUCT(Entity, fields_count) j = 0; j != fields_count; ++j) {
             EntityField* const    field = &entity->fields[j];   // move to cash
             void* ptr = (entity->pointer + field->shift);       // move to cash
 

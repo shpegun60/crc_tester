@@ -9,7 +9,9 @@
 
 #include "entity_port.h"
 
+
 #ifdef C_ENTITY_FRAMEWORK_LIB_ENA
+#include "preprocessor_ctx.h"
 #include "my_ctype_cast.h"
 
 /**************************************************************************************************************************************************
@@ -32,8 +34,8 @@ typedef struct Entity       Entity;
   * @retval None
   */
 typedef struct {
-    void (*entityCallback)(Entity* entity, EntityField* field, void* value, void* context); // callback function
-    void* context;                                                                          // callback context
+    void (*entityCallback)(Entity* entity, EntityField* field, void* value, PREPROCESSOR_CTX_TYPE(context)); // callback function
+    PREPROCESSOR_CTX_MUTABLE_TYPE(context);                                                                          // callback context
 } entityCallbackContainer;
 
 
@@ -243,7 +245,7 @@ int entityInitCallback_txt(Entity* const entityInst, const char descr[ENTITY_DES
  * **********************************************************************************************************************************
  */
 
-int foreachEntities(int (*predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, void* ctx), void* ctx);
+int foreachEntities(int (* const predicate)(reg entityNumber, Entity* entity, reg fieldNumber, EntityField* field, void* val, PREPROCESSOR_CTX_TYPE(ctx)), PREPROCESSOR_CTX_TYPE(ctx));
 
 /// string compleate for entities---------------------------------------------------------------------------------------------------
 STATIC_FORCEINLINE int entityDescrNotCompleate(const c8* str1, const c8* str2)
