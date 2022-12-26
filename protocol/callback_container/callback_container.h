@@ -11,7 +11,7 @@
     (desc)->callback((desc)->context)
 
 /* safe calling callback container */
-#define CC_SAFE_CALL(desc)                                                     \
+#define CC_SAFE_CALL(desc)                                                      \
     do{                                                                         \
         const TYPEOF_DATA((desc)->callback) _callback   = (desc)->callback;     \
         const TYPEOF_DATA((desc)->context)  _ctx        = (desc)->context;      \
@@ -21,7 +21,7 @@
     }while(0L)
 
 /* safe calling callback container with value getting */
-#define CC_SAFE_CALL_VAL(desc, value)                                          \
+#define CC_SAFE_CALL_VAL(desc, value)                                           \
     do{                                                                         \
         const TYPEOF_DATA((desc)->callback) _callback   = (desc)->callback;     \
         const TYPEOF_DATA((desc)->context)  _ctx        = (desc)->context;      \
@@ -31,7 +31,7 @@
     }while(0L)
 
 /* safe calling callback container with descriptor nullptr check */
-#define CC_SAFE_CALL_DESC(desc)                                                \
+#define CC_SAFE_CALL_DESC(desc)                                                 \
     do{                                                                         \
         const TYPEOF_DATA((desc)->callback) _callback   = (desc)->callback;     \
         const TYPEOF_DATA((desc)->context)  _ctx        = (desc)->context;      \
@@ -41,7 +41,7 @@
     }while(0L)
 
 /* safe calling callback container with value getting and descriptor nullptr check */
-#define CC_SAFE_CALL_DESC_VAL(desc, value)                                     \
+#define CC_SAFE_CALL_DESC_VAL(desc, value)                                      \
     do{                                                                         \
         const TYPEOF_DATA((desc)->callback) _callback   = (desc)->callback;     \
         const TYPEOF_DATA((desc)->context)  _ctx        = (desc)->context;      \

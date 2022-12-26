@@ -98,31 +98,34 @@ STATIC_FORCEINLINE u64 Reverse64(const u64 value)
 // pointrs input ----------------------------------------------
 STATIC_FORCEINLINE void Reverse16_ptr(const u16 * const value, u16 * const to)
 {
+    const u16 value_internal = (*value);
     *to = (const u16)( 0
-                       | (((*value) & 0x00ff) << 8U)
-                       | (((*value) & 0xff00) >> 8U) );
+                       | ((value_internal & 0x00ff) << 8U)
+                       | ((value_internal & 0xff00) >> 8U) );
 }
 
 STATIC_FORCEINLINE void Reverse32_ptr(const u32 * const value, u32 * const to)
 {
+    const u32 value_internal = (*value);
     *to = (const u32)( 0
-                       | (((*value) & 0x000000ffUL) << 24U)
-                       | (((*value) & 0x0000ff00UL) << 8U)
-                       | (((*value) & 0x00ff0000UL) >> 8U)
-                       | (((*value) & 0xff000000UL) >> 24U) );
+                       | ((value_internal & 0x000000ffUL) << 24U)
+                       | ((value_internal & 0x0000ff00UL) << 8U)
+                       | ((value_internal & 0x00ff0000UL) >> 8U)
+                       | ((value_internal & 0xff000000UL) >> 24U) );
 }
 
 STATIC_FORCEINLINE void Reverse64_ptr(const u64 * const value, u64 * const to)
 {
+    const u64 value_internal = (*value);
     *to = (const u64)( 0
-                       | (((*value) & 0x00000000000000ffULL) << 56U)
-                       | (((*value) & 0x000000000000ff00ULL) << 40U)
-                       | (((*value) & 0x0000000000ff0000ULL) << 24U)
-                       | (((*value) & 0x00000000ff000000ULL) << 8U)
-                       | (((*value) & 0x000000ff00000000ULL) >> 8U)
-                       | (((*value) & 0x0000ff0000000000ULL) >> 24U)
-                       | (((*value) & 0x00ff000000000000ULL) >> 40U)
-                       | (((*value) & 0xff00000000000000ULL) >> 56U) );
+                       | ((value_internal & 0x00000000000000ffULL) << 56U)
+                       | ((value_internal & 0x000000000000ff00ULL) << 40U)
+                       | ((value_internal & 0x0000000000ff0000ULL) << 24U)
+                       | ((value_internal & 0x00000000ff000000ULL) << 8U)
+                       | ((value_internal & 0x000000ff00000000ULL) >> 8U)
+                       | ((value_internal & 0x0000ff0000000000ULL) >> 24U)
+                       | ((value_internal & 0x00ff000000000000ULL) >> 40U)
+                       | ((value_internal & 0xff00000000000000ULL) >> 56U) );
 }
 
 /*

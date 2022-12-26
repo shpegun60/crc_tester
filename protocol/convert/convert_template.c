@@ -13,42 +13,52 @@
  */
 T TEMPLATE(convertRead_LSB, T) (u8* data, reg * pos)
 {
+    reg posInternal = (*pos);
     T value;
-    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + *pos), (u8 *)(&value));
-    *pos += sizeof(T);
+    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + posInternal), (u8 *)(&value));
+    posInternal += sizeof(T);
+    (*pos) = posInternal;
     return value;
 }
 
 void TEMPLATE(convertWrite_LSB, T) (u8* data, reg* pos, T value)
 {
-    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + *pos));
-    *pos += sizeof(T);
+    reg posInternal = (*pos);
+    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + posInternal));
+    posInternal += sizeof(T);
+    (*pos) = posInternal;
 }
 
 //with check buffer-----------------------------------------------------------------------------
 T TEMPLATE(convertReadCheck_LSB, T) (u8* data, reg* pos, reg buffSize, b* ok)
 {
-    if((*pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+    reg posInternal = (*pos);
+
+    if((posInternal + sizeof(T)) > buffSize) {
+        (*ok) = CTYPE_FALSE;
         return (T)(0);
     }
 
     T value;
-    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + *pos), (u8 *)(&value));
-    *pos += sizeof(T);
-    *ok = CTYPE_TRUE;
+    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + posInternal), (u8 *)(&value));
+    posInternal += sizeof(T);
+    (*ok) = CTYPE_TRUE;
+    (*pos) = posInternal;
     return value;
 }
 void TEMPLATE(convertWriteCheck_LSB, T) (u8* data, reg* pos, T value, reg buffSize, b* ok)
 {
-    if((*pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+    reg posInternal = (*pos);
+
+    if((posInternal + sizeof(T)) > buffSize) {
+        (*ok) = CTYPE_FALSE;
         return;
     }
 
-    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + *pos));
-    *pos += sizeof(T);
-    *ok = CTYPE_TRUE;
+    MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + posInternal));
+    posInternal += sizeof(T);
+    (*ok) = CTYPE_TRUE;
+    (*pos) = posInternal;
 }
 
 // position not a pointer-----------------------------------------------------------------------
@@ -68,24 +78,24 @@ void TEMPLATE(convertWrite_cpos_LSB, T) (u8* data, reg pos, T value)
 T TEMPLATE(convertReadCheck_cpos_LSB, T) (u8* data, reg pos, reg buffSize, b* ok)
 {
     if((pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+        (*ok) = CTYPE_FALSE;
         return (T)(0);
     }
 
     T value;
     MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(data + pos), (u8 *)(&value));
-    *ok = CTYPE_TRUE;
+    (*ok) = CTYPE_TRUE;
     return value;
 }
 void TEMPLATE(convertWriteCheck_cpos_LSB, T) (u8* data, reg pos, T value, reg buffSize, b* ok)
 {
     if((pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+        (*ok) = CTYPE_FALSE;
         return;
     }
 
     MY_CTYPE_USER_DATA_MEMCPY(sizeof(T), (u8*)(&value), (u8*)(data + pos));
-    *ok = CTYPE_TRUE;
+    (*ok) = CTYPE_TRUE;
 }
 
 
@@ -97,42 +107,56 @@ void TEMPLATE(convertWriteCheck_cpos_LSB, T) (u8* data, reg pos, T value, reg bu
 
 T TEMPLATE(convertRead_MSB, T) (u8* data, reg* pos)
 {
+    reg posInternal = (*pos);
+
     T value;
-    MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + *pos), (u8 *)(&value));
-    *pos += sizeof(T);
+    MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + posInternal), (u8 *)(&value));
+    posInternal += sizeof(T);
+
+    (*pos) = posInternal;
     return value;
 }
 
 void TEMPLATE(convertWrite_MSB, T) (u8* data, reg* pos, T value)
 {
-    MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(&value), (u8*)(data + *pos));
-    *pos += sizeof(T);
+    reg posInternal = (*pos);
+
+    MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(&value), (u8*)(data + posInternal));
+    posInternal += sizeof(T);
+
+    (*pos) = posInternal;
 }
 
 //with check buffer-----------------------------------------------------------------------------
 T TEMPLATE(convertReadCheck_MSB, T) (u8* data, reg* pos, reg buffSize, b* ok)
 {
-    if((*pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+    reg posInternal = (*pos);
+
+    if((posInternal + sizeof(T)) > buffSize) {
+        (*ok) = CTYPE_FALSE;
         return (T)(0);
     }
 
     T value;
-    MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + *pos), (u8 *)(&value));
-    *pos += sizeof(T);
-    *ok = CTYPE_TRUE;
+    MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + posInternal), (u8 *)(&value));
+    posInternal += sizeof(T);
+    (*ok) = CTYPE_TRUE;
+    (*pos) = posInternal;
     return value;
 }
 void TEMPLATE(convertWriteCheck_MSB, T) (u8* data, reg* pos, T value, reg buffSize, b* ok)
 {
-    if((*pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+    reg posInternal = (*pos);
+
+    if((posInternal + sizeof(T)) > buffSize) {
+        (*ok) = CTYPE_FALSE;
         return;
     }
 
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(&value), (u8*)(data + *pos));
-    *pos += sizeof(T);
-    *ok = CTYPE_TRUE;
+    posInternal += sizeof(T);
+    (*ok) = CTYPE_TRUE;
+    (*pos) = posInternal;
 }
 
 // position not a pointer
@@ -152,24 +176,24 @@ void TEMPLATE(convertWrite_cpos_MSB, T) (u8* data, reg pos, T value)
 T TEMPLATE(convertReadCheck_cpos_MSB, T) (u8* data, reg pos, reg buffSize, b* ok)
 {
     if((pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+        (*ok) = CTYPE_FALSE;
         return (T)(0);
     }
 
     T value;
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(data + pos), (u8 *)(&value));
-    *ok = CTYPE_TRUE;
+    (*ok) = CTYPE_TRUE;
     return value;
 }
 void TEMPLATE(convertWriteCheck_cpos_MSB, T) (u8* data, reg pos, T value, reg buffSize, b* ok)
 {
     if((pos + sizeof(T)) > buffSize) {
-        *ok = CTYPE_FALSE;
+        (*ok) = CTYPE_FALSE;
         return;
     }
 
     MY_CTYPE_USER_DATA_REVCPY(sizeof(T), (u8*)(&value), (u8*)(data + pos));
-    *ok = CTYPE_TRUE;
+    (*ok) = CTYPE_TRUE;
 }
 
 

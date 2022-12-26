@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     protocolAllTest(time(NULL), 100, (TESTER_CRC | TESTER_ENDIAN | TESTER_CONVERT | TESTER_RAW_P_DMA | TESTER_REED_SOLOMON_ECC | TESTER_CALLBACK_MANAGER | TESTER_PULL_CONTAINER | TESTER_RAW_P_IT));
-    //protocolAllTest(time(NULL), 10, (TESTER_REED_SOLOMON_ECC));
+    //protocolAllTest(time(NULL), 10, (TESTER_ENDIAN | TESTER_CONVERT));
 //    //protocolAllTest(time(NULL), 100, (TESTER_RAW_P_IT));
 
 //    //__M_assert_test();
