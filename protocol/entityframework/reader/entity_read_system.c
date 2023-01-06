@@ -71,6 +71,7 @@ int initEntityReadSystem(void)
     EN_RD_SYS_ASSERT( entityReadPoolContainer_initBoard(&ersys.readPool, &boards_num, 3, fieldCountList, ARRAY_COUNT(fieldCountList)) );
     // all parent push to container---------------------------------------------------------------------------------------------------------
     EN_RD_SYS_ASSERT( entityReadPoolContainer_push(&ersys.readPool, &ersys.name.parent) );
+    EN_RD_SYS_ASSERT( entityReadPoolContainer_push(&ersys.readPool, &ersys.name1.parent) );
 
     /***********************************************************************
      * Write container initialization (for only write changed fields)

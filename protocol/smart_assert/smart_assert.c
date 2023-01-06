@@ -14,6 +14,8 @@ static inline void __M_SEND_ASSERT_MSG(const char* const header,
                                 const char* const file, const int line,
                                 const char* const msg, va_list args)
 {
+#if !defined(M_ASSERT_MSG_TEXT_DISABLE)
+
     if(__M_IF_ASSERT_ADDITION_DATA(msg)) {
 
         int assertEna = 1;
@@ -47,36 +49,62 @@ static inline void __M_SEND_ASSERT_MSG(const char* const header,
 
         }
 
-#if !defined(M_MESSAGE_ALWAYS_ENABLE)
+#   if !defined(M_MESSAGE_ALWAYS_ENABLE)
         // send message if enabled message
         if(assertEna) {
-#endif /* !defined(M_MESSAGE_ALWAYS_ENABLE) */
+#   endif /* !defined(M_MESSAGE_ALWAYS_ENABLE) */
             fprintf(stderr, "\n%s\n", header);
             fprintf(stderr, "Library Name: %s\n", descr);
             fprintf(stderr, "Assert failed:\t");
             vfprintf(stderr, &msg[3], args);
             fprintf(stderr, "\n");
 
-            fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
-            fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+#   if !defined(M_ASSERT_EXPR_DISABLE)
+        fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
+#   endif /* defined(M_ASSERT_EXPR_TEXT_DISABLE) */
+
+#   if !defined(M_ASSERT_FILE_LINE_TEXT_DISABLE)
+        fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+#   endif /* defined(M_ASSERT_FILE_LINE_TEXT_DISABLE) */
             fflush(stderr);
 
-#if !defined(M_MESSAGE_ALWAYS_ENABLE)
+#   if !defined(M_MESSAGE_ALWAYS_ENABLE)
         }
-#endif /* !defined(M_MESSAGE_ALWAYS_ENABLE) */
+#   endif /* !defined(M_MESSAGE_ALWAYS_ENABLE) */
 
         (void)assertEna;
     } else {
 
+#endif /* defined(M_ASSERT_MSG_TEXT_DISABLE) */
+
         fprintf(stderr, "\n%s\n", header);
+#if !defined(M_ASSERT_MSG_TEXT_DISABLE)
         fprintf(stderr, "Assert failed:\t");
         vfprintf(stderr, msg, args);
         fprintf(stderr, "\n");
+#endif /* defined(M_ASSERT_MSG_TEXT_DISABLE) */
 
+#if !defined(M_ASSERT_EXPR_DISABLE)
         fprintf(stderr, "Expression:\t %s, value: %d\n", expr_str, expr);
+#endif /* defined(M_ASSERT_EXPR_TEXT_DISABLE) */
+
+#if !defined(M_ASSERT_FILE_LINE_TEXT_DISABLE)
         fprintf(stderr, "Source:\t\t %s, line: %d\n", file, line);
+#endif /* defined(M_ASSERT_FILE_LINE_TEXT_DISABLE) */
+
         fflush(stderr);
+
+#if !defined(M_ASSERT_MSG_TEXT_DISABLE)
     }
+#endif /* defined(M_ASSERT_MSG_TEXT_DISABLE) */
+
+    (void)header;
+    (void)expr_str;
+    (void)expr;
+    (void)file;
+    (void)line;
+    (void)msg;
+    (void)args;
 }
 
 void __M_Error(const char* const expr_str, const unsigned char expr, const char* const file, const int line, const char* const msg, ...)
@@ -131,6 +159,7 @@ void __M_DBG_FILE(FILE * file, const char* const msg, ...)
     fflush(file);
     va_end(args);
 }
+
 
 
 void __M_assert_test()

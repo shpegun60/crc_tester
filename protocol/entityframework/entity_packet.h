@@ -51,6 +51,11 @@ int setFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, 
  */
 int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const size, const reg maxOutBufferSize);
 
+/* ******************************************************************************************************************
+ * GLUED functions fields values
+ *
+ */
+int proceedGluedValues(u8* const inputData, u8* const outputData, reg* const size, const reg maxOutBufferSize);
 
 
 /* ******************************************************************************************************************

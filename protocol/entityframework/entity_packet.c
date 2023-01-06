@@ -106,10 +106,10 @@ int readEntitiesDescriptions(const TYPEOF_STRUCT(EntityInfo, entities_count) sta
 
 
     // error proceeding lable -------------------------------------------------------------------
-    error:
-        outputData[0] = ENTITY_ERROR;
-        (*size) = 1;
-        return ENTITY_ERROR;
+error:
+    outputData[0] = ENTITY_ERROR;
+    (*size) = 1;
+    return ENTITY_ERROR;
 }
 
 int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) startFieldNumber, TYPEOF_STRUCT(Entity, fields_count) len, u8* const outputData, reg* const size, const reg maxOutBufferSize)
@@ -156,18 +156,18 @@ int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumbe
                                    }, "readEntityFields: fields read size more than buffer");
 
 
-//-----------------=============================-----------------------------------===========================-----------------------------=================================----OLD VERSION DO NOT SUPPORT---------------------------===========================----------------
-//            ENTITY_BYTE_CPY(sizeof(field->bitFlags), (u8 *)&field->bitFlags, &outputData[pos]);
-//            pos += sizeof(field->bitFlags);
+            //-----------------=============================-----------------------------------===========================-----------------------------=================================----OLD VERSION DO NOT SUPPORT---------------------------===========================----------------
+            //            ENTITY_BYTE_CPY(sizeof(field->bitFlags), (u8 *)&field->bitFlags, &outputData[pos]);
+            //            pos += sizeof(field->bitFlags);
 
-//            ENTITY_BYTE_CPY(sizeof(field->shift), (u8 *)&field->shift, &outputData[pos]);
-//            pos += sizeof(field->shift);
+            //            ENTITY_BYTE_CPY(sizeof(field->shift), (u8 *)&field->shift, &outputData[pos]);
+            //            pos += sizeof(field->shift);
 
-//            outputData[pos++] = (field->type & 0xFFU);
+            //            outputData[pos++] = (field->type & 0xFFU);
 
-//            ENTITY_BYTE_CPY(ENTITY_DESCRIPTION_SIZE, (u8 *)&field->descr, &outputData[pos]);
-//            pos += ENTITY_DESCRIPTION_SIZE;
-//-----------------=============================-----------------------------------===========================-----------------------------=================================-------------------------------===========================-------------------======================
+            //            ENTITY_BYTE_CPY(ENTITY_DESCRIPTION_SIZE, (u8 *)&field->descr, &outputData[pos]);
+            //            pos += ENTITY_DESCRIPTION_SIZE;
+            //-----------------=============================-----------------------------------===========================-----------------------------=================================-------------------------------===========================-------------------======================
             // this is glitch
             ENTITY_BYTE_CPY(1, (u8 *)&field->bitFlags, &outputData[pos]);
             pos += 1;
@@ -179,7 +179,7 @@ int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumbe
 
             ENTITY_BYTE_CPY(ENTITY_DESCRIPTION_SIZE, (u8 *)&field->descr, &outputData[pos]);
             pos += ENTITY_DESCRIPTION_SIZE;
-//------------------------------=========================================--------------------------------------===================================--------------------------------------=============================---------------------------------========================
+            //------------------------------=========================================--------------------------------------===================================--------------------------------------=============================---------------------------------========================
 
         }
 
@@ -192,10 +192,10 @@ int readEntityFields(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumbe
     return ENTITY_OK;
 
     // error proceeding lable -------------------------------------------------------------------
-    error:
-        outputData[0] = ENTITY_ERROR;
-        (*size) = 1;
-        return ENTITY_ERROR;
+error:
+    outputData[0] = ENTITY_ERROR;
+    (*size) = 1;
+    return ENTITY_ERROR;
 }
 
 
@@ -241,17 +241,17 @@ int readFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber,
         (*size) = pos;
 
     } else {
-       goto error;
+        goto error;
     }
 
     UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 
     // error proceeding lable -------------------------------------------------------------------
-    error:
-        outputData[0] = ENTITY_ERROR;
-        (*size) = 1;
-        return ENTITY_ERROR;
+error:
+    outputData[0] = ENTITY_ERROR;
+    (*size) = 1;
+    return ENTITY_ERROR;
 }
 
 /* ******************************************************************************************************************
@@ -287,7 +287,7 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
             const reg typeLen = getMYCTypeLen(field->type);
 
             ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, {
-                                     goto error;
+                                      goto error;
                                   }, "readSeveralFieldsValues: field size more than buffer");
 
             ptr = (entity->pointer + field->shift);
@@ -315,17 +315,17 @@ int readSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* cons
 
 
     // error proceeding lable -------------------------------------------------------------------
-    error:
-        Wpos = 0;
-        outputData[Wpos++] = ENTITY_ERROR;
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
-        Wpos += ENTITIES_SIZEOF;
+error:
+    Wpos = 0;
+    outputData[Wpos++] = ENTITY_ERROR;
+    ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
+    Wpos += ENTITIES_SIZEOF;
 
-        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
-        Wpos += ENTITY_FIELD_SIZEOF;
+    ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
+    Wpos += ENTITY_FIELD_SIZEOF;
 
-        (*size) = Wpos;
-        return ENTITY_ERROR;
+    (*size) = Wpos;
+    return ENTITY_ERROR;
 }
 
 
@@ -349,7 +349,7 @@ int setFieldValue(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, 
         const reg typeLen = getMYCTypeLen(field->type);
 
         ENTITY_DBG_ASSERT_BUF((typeLen > inputBufferSize), M_EMPTY, {
-                                 return ENTITY_ERROR;
+                                  return ENTITY_ERROR;
                               }, "setFieldValue: field size more than buffer");
 
         proceedWriteEntity(bitFlags, ptr, inputData, typeLen);
@@ -435,17 +435,126 @@ int setSeveralFieldsValues(u8* const inputData, u8* const outputData, reg* const
 
 
     // error proceeding lable -------------------------------------------------------------------
-    error:
-        Wpos = 0;
-        outputData[Wpos++] = ENTITY_ERROR;
-        ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
-        Wpos += ENTITIES_SIZEOF;
+error:
+    Wpos = 0;
+    outputData[Wpos++] = ENTITY_ERROR;
+    ENTITY_BYTE_CPY(ENTITIES_SIZEOF,     &outputData[Wpos], (u8*)&entityNumber);
+    Wpos += ENTITIES_SIZEOF;
 
-        ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
-        Wpos += ENTITY_FIELD_SIZEOF;
+    ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &outputData[Wpos], (u8*)&fieldNumber );
+    Wpos += ENTITY_FIELD_SIZEOF;
 
-        (*size) = Wpos;
-        return ENTITY_ERROR;
+    (*size) = Wpos;
+    return ENTITY_ERROR;
+}
+
+/* ******************************************************************************************************************
+ * GLUED functions fields values
+ *
+ */
+int proceedGluedValues(u8* const inputData, u8* const outputData, reg* const size, const reg maxOutBufferSize)
+{
+    M_Assert_Break((entityInfo.entities == NULLPTR(TYPEOF_STRUCT(EntityInfo, entities)) || (maxOutBufferSize < 3) || (outputData == NULL) || (inputData == NULL) || (size == NULL)), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: No allocated entities or invalid input");
+
+    const reg inputMsgSize = (*size);
+    reg Wpos = 0;
+    reg Rpos = 0;
+    void* ptr;
+
+    const TYPEOF_STRUCT(EntityInfo, entities_count) entities_count = entityInfo.entities_count;
+    TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber;
+    TYPEOF_STRUCT(Entity, fields_count) fieldNumber;
+
+    u8 cmd = inputData[Rpos++];
+
+    if(cmd == WRITE_SEVERAL_VALUES_GLUED) {
+        const u8 writeRequestCnt = inputData[Rpos++];
+        for(reg i = 0; i < writeRequestCnt; ++i) {
+            ENTITY_DBG_ASSERT_BUF(((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > inputMsgSize),
+                                  M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field write size more than outBuffer");
+
+            readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
+
+            Entity* const entity = entityInfo.entities[entityNumber];
+            EntityField* const field = &entity->fields[fieldNumber];
+            const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+            const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags             = field->bitFlags;
+
+            if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
+                const reg typeLen = getMYCTypeLen(field->type);
+
+                ENTITY_DBG_ASSERT_BUF(((Rpos + typeLen) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field read size more than buffer");
+
+                if((bitFlags & ENTITY_READ_ONLY_MSK) == 0) {
+
+                    ptr = (entity->pointer + field->shift);
+                    proceedWriteEntity(bitFlags, ptr, &inputData[Rpos], typeLen);
+
+
+#ifdef USE_ENTITY_WRITE_CALLBACK
+                    const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->wrCallback.entityCallback;
+                    if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+                        __entityCallback(entity, field, ptr, field->wrCallback.context);
+                    }
+#endif /* USE_ENTITY_WRITE_CALLBACK */
+
+                }
+
+                Rpos += typeLen;
+            }
+        }
+
+        ENTITY_DBG_ASSERT_BUF(((Rpos + 1) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field read size more than buffer");
+        cmd = inputData[Rpos];
+
+        if(cmd == SEVERAL_VALUES_GLUED_END) {
+            (*size) = 0;
+            return ENTITY_OK;
+        }
+    }
+
+    if(cmd == READ_SEVERAL_VALUES_GLUED) {
+        ENTITY_DBG_ASSERT_BUF(((Rpos + 2) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field read size more than buffer");
+
+        const u8 readRequestCnt = inputData[Rpos++];
+         outputData[Wpos++] = READ_SEVERAL_VALUES_GLUED;
+         outputData[Wpos++] = readRequestCnt;
+         outputData[Wpos++] = inputData[Rpos++];
+
+         for(reg i = 0; i < readRequestCnt; ++i) {
+             ENTITY_DBG_ASSERT_BUF(((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field request size more than buffer");
+
+             readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
+
+             Entity* const entity = entityInfo.entities[entityNumber];
+             EntityField* const field = &entity->fields[fieldNumber];
+             const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+
+             if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
+                 const reg typeLen = getMYCTypeLen(field->type);
+
+                  ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field write size more than outBuffer");
+
+                  ptr = (entity->pointer + field->shift);
+                  proceedReadEntity(field->bitFlags, ptr, &outputData[Wpos], typeLen);
+
+
+#ifdef USE_ENTITY_READ_CALLBACK
+                  const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->rdCallback.entityCallback;
+                  if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+                      __entityCallback(entity, field, ptr, field->rdCallback.context);
+                  }
+#endif /* USE_ENTITY_READ_CALLBACK */
+
+                Wpos += typeLen;
+             } else {
+                 return ENTITY_ERROR;
+             }
+         }
+    }
+
+    (*size) = Wpos;
+    return ENTITY_OK;
 }
 
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */

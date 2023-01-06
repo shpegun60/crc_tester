@@ -218,6 +218,7 @@
 #define WRITE_SEVERAL_VALUES_GLUED 	0x07U
 #define ENTITY_FLASH_OPERATION 		0x08U
 #define ENTITY_MAIL_SERVICE_PACK    0x33U
+#define SEVERAL_VALUES_GLUED_END 	0x09U
 
 
 /* **********************************************************************************************************************************
