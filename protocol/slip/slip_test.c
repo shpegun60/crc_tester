@@ -43,6 +43,8 @@ int slip_test(int random_seed, int counts)
         send("value 123");
 
         return 0;
+        (void)random_seed;
+        (void)counts;
 }
 
 void recv_message(uint8_t *data, uint32_t size)

@@ -155,7 +155,7 @@ STATIC_FORCEINLINE void * getVoidPointer(const TYPEOF_STRUCT(EntityInfo, entitie
 STATIC_FORCEINLINE void * getFieldValuePointer(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber)
 {
     const Entity*       const entity    = entityInfo.entities[entityNumber];
-    const EntityField*  const field     = &entityInfo.entities[entityNumber]->fields[fieldNumber];
+    const EntityField*  const field     = &entity->fields[fieldNumber];
 
     if((entityNumber < entityInfo.entities_count) && (fieldNumber < entity->fields_count)) {
         return (UINT8_TYPE_DC(entity->pointer) + field->shift);

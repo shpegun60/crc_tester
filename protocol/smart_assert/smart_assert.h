@@ -27,11 +27,11 @@ extern "C" {
  * ***********************************************************************
  */
 
-//#define NDEBUG
-#define M_MESSAGE_ALWAYS_ENABLE         1
-#define M_ASSERT_MSG_TEXT_DISABLE       1
-#define M_ASSERT_EXPR_DISABLE           1
-#define M_ASSERT_FILE_LINE_TEXT_DISABLE 1
+//#define NDEBUG                              // uncommit this if program in release version
+#define M_MESSAGE_ALWAYS_ENABLE         1   // enabling runtime assert message filter and additon library information (see additional information macro)
+#define M_ASSERT_MSG_TEXT_DISABLE       1   // disabling sending assert message text and do not saving this in .text section
+#define M_ASSERT_EXPR_DISABLE           1   // disabling sending assert expression text, value and do not saving this in .text section
+#define M_ASSERT_FILE_LINE_TEXT_DISABLE 1   // disabling sending assert file, line text and do not saving this in .text section
 
 /*
  * ***********************************************************************
@@ -64,7 +64,11 @@ extern "C" {
 #   define ASSERT_WARNING(Expr_txt, Expr, File, Line, Msg, ...) __M_Warning(ASSERT_EXPR_TXT(Expr_txt), ASSERT_EXPR(Expr), ASSERT_FILE(File), ASSERT_LINE(Line), (Msg), ##__VA_ARGS__)
 #endif /* defined(M_ASSERT_MSG_TEXT_DISABLE) */
 
-
+/*
+ * ***********************************************************************
+ *  smart asserts additional information macro
+ * ***********************************************************************
+ */
 #define M_EMPTY     /* ignored expression */
 #define M_ALWAYS 1  /* always proceed expression */
 #define M_LIB_DATA_DEF          "[d]" /* adds text for some library data, user must adds to message list 0--> messageEna, 1-->libDescr  (0|1, "descr") */

@@ -156,13 +156,15 @@
  */
 
 #ifndef OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
-//#   define OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
+#   define OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
 #endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
 
 #ifdef OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE
 #   define ENTITY_DBG_ASSERT_BUF M_Assert_Break
+//#   define ENTITY_DBG_ASSERT_BUF(...)
 #else
 #   define ENTITY_DBG_ASSERT_BUF M_Assert_BreakSaveCheck
+//#   define ENTITY_DBG_ASSERT_BUF M_Assert_Break
 #endif /* OPTIMIZE_ENTITY_BUFFER_CHECK_AFTER_RELEASE */
 
 /* **********************************************************************************************************************************
@@ -208,17 +210,24 @@
 /* **********************************************************************************************************************************
  *  COMMANDS macro
  */
+// general commands
 #define READ_ENTITY_DESCRIPTIONS 	0x00U
 #define READ_ENTITY_FIELDS 			0x01U
 #define READ_FIELD_VALUE 			0x02U
 #define WRITE_FIELD_VALUE 			0x03U
 #define READ_SEVERAL_VALUES 		0x04U
 #define WRITE_SEVERAL_VALUES 		0x05U
+// glued command (for read/write in per one packet)
 #define READ_SEVERAL_VALUES_GLUED 	0x06U
 #define WRITE_SEVERAL_VALUES_GLUED 	0x07U
-#define ENTITY_FLASH_OPERATION 		0x08U
-#define ENTITY_MAIL_SERVICE_PACK    0x33U
 #define SEVERAL_VALUES_GLUED_END 	0x09U
+// flash operations
+#define ENTITY_FLASH_OPERATION 		0x08U
+// flash operations
+
+// mail service for stream from device
+#define ENTITY_MAIL_SERVICE_PACK    0x33U
+
 
 
 /* **********************************************************************************************************************************

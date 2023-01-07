@@ -177,6 +177,35 @@ STATIC_FORCEINLINE void proceedWriteEntity(const TYPEOF_STRUCT(EntityField, bitF
 }
 
 
+// write entity number to out buffer by next position
+STATIC_FORCEINLINE void writeEntityNumberToBuf(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, u8* const outputData)
+{
+    /*******************************************************************************************************
+     *  write entity number
+     */
+#if (MAX_NUBER_OF_ENTITIES < 256U)
+    (*outputData) = entityNumber;
+#else
+    ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&entityNumber, outputData);
+#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
+    //----------------- END -------------------------------------------------------------------------------
+}
+
+// write field number to out buffer by next position
+STATIC_FORCEINLINE void writeFieldNumberToBuf(const TYPEOF_STRUCT(Entity, fields_count) fieldNumber, u8* const outputData)
+{
+    /*******************************************************************************************************
+     *  write field number
+     */
+#if (MAX_NUBER_OF_FIELDS < 256U)
+    (*outputData) = fieldNumber;
+#else
+    ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&fieldNumber, outputData);
+#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
+    //----------------- END -------------------------------------------------------------------------------
+}
+
+
 // write entity & field number to out buffer by next position
 STATIC_FORCEINLINE void writeEntityFieldNumbersToBuf(const TYPEOF_STRUCT(EntityInfo, entities_count) entityNumber, const TYPEOF_STRUCT(Entity, fields_count) fieldNumber, u8* const outputData, reg* const Wpos)
 {
@@ -185,26 +214,48 @@ STATIC_FORCEINLINE void writeEntityFieldNumbersToBuf(const TYPEOF_STRUCT(EntityI
     /*******************************************************************************************************
      *  write entity number
      */
-
-#if (MAX_NUBER_OF_ENTITIES < 256U)
-    outputData[Wpos_internal++] = entityNumber;
-#else
-    ENTITY_BYTE_CPY(ENTITIES_SIZEOF, (u8*)&entityNumber, &outputData[Wpos_internal]);
-    Wpos_internal += ENTITIES_SIZEOF;
-#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
+     writeEntityNumberToBuf(entityNumber, &outputData[Wpos_internal]);
+     Wpos_internal += ENTITIES_SIZEOF;
 
     /*******************************************************************************************************
      *  write field number
      */
-#if (MAX_NUBER_OF_FIELDS < 256U)
-    outputData[Wpos_internal++] = fieldNumber;
-#else
-    ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, (u8*)&fieldNumber, &outputData[Wpos_internal]);
-    Wpos_internal += ENTITY_FIELD_SIZEOF;
-#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
+     writeFieldNumberToBuf(fieldNumber, &outputData[Wpos_internal]);
+     Wpos_internal += ENTITY_FIELD_SIZEOF;
 
-    //----------------- END -----------------------------------------------
+    //----------------- END -------------------------------------------------------------------------------
     (*Wpos) = Wpos_internal;
+}
+
+
+// read entity number from input buffer
+STATIC_FORCEINLINE void readEntityNumberFromBuf(TYPEOF_STRUCT(EntityInfo, entities_count)* const entityNumber, u8* const inputData)
+{
+    /*******************************************************************************************************
+     *  read entity number
+     */
+#if (MAX_NUBER_OF_ENTITIES < 256U)
+    (*entityNumber) = *(inputData);
+#else
+    ENTITY_BYTE_CPY(ENTITIES_SIZEOF, inputData, (u8*)entityNumber);
+    (*entityNumber) &= 0x0000FFFFUL;
+#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
+    //----------------- END --------------------------------------------------------------------------------
+}
+
+// read field number from input buffer
+STATIC_FORCEINLINE void readFieldNumberFromBuf(TYPEOF_STRUCT(Entity, fields_count)* const fieldNumber, u8* const inputData)
+{
+    /*******************************************************************************************************
+     *  read field number
+     */
+#if (MAX_NUBER_OF_FIELDS < 256U)
+    (*fieldNumber) = *(inputData);
+#else
+    ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, inputData, (u8*)fieldNumber);
+    (*fieldNumber) &= 0x0000FFFFUL;
+#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
+    //----------------- END --------------------------------------------------------------------------------
 }
 
 // read entity & field number from input buffer by next position
@@ -215,24 +266,14 @@ STATIC_FORCEINLINE void readEntityFieldNumbersfromBuf(TYPEOF_STRUCT(EntityInfo, 
     /*******************************************************************************************************
      *  read entity number
      */
-#if (MAX_NUBER_OF_ENTITIES < 256U)
-    (*entityNumber) = inputData[Rpos_internal++];
-#else
-    ENTITY_BYTE_CPY(ENTITIES_SIZEOF, &inputData[Rpos_internal], (u8*)entityNumber);
-    (*entityNumber) &= 0x0000FFFFUL;
+    readEntityNumberFromBuf(entityNumber, &inputData[Rpos_internal]);
     Rpos_internal += ENTITIES_SIZEOF;
-#endif /* (MAX_NUBER_OF_ENTITIES < 256U) */
 
     /*******************************************************************************************************
      *  read field number
      */
-#if (MAX_NUBER_OF_FIELDS < 256U)
-    (*fieldNumber) = inputData[Rpos_internal++];
-#else
-    ENTITY_BYTE_CPY(ENTITY_FIELD_SIZEOF, &inputData[Rpos_internal], (u8*)fieldNumber);
-    (*entityNumber) &= 0x0000FFFFUL;
+    readFieldNumberFromBuf(fieldNumber, &inputData[Rpos_internal]);
     Rpos_internal += ENTITY_FIELD_SIZEOF;
-#endif /* (MAX_NUBER_OF_FIELDS < 256U) */
 
     //----------------- END -----------------------------------------------
     (*Rpos) = Rpos_internal;

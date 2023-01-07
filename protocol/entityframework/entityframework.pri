@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD	
 
 SOURCES += \
+    $$PWD/entity_cmd.c \
     $$PWD/entity_macro.c \
     $$PWD/entity_mail_service.c \
     $$PWD/entity_manager.c \
@@ -15,6 +16,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/entity_atomic.h \
+    $$PWD/entity_cmd.h \
     $$PWD/entity_macro.h \
     $$PWD/entity_mail_service.h \
     $$PWD/entity_manager.h \

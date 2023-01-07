@@ -21,7 +21,7 @@ EntityReadSystem_t ersys = {
 
     /* END GENERATION CODE */
     .writePool  = {},
-    .readPool   = {0, NULL}
+    .readPool   = {}
 };
 
 
@@ -97,7 +97,7 @@ int initEntityReadSystem(void)
     return ENTITY_ERROR;
 
     ersys.name.set(&ersys.name, 230);
-    //    ersys.name.parent.type = 0;
+        //ersys.name.parent.
 }
 
 

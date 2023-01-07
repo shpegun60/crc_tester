@@ -554,6 +554,7 @@ int proceedGluedValues(u8* const inputData, u8* const outputData, reg* const siz
     }
 
     (*size) = Wpos;
+    UNUSED(maxOutBufferSize);
     return ENTITY_OK;
 }
 

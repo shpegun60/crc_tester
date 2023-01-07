@@ -97,11 +97,13 @@ void entityNonBlockReadLoop(EntityNonBlockReadLoopVariables_t* const var)
                         EntityReadParent_t* const parent = readNode->field;
                         M_Assert_Break((parent == NULL), M_EMPTY, return, "entityNonBlockReadLoop: No valid parent!!!");
 
-                        ENTITY_DBG_ASSERT_BUF(((Wpos[board] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > outBufferSize), M_EMPTY, return, "entityNonBlockReadLoop: field request size more than outBuffer");
-                        writeEntityFieldNumbersToBuf(parent->entityNumber, parent->fieldNumber, data, &Wpos[board]);
-                        requestNonBlockPackTable.entityTable[board][requestTablePos][readRequestCnt[board]] = parent;
+                        if(parent->readEnable) {
+                            ENTITY_DBG_ASSERT_BUF(((Wpos[board] + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > outBufferSize), M_EMPTY, return, "entityNonBlockReadLoop: field request size more than outBuffer");
+                            writeEntityFieldNumbersToBuf(parent->entityNumber, parent->fieldNumber, data, &Wpos[board]);
+                            requestNonBlockPackTable.entityTable[board][requestTablePos][readRequestCnt[board]] = parent;
 
-                        ++readRequestCnt[board];
+                            ++readRequestCnt[board];
+                        }
 
                         readPos = readPos->next;
                         if(readPos->next == NULL) {
