@@ -17,7 +17,7 @@ typedef struct {
     b rdEmpty;
     b wrFull;
 
-    reg allocatedFields;
+    reg msk;
     EntityReadParent_t** writePool;
 } EntityWritePoolContainer_t;
 
@@ -35,13 +35,18 @@ STATIC_FORCEINLINE void entityWritePoolContainer_proceedSignalls(EntityWritePool
      *  assign fifo_empty  = ptr_match & (wr_addr[AW]==rd_addr[AW]);
      *
      */
-    self->rdEmpty = (self->head == self->tail);
-    self->wrFull  = ((self->head & (self->allocatedFields - 1)) == (self->tail & (self->allocatedFields - 1))) && (!self->rdEmpty);
+
+    const reg head = self->head;
+    const reg tail = self->tail;
+    const reg msk  = self->msk;
+
+    const u8 rdEmpty = self->rdEmpty = (head == tail);
+    self->wrFull  = ((head & msk) == (tail & msk)) && (!rdEmpty);
 }
 
 STATIC_FORCEINLINE void entityWritePoolContainer_pushParent(EntityWritePoolContainer_t * const self, EntityReadParent_t* const parent)
 {
-    const reg wr_pos = (self->head & (self->allocatedFields - 1));
+    const reg wr_pos = (self->head & self->msk);
     self->writePool[wr_pos] = parent;
 
     ++self->head;
@@ -50,7 +55,7 @@ STATIC_FORCEINLINE void entityWritePoolContainer_pushParent(EntityWritePoolConta
 
 STATIC_FORCEINLINE EntityReadParent_t* entityWritePoolContainer_readParent(EntityWritePoolContainer_t * const self)
 {
-    const reg rd_pos = (self->tail & (self->allocatedFields - 1));
+    const reg rd_pos = (self->tail & self->msk);
     EntityReadParent_t* const parent = self->writePool[rd_pos];
 
     ++self->tail;

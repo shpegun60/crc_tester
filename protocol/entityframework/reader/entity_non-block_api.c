@@ -18,7 +18,7 @@ typedef struct {
     IntrusiveSListNode* lastNodes                   [ENTITY_READ_SYSTEM_BOARD_COUNT];
 } EntityNonBlockPacketTable_t;
 
-EntityNonBlockPacketTable_t requestNonBlockPackTable; // in .bss
+static EntityNonBlockPacketTable_t requestNonBlockPackTable; // in .bss
 
 void entityNonBlock_init(void)
 {
@@ -168,7 +168,8 @@ void entityNonBlockReceivePacket(const u16 boardNumber, u8* const inBuffer, cons
 
         break;}
 
-    case READ_SEVERAL_VALUES_GLUED: {
+    case READ_SEVERAL_VALUES_GLUED :
+    case WRITE_SEVERAL_VALUES_GLUED: {
         // move to cash
         reg      Rpos               = 3;
         const u8 requestLenRx       =  inBuffer[1];

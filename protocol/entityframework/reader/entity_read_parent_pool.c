@@ -52,33 +52,42 @@ int entityReadPoolContainer_initBoard(EntityReadPoolContainer_t* const self,
                                 goto error;
                             }, "entityReadPoolContainer_initBoard: invoke /entityReadPoolContainer_initBoards/ function before");
 
-    M_Assert_BreakElseSaveCheck((self->boards_count > (*boardNumber)), {
+    // move to cash constants pointers and values
+    TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count) boardNumberInternal = (*boardNumber);
+    EN_BoardReadNode_t*   const             board            = &self->boards[boardNumberInternal];
 
-                                    self->boards[(*boardNumber)].entities = calloc(entities_count, sizeof(EN_EntityReadNode_t));
-                                    M_Assert_BreakSaveCheck((self->boards[(*boardNumber)].entities == NULL), M_EMPTY, {
+    M_Assert_BreakElseSaveCheck((self->boards_count > boardNumberInternal), {
+
+                                    board->entities = calloc(entities_count, sizeof(EN_EntityReadNode_t));
+                                    M_Assert_BreakSaveCheck((board->entities == NULL), M_EMPTY, {
                                         goto error;
                                     }, "entityReadPoolContainer_initBoard: No memory for allocation");
 
-                                    self->boards[(*boardNumber)].entities_count = entities_count;
+                                    board->entities_count = entities_count;
 
                                     for(TYPEOF_STRUCT(EntityInfo, entities_count) i = 0; i < entities_count; ++i) {
                                         M_Assert_BreakSaveCheck((fieldCountList[i] > MAX_NUBER_OF_FIELDS), M_EMPTY, {
                                             goto error;
                                         }, "entityReadPoolContainer_initBoard: field count more than maximum fields number");
 
-                                        self->boards[(*boardNumber)].entities[i].fields = calloc(fieldCountList[i], sizeof(EntityReadParent_t*));
+                                        EN_EntityReadNode_t*  const     entity           = &board->entities[i];
 
-                                        M_Assert_BreakSaveCheck((self->boards[(*boardNumber)].entities[i].fields == NULL), M_EMPTY, {
+                                        entity->fields = calloc(fieldCountList[i], sizeof(EntityReadParent_t*));
+
+                                        M_Assert_BreakSaveCheck((entity->fields == NULL), M_EMPTY, {
                                             goto error;
                                         }, "entityReadPoolContainer_initBoard: No memory for allocation");
-                                        self->boards[(*boardNumber)].entities[i].fields_count = fieldCountList[i];
+                                        entity->fields_count = fieldCountList[i];
                                     }
 
-                                    ++(*boardNumber);
+                                    ++boardNumberInternal;
+                                    (*boardNumber) = boardNumberInternal;
 
                                     return ENTITY_OK;
 
                                 }, M_EMPTY, M_EMPTY, "entityReadPoolContainer_initBoard: too long board number: %d, allocated: %d", (*boardNumber), self->boards_count);
+
+    return ENTITY_ERROR;
 
     error:
         entityReadPoolContainer_delete(self);
@@ -145,7 +154,7 @@ int entityReadPoolContainer_push(EntityReadPoolContainer_t* const self, EntityRe
 
                                         M_Assert_BreakElseSaveCheck((parent->fieldNumber < fields_count), {
 
-                                            *field = parent;
+                                            (*field) = parent;
 
                                             if(parent->readEnable) {
                                                 const IntrusiveSListNode * const same_position = find_TheSameParent(&board->needReadList, parent);
@@ -175,43 +184,8 @@ int entityReadPoolContainer_setReadEnable(EntityReadPoolContainer_t* const self,
 {
     M_Assert_BreakSaveCheck((self == NULL || parent == NULL), M_EMPTY, return ENTITY_ERROR, "entityReadPoolContainer_setReadEnable: no valid input object");
 
-    // move to cash all values --------------------------------------------------------------------------------
-    EN_BoardReadNode_t*   const             board            = &self->boards[parent->boardNumber];
-    const   EN_EntityReadNode_t*  const     entity           = &board->entities[parent->entityNumber];
-
-    const TYPEOF_STRUCT(EntityReadPoolContainer_t, boards_count)    boards_count    = (self)->boards_count;
-    const TYPEOF_STRUCT(EntityInfo, entities_count)                 entities_count  = board->entities_count;
-    const TYPEOF_STRUCT(Entity, fields_count)                       fields_count    = entity->fields_count;
-
-    // do logic --------------------------------------------------------------------------------
-    M_Assert_BreakElseSaveCheck((parent->boardNumber < boards_count), {
-
-                                    M_Assert_BreakElseSaveCheck((parent->entityNumber < entities_count), {
-
-                                        M_Assert_BreakElseSaveCheck((parent->fieldNumber < fields_count), {
-
-                                            parent->readEnable = 1;
-                                            const IntrusiveSListNode * const same_position = find_TheSameParent(&board->needReadList, parent);
-
-                                            if(same_position == NULLPTR(IntrusiveSListNode*)) {
-                                                NeedReadListNode_t* needReadNode = (NeedReadListNode_t *) malloc(sizeof(NeedReadListNode_t));
-                                                M_Assert_BreakSaveCheck(needReadNode == NULLPTR(NeedReadListNode_t*), M_EMPTY, return ENTITY_ERROR, "entityReadPoolContainer_setReadEnable: No memory for allocation letter");
-
-                                                needReadNode->field = parent;
-                                                islist_init(&(needReadNode->link));
-                                                islist_insert_back(&board->needReadList, &(needReadNode->link));
-                                            }
-
-
-                                            return ENTITY_OK;
-
-                                        }, M_EMPTY, M_EMPTY, "entityReadPoolContainer_setReadEnable: no valid input fieldNumber: %d", parent->fieldNumber);
-
-                                    }, M_EMPTY, M_EMPTY, "entityReadPoolContainer_setReadEnable: no valid input entityNumber: %d", parent->entityNumber);
-
-                                }, M_EMPTY, M_EMPTY, "entityReadPoolContainer_setReadEnable: no valid input boardNumber: %d", parent->boardNumber);
-
-    return ENTITY_ERROR;
+    parent->readEnable = 1;
+    return entityReadPoolContainer_push(self, parent);
 }
 
 int entityReadPoolContainer_setReadDisable(EntityReadPoolContainer_t* const self, EntityReadParent_t* const parent)
@@ -256,7 +230,7 @@ EntityReadParent_t* entityReadPoolContainer_getParent(EntityReadPoolContainer_t*
         return field;
     }
 
-    return NULL;
+    return NULLPTR(EntityReadParent_t*);
 }
 
 int entityReadPool_foreach(EntityReadPoolContainer_t* const self,

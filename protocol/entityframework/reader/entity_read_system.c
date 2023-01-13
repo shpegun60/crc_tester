@@ -35,7 +35,7 @@ static int parentPointersCheck(EntityReadParent_t* const field, PREPROCESSOR_CTX
     *allfieldsIsNull = 0;
 
     M_Assert_BreakSaveCheck(    field->writeContainer == NULL
-                                ||  field->writeContainer->allocatedFields == 0
+                                ||  field->writeContainer->msk == 0
                                 ||  field->writeContainer->writePool == NULL, M_EMPTY, ++(*errorInit), "parentPointersCheck: parent write container is null!!!, board: %d, entity: %d, field: %d", field->boardNumber, field->entityNumber, field->fieldNumber);
 
     M_Assert_BreakSaveCheck(field->boardNumber >= ENTITY_READ_SYSTEM_BOARD_COUNT, M_EMPTY, ++(*errorInit), "parentPointersCheck: board number is invalid!!!, board: %d, entity: %d, field: %d", field->boardNumber, field->entityNumber, field->fieldNumber);
@@ -44,7 +44,7 @@ static int parentPointersCheck(EntityReadParent_t* const field, PREPROCESSOR_CTX
     M_Assert_BreakSaveCheck(field->type >= TYPE_ARRAY_LENGTH, M_EMPTY, ++(*errorInit), "parentPointersCheck: type is invalid!!!, board: %d, entity: %d, field: %d", field->boardNumber, field->entityNumber, field->fieldNumber);
 
     M_Assert_BreakSaveCheck(    field->writeContainer == NULL
-                                ||  field->writeContainer->allocatedFields == 0
+                                ||  field->writeContainer->msk == 0
                                 ||  field->writeContainer->writePool == NULL, M_EMPTY, ++(*errorInit), "parentPointersCheck: parent write container is null!!!, board: %d, entity: %d, field: %d", field->boardNumber, field->entityNumber, field->fieldNumber);
 
     M_Assert_BreakSaveCheck(field->data == NULL, M_EMPTY, ++(*errorInit), "parentPointersCheck: parent data is null!!!, board: %d, entity: %d, field: %d", field->boardNumber, field->entityNumber, field->fieldNumber);

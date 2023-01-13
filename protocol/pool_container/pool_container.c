@@ -39,7 +39,7 @@ void poolContainer_init(pool_container_t * const self, const u16 rows, const u16
 
     self->columns = columns;
     self->rows = rows;
-    self->msk = (rows - 1U);
+    self->msk = (reg)(rows - 1U);
     poolContainer_clear(self);
 }
 

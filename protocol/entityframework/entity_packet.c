@@ -517,40 +517,40 @@ int proceedGluedValues(u8* const inputData, u8* const outputData, reg* const siz
         ENTITY_DBG_ASSERT_BUF(((Rpos + 2) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field read size more than buffer");
 
         const u8 readRequestCnt = inputData[Rpos++];
-         outputData[Wpos++] = READ_SEVERAL_VALUES_GLUED;
-         outputData[Wpos++] = readRequestCnt;
-         outputData[Wpos++] = inputData[Rpos++];
+        outputData[Wpos++] = READ_SEVERAL_VALUES_GLUED;
+        outputData[Wpos++] = readRequestCnt;
+        outputData[Wpos++] = inputData[Rpos++];
 
-         for(reg i = 0; i < readRequestCnt; ++i) {
-             ENTITY_DBG_ASSERT_BUF(((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field request size more than buffer");
+        for(reg i = 0; i < readRequestCnt; ++i) {
+            ENTITY_DBG_ASSERT_BUF(((Rpos + (ENTITIES_SIZEOF + ENTITY_FIELD_SIZEOF)) > inputMsgSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field request size more than buffer");
 
-             readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
+            readEntityFieldNumbersfromBuf(&entityNumber, &fieldNumber, inputData, &Rpos);
 
-             Entity* const entity = entityInfo.entities[entityNumber];
-             EntityField* const field = &entity->fields[fieldNumber];
-             const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
+            Entity* const entity = entityInfo.entities[entityNumber];
+            EntityField* const field = &entity->fields[fieldNumber];
+            const TYPEOF_STRUCT(Entity, fields_count) fields_count          = entity->fields_count;
 
-             if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
-                 const reg typeLen = getMYCTypeLen(field->type);
+            if((entityNumber < entities_count) && (fieldNumber < fields_count)) {
+                const reg typeLen = getMYCTypeLen(field->type);
 
-                  ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field write size more than outBuffer");
+                ENTITY_DBG_ASSERT_BUF(((Wpos + typeLen) > maxOutBufferSize), M_EMPTY, return ENTITY_ERROR, "proceedGluedValues: field write size more than outBuffer");
 
-                  ptr = (entity->pointer + field->shift);
-                  proceedReadEntity(field->bitFlags, ptr, &outputData[Wpos], typeLen);
+                ptr = (entity->pointer + field->shift);
+                proceedReadEntity(field->bitFlags, ptr, &outputData[Wpos], typeLen);
 
 
 #ifdef USE_ENTITY_READ_CALLBACK
-                  const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->rdCallback.entityCallback;
-                  if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
-                      __entityCallback(entity, field, ptr, field->rdCallback.context);
-                  }
+                const TYPEOF_STRUCT(entityCallbackContainer, entityCallback) __entityCallback = field->rdCallback.entityCallback;
+                if(__entityCallback != NULLPTR(TYPEOF_STRUCT(entityCallbackContainer, entityCallback))) {
+                    __entityCallback(entity, field, ptr, field->rdCallback.context);
+                }
 #endif /* USE_ENTITY_READ_CALLBACK */
 
                 Wpos += typeLen;
-             } else {
-                 return ENTITY_ERROR;
-             }
-         }
+            } else {
+                return ENTITY_ERROR;
+            }
+        }
     }
 
     (*size) = Wpos;

@@ -26,7 +26,7 @@ int entityWritePoolContainer_init(EntityWritePoolContainer_t* const self, const 
     self->writePool = calloc(pointerCount, sizeof(EntityReadParent_t*));
     M_Assert_BreakSaveCheck((self->writePool == NULL), M_EMPTY, return ENTITY_ERROR, "entityWritePoolContainer_init: No memory for allocation");
 
-    self->allocatedFields = pointerCount;
+    self->msk = (pointerCount - 1);
     self->head = 0;
     self->tail = 0;
     self->wrFull = 0;

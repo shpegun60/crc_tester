@@ -204,7 +204,7 @@ int initField(Entity* const entityInst, reg* const fieldNumber, const TYPEOF_STR
     M_Assert_BreakSaveCheck((entityInst == NULLPTR(Entity *) || fieldNumber == NULL), M_EMPTY, return ENTITY_ERROR, "initField: No valid input");
 
 #ifdef USE_ENTITY_REGISTER
-    M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && (type != REG_TYPE || type != SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initField: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
+    M_Assert_BreakSaveCheck((bitFlags & ENTITY_REGISTER_MSK) && !(type == REG_TYPE || type == SREG_TYPE), M_EMPTY, return ENTITY_ERROR, "initField: with ENTITY_REGISTER_MSK flag must be REG_TYPE or SREG_TYPE types only!!!");
 #endif /* USE_ENTITY_REGISTER */
 
     reg fieldNumber_readed = (*fieldNumber);

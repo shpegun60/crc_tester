@@ -15,7 +15,7 @@ typedef struct {
     u16 columns;
     u16 rows;
 
-    u16 msk;
+    reg msk;
 
     reg tail;
     reg head;
