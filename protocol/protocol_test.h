@@ -13,6 +13,7 @@ extern "C" {
 #define TESTER_CALLBACK_MANAGER     0x00000020UL
 #define TESTER_PULL_CONTAINER       0x00000040UL
 #define TESTER_RAW_P_IT             0x00000080UL
+#define TESTER_RAW_P_GEN             0x00000100UL
 
 
 int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags);

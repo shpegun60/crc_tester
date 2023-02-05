@@ -155,6 +155,10 @@ int rawParserItTest(unsigned int randomSeed, int randTestCount, int collisionTes
     //--------------------------------------------------------------------------------------------------
     RawParser_it_t * prot = rawParser_it_new(0x1A);
 
+    if(prot == NULL) {
+        return 1;
+    }
+
 #if defined(D_RAW_P_DISABLE_INTERNAL_TX_BUFFER) && defined(D_RAW_P_DISABLE_INTERNAL_RX_BUFFER)
  // if disabled internal rx & tx buffers than set external
     rawParser_it_setUserBuffers(prot, m_receiveFrameBuffer_external_it, m_sendBuffer_external_it);
@@ -222,7 +226,7 @@ int rawParserItTest(unsigned int randomSeed, int randTestCount, int collisionTes
     printf("---------------------------------------------------------------------------------\n");
     fflush(stdout);
     free(data);
-    conterNotvalid += rawParser_it_delete(&prot);
+    conterNotvalid += (rawParser_it_delete(&prot) != D_RAW_P_OK);
     //--------------------------------------------------------------------------------------------------
     return conterNotvalid;
 }

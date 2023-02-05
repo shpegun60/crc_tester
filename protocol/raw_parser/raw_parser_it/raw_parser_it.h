@@ -46,7 +46,7 @@ typedef struct {
 
 
 RawParser_it_t* rawParser_it_new(const u8 packStart);
-void rawParser_it_init(RawParser_it_t * const self, const u8 packStart);
+int rawParser_it_init(RawParser_it_t * const self, const u8 packStart);
 
 // set external buffers
 #ifdef D_RAW_P_DISABLE_INTERNAL_TX_BUFFER

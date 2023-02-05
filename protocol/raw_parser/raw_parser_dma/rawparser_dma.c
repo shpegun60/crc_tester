@@ -45,8 +45,8 @@
 
 
 /* CREATE/DELETE FUNCTIONS *************************************************************************************************
-    *
-    */
+ *
+ */
 RawParser_dma_t* rawParser_dma_new(const u8 packStart)
 {
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
@@ -56,17 +56,20 @@ RawParser_dma_t* rawParser_dma_new(const u8 packStart)
     RawParser_dma_t* self = (RawParser_dma_t *)calloc(1, sizeof(RawParser_dma_t));
     M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return self, "rawParser_dma_new: No memory for allocation ");
 
-    rawParser_dma_init(self, packStart);
+    if(rawParser_dma_init(self, packStart) == D_RAW_P_ERROR) {
+        free(self);
+        self = NULL;
+    }
     return self;
 }
 
-void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
+int rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
 {
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    M_Assert_BreakSaveCheck(packStart == RECEIVE_EXTENDED_LEN_CMD, M_EMPTY, return, "rawParser_dma_init: start byte: %d must be not equal RECEIVE_EXTENDED_LEN_CMD: %d", packStart, RECEIVE_EXTENDED_LEN_CMD);
+    M_Assert_BreakSaveCheck(packStart == RECEIVE_EXTENDED_LEN_CMD, M_EMPTY, return D_RAW_P_ERROR, "rawParser_dma_init: start byte: %d must be not equal RECEIVE_EXTENDED_LEN_CMD: %d", packStart, RECEIVE_EXTENDED_LEN_CMD);
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-    M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return, "rawParser_dma_init: No input data valid ");
+    M_Assert_BreakSaveCheck(self == (RawParser_dma_t *)NULL, M_EMPTY, return D_RAW_P_ERROR, "rawParser_dma_init: No input data valid ");
 
     self->m_startByte = packStart;
     self->m_receivePackLen = 0;
@@ -111,6 +114,8 @@ void rawParser_dma_init(RawParser_dma_t * const self, const u8 packStart)
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     rs_initialize_ecc(&self->rs_ecc);
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
+    return D_RAW_P_OK;
 }
 
 
@@ -152,11 +157,11 @@ void rawParser_dma_setUserBuffers(RawParser_dma_t * const self, u8 * const rxBuf
 
 int rawParser_dma_delete(RawParser_dma_t** data)
 {
-    M_Assert_BreakSaveCheck((data == NULL) || (*data == NULL), M_EMPTY, return 1, "rawParser_dma_delete: No allocated memory");
+    M_Assert_BreakSaveCheck((data == NULL) || (*data == NULL), M_EMPTY, return D_RAW_P_ERROR, "rawParser_dma_delete: No allocated memory");
     free(*data);
     *data = NULL;
 
-    return 0;
+    return D_RAW_P_OK;
 }
 
 /* PROCEED FUNCTIONS *************************************************************************************************
@@ -199,6 +204,12 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
                                           self->receiveState = RAW_P_DMA_RECEIVE_ERR;
                                       }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", rx_len, D_RAW_P_RX_BUF_SIZE);
 
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+            M_Assert_WarningSaveCheck((rx_len < (RSCODE_NPAR + 1U)), M_EMPTY, {
+                                        self->receiveState = RAW_P_DMA_RECEIVE_ERR;
+                                      }, "RawParser_dma_proceedByte: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), rx_len);
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
         }
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
@@ -206,7 +217,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         break;}
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    case RAW_P_DMA_RECEIVE_LEN_LOW:
+    case RAW_P_DMA_RECEIVE_LEN_LOW: {
 
 #   ifdef D_RAW_P_CRC_ENA
         self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
@@ -214,7 +225,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
         self->m_receivePackLen = (reg)(ch & 0x000000FFUL);    // read low byte
         self->receiveState = RAW_P_DMA_RECEIVE_LEN_HIGH;
-        break;
+        break;}
 
     case RAW_P_DMA_RECEIVE_LEN_HIGH: {
 
@@ -222,14 +233,21 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
         self->m_receiveCalcCRC = D_RAW_P_CRC_UPDATE(self->m_receiveCalcCRC, ch);
 #   endif /* D_RAW_P_CRC_ENA */
 
-        self->m_receivePackLen |= (reg)((((reg)ch) << 8U) & 0x0000FF00UL); // read high byte
-        const reg rx_len = self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen);
+        reg rx_len = (reg)((((reg)ch) << 8U) & 0x0000FF00UL) | self->m_receivePackLen; // read high byte
+        self->m_receivePackLen = rx_len = LittleEndianU16(rx_len);
 
         self->m_receiveHandlePos = 0;
         self->receiveState = RAW_P_DMA_RECEIVE_DATA;
         M_Assert_WarningSaveCheck((rx_len > D_RAW_P_RX_BUF_SIZE || rx_len == 0), M_EMPTY, {
                                       self->receiveState = RAW_P_DMA_RECEIVE_ERR;
                                   }, "RawParser_dma_proceedByte: No valid receive length, rx_len = %d, max_len = %d", rx_len, D_RAW_P_RX_BUF_SIZE);
+
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+        M_Assert_WarningSaveCheck((rx_len < (RSCODE_NPAR + 1U)), M_EMPTY, {
+                                    self->receiveState = RAW_P_DMA_RECEIVE_ERR;
+                                  }, "RawParser_dma_proceedByte: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), rx_len);
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
         break;}
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
@@ -260,7 +278,7 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
 #ifdef D_RAW_P_CRC_ENA
 
-    case RAW_P_DMA_RECEIVE_CRC_0:
+    case RAW_P_DMA_RECEIVE_CRC_0: {
 
 #   ifdef D_RAW_P_USE_CRC8
 
@@ -280,91 +298,93 @@ static void RawParser_dma_proceedByte(RawParser_dma_t* const self, const u8 ch, 
 
 #   endif /* CRC 0b SWITCH LOGIC */
 
-        break;
+        break;}
 
 
 
 #   if defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
-    case RAW_P_DMA_RECEIVE_CRC_1:
-        self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 8U) & 0x0000FF00UL); // read 1 byte
+    case RAW_P_DMA_RECEIVE_CRC_1: {
 
 #       if defined(D_RAW_P_USE_CRC16)
-        self->m_receiveCRCBuf = LittleEndianU16(self->m_receiveCRCBuf);
+        rawP_crc_t RX_crc = (rawP_crc_t)((((rawP_crc_t)ch) << 8U) & 0x0000FF00UL) | self->m_receiveCRCBuf; // read 1 byte
+        RX_crc = LittleEndianU16(RX_crc);
 
-        if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
+        if(self->m_receiveCalcCRC == RX_crc) {
             self->RX.size = self->m_receivePackLen;
             self->receiveState = RAW_P_DMA_RECEIVE_OK;
         } else {
-            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC16 error, rx_crc: %d, calc_crc: %d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
+            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC16 error, rx_crc: %d, calc_crc: %d", RX_crc, self->m_receiveCalcCRC);
             self->receiveState = RAW_P_DMA_RECEIVE_ERR;
         }
 
 #       elif defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
 
+        self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 8U) & 0x0000FF00UL); // read 1 byte
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_2;
 
 #       endif /* CRC16 - CRC32 - CRC64 SWITCH */
 
-        break;
+        break;}
 
 #   endif /* defined(D_RAW_P_USE_CRC16) || defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
 
 
 
 #   if defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64)
-    case RAW_P_DMA_RECEIVE_CRC_2:
+    case RAW_P_DMA_RECEIVE_CRC_2: {
         self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 16U) & 0x00FF0000UL); // read 2 byte
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_3;
-        break;
+        break;}
 
-    case RAW_P_DMA_RECEIVE_CRC_3:
-        self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 24U) & 0xFF000000UL); // read 3 byte
+    case RAW_P_DMA_RECEIVE_CRC_3: {
 
 #       if defined(D_RAW_P_USE_CRC32)
-        self->m_receiveCRCBuf = LittleEndianU32(self->m_receiveCRCBuf);
+        rawP_crc_t RX_crc = (rawP_crc_t)((((rawP_crc_t)ch) << 24U) & 0xFF000000UL) | self->m_receiveCRCBuf; // read 3 byte
+        RX_crc = LittleEndianU32(RX_crc);
 
-        if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
+        if(self->m_receiveCalcCRC == RX_crc) {
             self->RX.size = self->m_receivePackLen;
             self->receiveState = RAW_P_DMA_RECEIVE_OK;
         } else {
-            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC32 error, rx data: %d, crc calc:%d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
+            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC32 error, rx data: %d, crc calc:%d", RX_crc, self->m_receiveCalcCRC);
             self->receiveState = RAW_P_DMA_RECEIVE_ERR;
         }
 #       elif defined(D_RAW_P_USE_CRC64)
+        self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 24U) & 0xFF000000UL); // read 3 byte
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_4;
 #       endif /* defined(D_RAW_P_USE_CRC32) */
-        break;
+        break;}
 
 #   endif /* defined(D_RAW_P_USE_CRC32) || defined(D_RAW_P_USE_CRC64) */
 
 #   if defined(D_RAW_P_USE_CRC64)
-    case RAW_P_DMA_RECEIVE_CRC_4:
+    case RAW_P_DMA_RECEIVE_CRC_4: {
         self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 32U) & 0x000000FF00000000ULL); // read 4 byte
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_5;
-        break;
+        break;}
 
-    case RAW_P_DMA_RECEIVE_CRC_5:
+    case RAW_P_DMA_RECEIVE_CRC_5: {
         self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 40U) & 0x0000FF0000000000ULL); // read 5 byte
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_6;
-        break;
+        break;}
 
-    case RAW_P_DMA_RECEIVE_CRC_6:
+    case RAW_P_DMA_RECEIVE_CRC_6: {
         self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 48U) & 0x00FF000000000000ULL); // read 6 byte
         self->receiveState = RAW_P_DMA_RECEIVE_CRC_7;
-        break;
+        break;}
 
-    case RAW_P_DMA_RECEIVE_CRC_7:
-        self->m_receiveCRCBuf |= (rawP_crc_t)((((rawP_crc_t)ch) << 56U) & 0xFF00000000000000ULL); // read 7 byte
-        self->m_receiveCRCBuf = LittleEndianU64(self->m_receiveCRCBuf);
+    case RAW_P_DMA_RECEIVE_CRC_7: {
+        rawP_crc_t RX_crc = (rawP_crc_t)((((rawP_crc_t)ch) << 56U) & 0xFF00000000000000ULL) | self->m_receiveCRCBuf; // read 7 byte
+        RX_crc = LittleEndianU64(RX_crc);
 
-        if(self->m_receiveCalcCRC == self->m_receiveCRCBuf) {
+        if(self->m_receiveCalcCRC == RX_crc) {
             self->RX.size = self->m_receivePackLen;
             self->receiveState = RAW_P_DMA_RECEIVE_OK;
         } else {
-            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC64 error, rx data: %d, crc calc:%d", self->m_receiveCRCBuf, self->m_receiveCalcCRC);
+            M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_dma_proceedByte: Receive CRC64 error, rx data: %d, crc calc:%d", RX_crc, self->m_receiveCalcCRC);
             self->receiveState = RAW_P_DMA_RECEIVE_ERR;
         }
-        break;
+        break;}
 #   endif /* defined(D_RAW_P_USE_CRC64) */
 
 #endif /* D_RAW_P_CRC_ENA */
@@ -426,16 +446,9 @@ RawParser_Frame_t* RawParser_dma_proceed(RawParser_dma_t* const self)
 
         if(self->RX.size != 0) {
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-            M_Assert_WarningSaveCheck((self->RX.size < (RSCODE_NPAR + 1U)), M_EMPTY, {
-                                          self->RX.size = 0U;
-                                          return &self->RX;
-                                      }, "RawParser_dma_proceed: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), self->RX.size);
-
-
             /* Now decode -- encoded codeword size must be passed */
             rscode_decode(&self->rs_ecc, self->RX.data, self->RX.size);
             self->RX.size -= RSCODE_NPAR;
-
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
             break;
         }

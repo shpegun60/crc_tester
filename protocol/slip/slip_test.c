@@ -4,8 +4,8 @@
 
 #include "slip.h"
 
-void recv_message(uint8_t *data, uint32_t size);
-uint8_t write_byte(uint8_t byte);
+static void recv_message(uint8_t *data, uint32_t size);
+static uint8_t write_byte(uint8_t byte);
 
 static uint8_t buf[100];
 
@@ -22,7 +22,7 @@ static slip_handler_s slip;
 static uint8_t loopback_buf_index;
 static uint8_t loopback_buf[100];
 
-void send(char *to_send)
+static void send(char *to_send)
 {
         loopback_buf_index = 0;
         printf("SEND: %s\n", to_send);
@@ -47,7 +47,7 @@ int slip_test(int random_seed, int counts)
         (void)counts;
 }
 
-void recv_message(uint8_t *data, uint32_t size)
+static void recv_message(uint8_t *data, uint32_t size)
 {
         char recv_buf[size + 1];
 
@@ -57,7 +57,7 @@ void recv_message(uint8_t *data, uint32_t size)
         printf("RECV: %s\n", recv_buf);
 }
 
-uint8_t write_byte(uint8_t byte)
+static uint8_t write_byte(uint8_t byte)
 {
         loopback_buf[loopback_buf_index++] = byte;
         return 1;

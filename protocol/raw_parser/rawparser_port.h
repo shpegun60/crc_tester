@@ -8,6 +8,9 @@
 #endif /* D_RAW_P_TEST_DISABLE */
 
 
+#define D_RAW_P_ERROR 0
+#define D_RAW_P_OK 1
+
 /*
 ***************************************************************************************************
     INTERNAL BUFFER SIZE DEFINES AND ENABLE/DISABLE
@@ -87,8 +90,8 @@ typedef struct {
 
     //#define D_RAW_P_USE_CRC8                // enable crc8, check if multiple use crc then error
     //#define D_RAW_P_USE_CRC16               // enable crc16, check if multiple use crc then error
-    //#define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
-    #define D_RAW_P_USE_CRC64               // enable crc64, check if multiple use crc then error
+    #define D_RAW_P_USE_CRC32               // enable crc32, check if multiple use crc then error
+    //#define D_RAW_P_USE_CRC64               // enable crc64, check if multiple use crc then error
 
 #endif /* D_RAW_P_CRC_ENA */
 

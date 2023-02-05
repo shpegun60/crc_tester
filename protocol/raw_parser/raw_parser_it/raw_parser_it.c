@@ -48,18 +48,21 @@ RawParser_it_t* rawParser_it_new(const u8 packStart)
     RawParser_it_t* self = (RawParser_it_t *)calloc(1, sizeof(RawParser_it_t));
     M_Assert_BreakSaveCheck(self == (RawParser_it_t *)NULL, M_EMPTY, return self, "RawParser_it_t: No memory for allocation ");
 
-    rawParser_it_init(self, packStart);
+    if(rawParser_it_init(self, packStart) == D_RAW_P_ERROR) {
+        free(self);
+        self = NULL;
+    }
     return self;
 }
 
 
-void rawParser_it_init(RawParser_it_t * const self, const u8 packStart)
+int rawParser_it_init(RawParser_it_t * const self, const u8 packStart)
 {
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    M_Assert_BreakSaveCheck(packStart == RECEIVE_EXTENDED_LEN_CMD, M_EMPTY, return, "rawParser_it_init: start byte: %d must be not equal RECEIVE_EXTENDED_LEN_CMD: %d", packStart, RECEIVE_EXTENDED_LEN_CMD);
+    M_Assert_BreakSaveCheck(packStart == RECEIVE_EXTENDED_LEN_CMD, M_EMPTY, return D_RAW_P_ERROR, "rawParser_it_init: start byte: %d must be not equal RECEIVE_EXTENDED_LEN_CMD: %d", packStart, RECEIVE_EXTENDED_LEN_CMD);
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-    M_Assert_BreakSaveCheck(self == (RawParser_it_t *)NULL, M_EMPTY, return, "rawParser_it_init: No input data valid ");
+    M_Assert_BreakSaveCheck(self == (RawParser_it_t *)NULL, M_EMPTY, return D_RAW_P_ERROR, "rawParser_it_init: No input data valid ");
 
 
     self->m_startByte = packStart;
@@ -101,6 +104,8 @@ void rawParser_it_init(RawParser_it_t * const self, const u8 packStart)
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     rs_initialize_ecc(&self->rs_ecc);
 #endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
+
+    return D_RAW_P_OK;
 }
 
 
@@ -144,11 +149,11 @@ void rawParser_it_setUserBuffers(RawParser_it_t * const self, u8 * const rxBuffe
 
 int rawParser_it_delete(RawParser_it_t** data)
 {
-    M_Assert_BreakSaveCheck((data == NULL) || (*data == NULL), M_EMPTY, return 1, "rawParser_it_delete: No allocated memory");
+    M_Assert_BreakSaveCheck((data == NULL) || (*data == NULL), M_EMPTY, return D_RAW_P_ERROR, "rawParser_it_delete: No allocated memory");
     free(*data);
     *data = NULL;
 
-    return 0;
+    return D_RAW_P_OK;
 }
 
 //------------------------------RX------------------------------------------------------------------------------------------
@@ -197,21 +202,23 @@ static void RawParser_it_proceedByte(RawParser_it_t* const self, const u8 ch, co
         break;}
 
 #ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    case RAW_P_IT_RECEIVE_LEN_LOW:
+    case RAW_P_IT_RECEIVE_LEN_LOW: {
 
         self->m_receivePackLen = (reg)(ch & 0x000000FFUL);    // read low byte
         self->receiveState = RAW_P_IT_RECEIVE_LEN_HIGH;
-        break;
+        break;}
 
     case RAW_P_IT_RECEIVE_LEN_HIGH: {
 
-        self->m_receivePackLen |= (reg)((((reg)ch) << 8U) & 0x0000FF00UL); // read high byte
+        reg rx_len = (reg)((((reg)ch) << 8U) & 0x0000FF00UL) | self->m_receivePackLen; // read high byte
 
 #ifdef D_RAW_P_CRC_ENA
-        const reg rx_len = self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen) + sizeof(rawP_crc_t);
+        rx_len = LittleEndianU16(rx_len) + sizeof(rawP_crc_t);
 #else
-        const reg rx_len = self->m_receivePackLen = LittleEndianU16(self->m_receivePackLen);
+        rx_len = LittleEndianU16(rx_len);
 #endif /* D_RAW_P_CRC_ENA */
+
+        self->m_receivePackLen = rx_len;
 
         self->m_receivePos = 0;
         self->receiveState = RAW_P_IT_RECEIVE_DATA;
@@ -226,30 +233,31 @@ static void RawParser_it_proceedByte(RawParser_it_t* const self, const u8 ch, co
                                       }, "RawParser_it_proceedByte: No valid receive length, rx_len = %d, max_len = %d", rx_len, D_RAW_P_RX_BUF_SIZE);
 
 #endif /* D_RAW_P_CRC_ENA */
-
-
         break;}
 
 #endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
 
-    case RAW_P_IT_RECEIVE_DATA:
+    case RAW_P_IT_RECEIVE_DATA: {
 
-        self->RX.data[self->m_receivePos++] = ch;
+        reg RxPos = self->m_receivePos;
+        self->RX.data[RxPos] = ch;
+        ++RxPos;
 
-        if (self->m_receivePos == self->m_receivePackLen) {
-            self->RX.size = self->m_receivePackLen;
+        if (RxPos == self->m_receivePackLen) {
+            self->RX.size = RxPos;
             self->receiveState = RAW_P_IT_RECEIVE_OK;
         }
-        break;
 
+        self->m_receivePos = RxPos;
+        break;}
 
-    case RAW_P_IT_RECEIVE_ERR:
+    case RAW_P_IT_RECEIVE_ERR: {
         M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_it_proceedByte: Receive error, byte: %d, rx_len: %d, max_rxlen: %d", ch, self->m_receivePackLen, D_RAW_P_RX_BUF_SIZE);
-        break;
+        break;}
 
-    case RAW_P_IT_RECEIVE_OK:
+    case RAW_P_IT_RECEIVE_OK: {
         M_Assert_Warning(M_ALWAYS, M_EMPTY, M_EMPTY, "RawParser_it_proceedByte: LAST Received OK, byte: %d is not received because no SB", ch);
-        break;
+        break;}
 
     default:
         break;
@@ -318,9 +326,17 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
 #ifdef D_RAW_P_CRC_ENA
 
-    M_Assert_WarningSaveCheck((RX_size < (sizeof(rawP_crc_t) + 1U)), M_EMPTY, {
+#ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
+    const reg needLen = (sizeof(rawP_crc_t) + RSCODE_NPAR + 1U);
+    M_Assert_WarningSaveCheck((RX_size < needLen), M_EMPTY, {
                                   goto error;
-                              }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + crc size, rx len-->&d, need len-->%d", RX_size, (sizeof(rawP_crc_t) + 1U));
+                              }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + crc size + ecc, rx len-->&d, need len-->%d", RX_size, needLen);
+#else
+    const reg needLen = (sizeof(rawP_crc_t) + 1U);
+    M_Assert_WarningSaveCheck((RX_size < needLen), M_EMPTY, {
+                                  goto error;
+                              }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + crc size, rx len-->&d, need len-->%d", RX_size, needLen);
+#endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
     const reg m_sizeWithoutCRC = (RX_size - sizeof(rawP_crc_t));
 
@@ -349,22 +365,22 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
     D_RAW_P_CRC_FINAL(m_calcCrc);
 
 #if defined(D_RAW_P_USE_CRC8)
-    rawP_crc_t m_receiveCrc = RX_data[m_sizeWithoutCRC];
+    const rawP_crc_t m_receiveCrc = RX_data[m_sizeWithoutCRC];
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC8, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC16)
-    rawP_crc_t m_receiveCrc = LittleEndianU16( *UINT16_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
+    const rawP_crc_t m_receiveCrc = LittleEndianU16( *UINT16_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC16, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC32)
-    rawP_crc_t m_receiveCrc = LittleEndianU32( *UINT32_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
+    const rawP_crc_t m_receiveCrc = LittleEndianU32( *UINT32_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC32, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
 #elif defined(D_RAW_P_USE_CRC64)
-    rawP_crc_t m_receiveCrc = LittleEndianU64( *UINT64_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
+    const rawP_crc_t m_receiveCrc = LittleEndianU64( *UINT64_TYPE_DC(&RX_data[m_sizeWithoutCRC]) );
     M_Assert_WarningSaveCheck((m_calcCrc != m_receiveCrc), M_EMPTY, {
                                   goto error;
                               }, "RawParser_it_RXproceedLoop: not compleate CRC64, calc: %d, receive: %d", m_calcCrc, m_receiveCrc);
@@ -372,14 +388,16 @@ RawParser_Frame_t* RawParser_it_RXproceedLoop(RawParser_it_t* const self)
 
     RX_size = m_sizeWithoutCRC;
 
+#elif defined(D_RAW_P_REED_SOLOMON_ECC_CORR_ENA)
+    const reg needLen = (RSCODE_NPAR + 1U);
+    M_Assert_WarningSaveCheck((RX_size < needLen), M_EMPTY, {
+                                  goto error;
+                              }, "RawParser_it_RXproceedLoop: ignore packet because len less than 1 byte + ecc, rx len-->&d, need len-->%d", RX_size, needLen);
 #endif /* D_RAW_P_CRC_ENA */
 
 
 
 #ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
-    M_Assert_WarningSaveCheck((RX_size < (RSCODE_NPAR + 1U)), M_EMPTY, {
-                                  goto error;
-                              }, "RawParser_it_RXproceedLoop: not compleate len with ECC RS-code, len need: %d, receive: %d", (RSCODE_NPAR + 1U), RX_size);
 
     /* Now decode -- encoded codeword size must be passed */
     rscode_decode(&self->rs_ecc, RX_data, RX_size);
@@ -549,7 +567,6 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8* const ch)
 {
     M_Assert_Break((self == (RawParser_it_t*)NULL), M_EMPTY, return 0, "RawParser_it_TXproceedIt: No valid input");
 
-
 #ifdef D_RAW_P_DISABLE_INTERNAL_RX_BUFFER
     M_Assert_Break((self->RX.data == NULL), M_EMPTY, return 0, "RawParser_it_TXproceedIt: No valid RX buffer, call function before: -->  rawParser_it_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
 #endif /* D_RAW_P_DISABLE_INTERNAL_RX_BUFFER */
@@ -633,21 +650,23 @@ int RawParser_it_TXproceedIt(RawParser_it_t* const self, u8* const ch)
         break;}
 
     case RAW_P_IT_TRANSMITT_DATA: {
-        const u8 byte = self->TX.data[self->m_transmittPos];
+        reg txPos = self->m_transmittPos;
+        const u8 byte = self->TX.data[txPos];
         (*ch) = byte;
 
         if((self->m_startByte == byte) && !self->transmissionRepeat) {
             self->transmissionRepeat = 1;
         } else {
             self->transmissionRepeat = 0;
-            ++self->m_transmittPos;
+            ++txPos;
 
-            if(self->m_transmittPos == self->m_transmittPackLen) {
+            if(txPos == self->m_transmittPackLen) {
                 self->TX.size = 0;
                 self->transmittState = RAW_P_IT_TRANSMITT_SB;
             }
         }
 
+        self->m_transmittPos = txPos;
         break;}
 
     }

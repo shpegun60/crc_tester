@@ -2,6 +2,7 @@
 #include "entity_tests.h"
 #include "protocol.h"
 #include "raw_parser_it_test.h"
+#include "raw_parser_general_test.h"
 
 #include <slip_test.h>
 #include <stdio.h>
@@ -192,6 +193,24 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
 
+    printf("\n***************************************************************************************\n");
+    printf("----------->>RAWPARSER GENERAL TEST<<--------------------\n");
+    printf("***************************************************************************************\n");
+
+    int RawParserGeneralTest = 0;
+
+#ifndef D_RAW_P_TEST_DISABLE
+    if(testFlags & TESTER_RAW_P_GEN) {
+        RawParserGeneralTest = rawParserGenTest(randomSeed, testCnt);
+    } else {
+        printf("...FLAGS: RAWPARSER GENERAL TEST DISABLED\n");
+    }
+#else
+    printf("...DEFINE: RAWPARSER GENERAL TEST DISABLED\n");
+#endif /* CALL_B_MAN_TEST_DISABLE */
+
+
+
 
 
     printf("\n***************************************************************************************\n");
@@ -206,9 +225,9 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     printf("CALLBACK MANAGER TEST EXIT WITH ERROR: %d\n", CallbackManager_Test);
     printf("POOL CONTAINER TEST EXIT WITH ERROR: %d\n", Pool_Container_Test);
     printf("RAWPARSER IT TEST EXIT WITH ERROR: %d\n", RawParserItTest);
+    printf("RAWPARSER GENERAL TEST EXIT WITH ERROR: %d\n", RawParserGeneralTest);
     printf("COMPILER VERSION: %s %ld\n", PREDEF_COMPILER_NAME, __STDC_VERSION__);
     printf("ENTITY VERSION: %d, %s\n", C_ENTITY_FRAMEWORK_LIB_VERSION, C_ENTITY_FRAMEWORK_LIB_VERSION_INFO);
-    // printf("ENTITY PACK SIZE: %d\n", sizeof(EntityPacketTable_t));
 
 //    u32 data;
 //    if (__builtin_types_compatible_p(int, MY_CTYPE_GET_TYPE(INT32_TYPE))) {
@@ -233,6 +252,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
     slip_test(randomSeed, testCnt);
+
 
     fflush(stdout);
     fflush(stderr);
