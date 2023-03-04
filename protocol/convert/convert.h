@@ -58,41 +58,41 @@
  * ******************************************
  */
 
-void TEMPLATE(convertRead_LSB, uni)(reg n, u8* data, reg* pos, u8* value);
-void TEMPLATE(convertWrite_LSB, uni)(reg n, u8* data, reg* pos, u8* value);
+void TEMPLATE(convertRead_LSB, uni)(reg n, u8* data, reg* pos, void* value);
+void TEMPLATE(convertWrite_LSB, uni)(reg n, u8* data, reg* pos, void* value);
 
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_LSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok);
-void TEMPLATE(convertWriteCheck_LSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok);
+void TEMPLATE(convertReadCheck_LSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok);
+void TEMPLATE(convertWriteCheck_LSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok);
 
 // position not a pointer
-void TEMPLATE(convertWrite_cpos_LSB, uni)(reg n, u8* data, reg pos, u8* value);
-void TEMPLATE(convertRead_cpos_LSB, uni)(reg n, u8* data, reg pos, u8* value);
+void TEMPLATE(convertWrite_cpos_LSB, uni)(reg n, u8* data, reg pos, void* value);
+void TEMPLATE(convertRead_cpos_LSB, uni)(reg n, u8* data, reg pos, void* value);
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok);
-void TEMPLATE(convertWriteCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok);
+void TEMPLATE(convertReadCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok);
+void TEMPLATE(convertWriteCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok);
 /*
  * ******************************************
  * MSB - first universal
  * ******************************************
  */
 
-void TEMPLATE(convertRead_MSB, uni)(reg n, u8* data, reg* pos, u8* value);
-void TEMPLATE(convertWrite_MSB, uni)(reg n, u8* data, reg* pos, u8* value);
+void TEMPLATE(convertRead_MSB, uni)(reg n, u8* data, reg* pos, void* value);
+void TEMPLATE(convertWrite_MSB, uni)(reg n, u8* data, reg* pos, void* value);
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_MSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok);
-void TEMPLATE(convertWriteCheck_MSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok);
+void TEMPLATE(convertReadCheck_MSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok);
+void TEMPLATE(convertWriteCheck_MSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok);
 
 // position not a pointer
-void TEMPLATE(convertRead_cpos_MSB, uni)(reg n, u8* data, reg pos, u8* value);
-void TEMPLATE(convertWrite_cpos_MSB, uni)(reg n, u8* data, reg pos, u8* value);
+void TEMPLATE(convertRead_cpos_MSB, uni)(reg n, u8* data, reg pos, void* value);
+void TEMPLATE(convertWrite_cpos_MSB, uni)(reg n, u8* data, reg pos, void* value);
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok);
-void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok);
+void TEMPLATE(convertReadCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok);
+void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok);
 
 
 

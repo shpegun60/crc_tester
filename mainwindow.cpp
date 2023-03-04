@@ -13,6 +13,7 @@
 extern "C" {
     #include "raw_parser_it_test.h"
     #include "entity_manager.h"
+    #include "convert.h"
 }
 
 #include "smart_assert.h"
@@ -97,8 +98,6 @@ MainWindow::MainWindow(QWidget *parent)
 //            });
 
 //    qDebug() << "!!!!!!!!!!!!!!!!!a " << a;
-
-
 }
 
 

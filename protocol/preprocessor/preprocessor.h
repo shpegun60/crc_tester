@@ -35,12 +35,14 @@
 #include "preprocessor_logical.h"
 #include "preprocessor_map.h"
 #include "preprocessor_nat_eq.h"
+#include "preprocessor_nat_op.h"
 #include "preprocessor_serial.h"
 #include "preprocessor_stringify.h"
 #include "preprocessor_symbol.h"
 #include "preprocessor_template.h"
 #include "preprocessor_tuple.h"
 #include "preprocessor_type_eq.h"
+#include "preprocessor_unused.h"
 
 
 #if defined(_MSC_VER)

@@ -28,7 +28,7 @@ extern "C" {
  */
 
 //#define NDEBUG                              // uncommit this if program in release version
-#define M_MESSAGE_ALWAYS_ENABLE         1   // enabling runtime assert message filter and additon library information (see additional information macro)
+//#define M_MESSAGE_ALWAYS_ENABLE         1   // enabling runtime assert message filter and additon library information (see additional information macro)
 //#define M_ASSERT_MSG_TEXT_DISABLE       1   // disabling sending assert message text and do not saving this in .text section
 //#define M_ASSERT_EXPR_DISABLE           1   // disabling sending assert expression text, value and do not saving this in .text section
 //#define M_ASSERT_FILE_LINE_TEXT_DISABLE 1   // disabling sending assert file, line text and do not saving this in .text section

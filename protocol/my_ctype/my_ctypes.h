@@ -2,8 +2,10 @@
 #define __MY_C_TYPES_H__ 1
 
 #include "inline.h"
+#include "endianness.h"
 #include "my_ctypes_def.h"
 #include "my_ctype_id.h"
+#include <string.h>
 
 
 /************************************************************************************
@@ -68,7 +70,11 @@
 #endif /* TYPEOF_DATA */
 
 #ifndef AUTO_VAL
-#   define AUTO_VAL(var, value) TYPEOF_DATA(value) var = (value);
+#   define AUTO_VAL(var, value) TYPEOF_DATA(value) var = (value)
+#endif /* TYPEOF_DATA */
+
+#ifndef AUTO_VAL_NO_INIT
+#   define AUTO_VAL_NO_INIT(var, value) TYPEOF_DATA(value) var
 #endif /* TYPEOF_DATA */
 
 
@@ -85,6 +91,13 @@
 #ifndef ARRAY_COUNT
 #   define ARRAY_COUNT(arr) (sizeof((arr))/sizeof((arr)[0]))
 #endif /* ARRAY_COUNT */
+
+
+/************************************************************************************
+ * Macro to reinterpret your own data safely
+ */
+#define UNION_CAST(x, destType) \
+   (((union {TYPEOF_DATA(x) a; destType b;})x).b)
 
 
 /************************************************************************************
@@ -111,17 +124,44 @@ extern const reg typeLengthMappingArray[TYPE_ARRAY_LENGTH];
 /************************************************************************************
  *  Macro for user copy
  */
-STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, u8* from, u8* to)
+STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_MEMCPY(reg n, void* from, void* to)
 {
-    while((n)--) {
-        *(to)++ = *(from)++;
+    switch (n) {
+    case sizeof(u64): *(u64*)to = *(u64*)from; break;
+    case sizeof(u32): *(u32*)to = *(u32*)from; break;
+    case sizeof(u16): *(u16*)to = *(u16*)from; break;
+    case sizeof(u8 ): *(u8 *)to = *(u8 *)from; break;
+    default: memcpy(to, from, n); break;
     }
 }
 
-STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, u8* from, u8* to)
+STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, void* from, void* to)
 {
-    while((n)--) {
-        *(to)++ = *((from) + (n));
+    switch (n) {
+    case sizeof(u64): {
+        u64 val = *(u64*)from;
+        *(u64*)to = bswap64(val);
+        break;}
+    case sizeof(u32): {
+        u32 val = *(u32*)from;
+        *(u32*)to = bswap32(val);
+        break;}
+    case sizeof(u16): {
+        u16 val = *(u16*)from;
+        *(u16*)to = bswap16(val);
+        break;}
+    case sizeof(u8): {
+        *(u8*)to = *(u8*)from;
+        break;
+    }
+    default: {
+        u8* from_ptr = (u8*)from + n - 1;
+        u8* to_ptr   = (u8*)to;
+
+        do {
+            *(to_ptr++) = *(from_ptr--);
+        } while (--n);
+        break;}
     }
 }
 
@@ -136,9 +176,11 @@ STATIC_FORCEINLINE void MY_CTYPE_WRITE_ONCE_SIZE(volatile void *p, void *res, re
     case 4: *(volatile u32 *)p = *(u32 *)res; break;
     case 8: *(volatile u64 *)p = *(u64 *)res; break;
     default:
-            //barrier(); /// need block all---------------------------
-            MY_CTYPE_USER_DATA_MEMCPY(size, (u8*)res, (u8*)p);
-            //barrier(); /// need unblock all-------------------------
+        //barrier(); /// need block all---------------------------
+        //MY_CTYPE_USER_DATA_MEMCPY(size, (u8*)res, (u8*)p);
+        memcpy((void*)p, (void*)res, size);
+        //barrier(); /// need unblock all-------------------------
+        break;
     }
 }
 
@@ -150,9 +192,10 @@ STATIC_FORCEINLINE void MY_CTYPE_READ_ONCE_SIZE(const volatile void *p, void *re
     case 4: *(u32 *)res = *(volatile u32 *)p; break;
     case 8: *(u64 *)res = *(volatile u64 *)p; break;
     default:
-            //barrier(); /// need block all---------------------------
-            MY_CTYPE_USER_DATA_MEMCPY(size, (u8*)p, (u8*)res);
-            //barrier(); /// need unblock all-------------------------
+        //barrier(); /// need block all---------------------------
+        //MY_CTYPE_USER_DATA_MEMCPY(size, (u8*)p, (u8*)res);
+        memcpy((void*)res, (void*)p, size);
+        //barrier(); /// need unblock all-------------------------
     }
 }
 

@@ -1,6 +1,7 @@
 #include "raw_parser_general_test.h"
 #include "raw_parser_general.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifndef D_RAW_P_TEST_DISABLE
@@ -129,7 +130,7 @@ static void recv_message_test_general(u8* data, reg size, PREPROCESSOR_CTX_TYPE(
     printf("data error: %d\n", error);
     printf("\n");
 
-    (*testNotPassed) = error;
+    (*testNotPassed) += error;
 
     UNUSED(loopback_buf_index);
     UNUSED(loopback_buf);

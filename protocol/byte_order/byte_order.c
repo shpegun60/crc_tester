@@ -27,6 +27,7 @@ static int byteOrderRevCheck(void * source, void * destination, int len)
 
 int endiansTest()
 {
+
     // dataset for test your system -------------------------------------------------------
     const u16 dataU16 = 12345U;
     const i16 dataI16 = -1000L;
@@ -51,7 +52,7 @@ int endiansTest()
     //------------------------
 
 
-#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+#if defined(__LITTLE_ENDIAN__)
     /*
      * ***************************************************
      *  LITTLE ENDIAN FUNCTIONS
@@ -310,7 +311,7 @@ int endiansTest()
         ++counter_notBigEndian;
     }
 
-#elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
+#elif defined(__BIG_ENDIAN__)
     /*
      * ***************************************************
      *  LITTLE ENDIAN FUNCTIONS
@@ -571,7 +572,7 @@ int endiansTest()
 
 #else
 #    error unsupported endianness
-#endif
+#endif /* ORDER SELECTION */
 
     // dataset for test toyr system -------------------------------------------------------
     (void)dataU16;
@@ -603,11 +604,20 @@ int endiansTest()
     printf("Big_endian test exit with error: %d\n", counter_notBigEndian);
     printf("Little_endian test exit with error: %d\n", counter_notlittleEndian);
     printf("Your system endian: %s\n", MY_SYSTEM_IS_LITTLE_ENDIAN ? "LITTLE_ENDIAN": "BIG_ENDIAN");
-    printf("ENDIAN LIB Enable for: %s\n", (MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN) ? "LITTLE_ENDIAN": "BIG_ENDIAN");
-    if((MY_SYSTEM_IS_LITTLE_ENDIAN && (MY_ENDIAN_ORDER != MY_LITTLE_ENDIAN)) || (MY_SYSTEM_IS_BIG_ENDIAN && (MY_ENDIAN_ORDER != MY_BIG_ENDIAN))) {
+#if defined(__LITTLE_ENDIAN__)
+    printf("ENDIAN LIB Enable for:  LITTLE_ENDIAN\n");
+    if(MY_SYSTEM_IS_BIG_ENDIAN) {
         printf("ERROR!!! : not matching byte orders with current system\n");
         test_passed = 0;
     }
+#elif defined(__BIG_ENDIAN__)
+    printf("ENDIAN LIB Enable for:  BIG_ENDIAN\n");
+    if(MY_SYSTEM_IS_LITTLE_ENDIAN) {
+        printf("ERROR!!! : not matching byte orders with current system\n");
+        test_passed = 0;
+    }
+#endif /* ORDER SELECTION */
+
     printf("ENDIAN LIB TEST PASSED: %d\n", test_passed);
 
 

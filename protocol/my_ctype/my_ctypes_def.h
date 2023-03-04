@@ -3,7 +3,6 @@
 
 #include <stddef.h> // size_t, ptrdiff_t, ...
 #include <stdint.h> // uint8_t, uint16_t, ...
-#include <stdlib.h> // malloc, free, ...
 
 
 // all types. Commit this if types defines upper--------------------------
@@ -38,17 +37,17 @@ typedef ptrdiff_t   sreg;   // platform depend type
 //------------------------------------------------------------------------------------
 
 
-typedef int8_t int8;
-typedef int16_t int16;
-typedef int32_t int32;
-typedef int64_t int64;
+typedef i8 int8;
+typedef i16 int16;
+typedef i32 int32;
+typedef i64 int64;
 
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
+typedef u8 uint8;
+typedef u16 uint16;
+typedef u32 uint32;
+typedef u64 uint64;
 
-typedef uint8 byte;
+typedef u8 byte;
 
 
 /*
@@ -58,7 +57,7 @@ typedef uint8 byte;
  */
 
 // strict type control (PRECOMPILE)------------------------------------------------
-#if (__STDC_VERSION__ >= 201112L) // if C version equal or more than C11
+#if defined(__cplusplus) || (__STDC_VERSION__ >= 201112L) // if C version equal or more than C11 or C++
 #include "assert.h"
 
 // unsigned
@@ -80,6 +79,9 @@ static_assert((sizeof(i64) == 8),   "MY_CTYPES: size of int64    type must be eq
 static_assert((sizeof(f32) == 4),   "MY_CTYPES: size of float         type must be equal 4, change --> my_types.h: typedef f32 ");
 static_assert((sizeof(f64) == 8),   "MY_CTYPES: size of double        type must be equal 8, change --> my_types.h: typedef f64 ");
 //static_assert((sizeof(f128) == 16), "MY_CTYPES: size of long double   type must be equal 16, change --> my_types.h: typedef f128 "); // platform depend
+
+static_assert(sizeof(float) == sizeof(u32), "Unexpected float format");
+static_assert(sizeof(double) == sizeof(u64), "Unexpected double format");
 
 // bool type
 static_assert((sizeof(b) == 1),    "MY_CTYPES: size of bool     type must be equal 1, change --> my_types.h: typedef b ");
@@ -111,6 +113,9 @@ C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(i64) == 8), size_of_int64_type_must
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f32) == 4), size_of_float_type_must_be_equal_4_change_typedef_f32);
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f64) == 8), size_of_double_type_must_be_equal_8_change_typedef_f64);
 //C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(f128) == 16), size_of_long_double_type_must_be_equal_16_change_typedef_f128); // platform depend
+
+C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(float) == sizeof(u32)), Unexpected_float_format);
+C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(double) == sizeof(u64)), Unexpected_double_format);
 
 // bool type
 C99MY_CTYPES_STATIC_ASSERTION_CREATE((sizeof(b) == 1), size_of_bool_type_must_be_equal_1_change_typedef_b);

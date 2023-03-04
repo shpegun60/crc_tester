@@ -116,10 +116,12 @@ int initEntity(reg* const entityNumber, const reg NumberOfFields, const reg poin
 
     // copy entity description-------------------------------------------------------------------------------------------------------------------------------------------------------------------
     if(descr) {
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)new_entity->descr);
+        memcpy(new_entity->descr, descr, ENTITY_DESCRIPTION_SIZE);
+        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)new_entity->descr);
     } else {
         sprintf(str, "E%d", entities_count);
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)new_entity->descr);
+        memcpy(new_entity->descr, str, ENTITY_DESCRIPTION_SIZE);
+        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)new_entity->descr);
     }
 
 
@@ -183,7 +185,8 @@ int initEntity(reg* const entityNumber, const reg NumberOfFields, const reg poin
         field->type      = VOID_TYPE;
 
         sprintf(str, "F%d", i);
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
+        memcpy(field->descr, str, ENTITY_DESCRIPTION_SIZE);
+        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
     }
 
     (*entityNumber) = entities_count;
@@ -218,7 +221,8 @@ int initField(Entity* const entityInst, reg* const fieldNumber, const TYPEOF_STR
                                     field->type         = type;
 
                                     if(descr) {
-                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)field->descr);
+                                        memcpy(field->descr, descr, ENTITY_DESCRIPTION_SIZE);
+                                        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)field->descr);
                                     }
 
                                     if(field_ptr) {
@@ -263,7 +267,8 @@ int initFieldArray(Entity* const entityInst, reg* const fieldNumber, TYPEOF_STRU
                                         } else {
                                             sprintf(str, ":[%d]", (i + startNum));
                                         }
-                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
+                                        memcpy(field->descr, str, ENTITY_DESCRIPTION_SIZE);
+                                        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)str, (u8 *)field->descr);
 
                                         shift += typeLen;
                                         ++fieldNumber_readed;
@@ -296,7 +301,8 @@ int initFieldFromPtr(EntityField* const fieldInst, const TYPEOF_STRUCT(EntityFie
     fieldInst->type         = type;
 
     if(descr) {
-        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)fieldInst->descr);
+        memcpy(fieldInst->descr, descr, ENTITY_DESCRIPTION_SIZE);
+        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)fieldInst->descr);
     }
     return ENTITY_OK;
 }
@@ -310,7 +316,8 @@ int fieldRename(Entity* const entityInst, const reg fieldNumber, const char desc
 
     M_Assert_BreakElseSaveCheck((fields_count > fieldNumber), {
 
-                                    MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[fieldNumber].descr);
+                                    memcpy(entityInst->fields[fieldNumber].descr, descr, ENTITY_DESCRIPTION_SIZE);
+                                    //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)entityInst->fields[fieldNumber].descr);
                                     return ENTITY_OK;
 
                                 }, M_EMPTY, M_EMPTY, "fieldRename: fieldNumber: &d,  is too long than allocated fields_count: %d", fieldNumber, fields_count);
@@ -365,7 +372,8 @@ int initFieldCallback(Entity* const  entityInst, reg* const fieldNumber, const T
                                 #endif /* USE_ENTITY_WRITE_CALLBACK */
 
                                     if(descr) {
-                                        MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)field->descr);
+                                        memcpy(field->descr, descr, ENTITY_DESCRIPTION_SIZE);
+                                        //MY_CTYPE_USER_DATA_MEMCPY(ENTITY_DESCRIPTION_SIZE, (u8 *)descr, (u8 *)field->descr);
                                     }
 
                                     if(field_ptr) {

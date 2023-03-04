@@ -5,7 +5,7 @@
 
 #ifdef _MY_CRC16_ENA
 
-#include "my_ctypes.h"
+#include "my_ctypes_def.h"
 
 #ifndef _MY_CRC_TEST_DISABLE
 int crc16_test(u8 *data, reg len, u16 * res);

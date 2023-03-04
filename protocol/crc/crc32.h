@@ -5,7 +5,7 @@
 
 #ifdef _MY_CRC32_ENA
 
-#include "my_ctypes.h"
+#include "my_ctypes_def.h"
 
 #ifndef _MY_CRC_TEST_DISABLE
 int crc32_test(u8 *data, reg len, u32 *res);

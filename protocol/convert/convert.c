@@ -1,4 +1,5 @@
 #include "convert.h"
+#include "byte_order.h"
 
 #ifdef T
 #undef T
@@ -50,7 +51,7 @@
  * ******************************************
  */
 
-void TEMPLATE(convertRead_LSB, uni)(reg n, u8* data, reg* pos, u8* value)
+void TEMPLATE(convertRead_LSB, uni)(reg n, u8* data, reg* pos, void* value)
 {
     reg posInternal = (*pos);
 
@@ -59,7 +60,7 @@ void TEMPLATE(convertRead_LSB, uni)(reg n, u8* data, reg* pos, u8* value)
     (*pos) = posInternal;
 }
 
-void TEMPLATE(convertWrite_LSB, uni)(reg n, u8* data, reg* pos, u8* value)
+void TEMPLATE(convertWrite_LSB, uni)(reg n, u8* data, reg* pos, void* value)
 {
     reg posInternal = (*pos);
 
@@ -71,7 +72,7 @@ void TEMPLATE(convertWrite_LSB, uni)(reg n, u8* data, reg* pos, u8* value)
 
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_LSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertReadCheck_LSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok)
 {
     reg posInternal = (*pos);
 
@@ -85,7 +86,7 @@ void TEMPLATE(convertReadCheck_LSB, uni) (reg n, u8* data, reg* pos, u8* value, 
     (*ok) = CTYPE_TRUE;
     (*pos) = posInternal;
 }
-void TEMPLATE(convertWriteCheck_LSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertWriteCheck_LSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok)
 {
     reg posInternal = (*pos);
 
@@ -101,18 +102,18 @@ void TEMPLATE(convertWriteCheck_LSB, uni) (reg n, u8* data, reg* pos, u8* value,
 }
 
 // position not a pointer
-void TEMPLATE(convertWrite_cpos_LSB, uni)(reg n, u8* data, reg pos, u8* value)
+void TEMPLATE(convertWrite_cpos_LSB, uni)(reg n, u8* data, reg pos, void* value)
 {
     MY_CTYPE_USER_DATA_MEMCPY(n, value, (u8*)(data + pos));
 }
 
-void TEMPLATE(convertRead_cpos_LSB, uni)(reg n, u8* data, reg pos, u8* value)
+void TEMPLATE(convertRead_cpos_LSB, uni)(reg n, u8* data, reg pos, void* value)
 {
     MY_CTYPE_USER_DATA_MEMCPY(n, (u8*)(data + pos), value);
 }
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertReadCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok)
 {
     if((pos + n) > buffSize) {
         (*ok) = CTYPE_FALSE;
@@ -122,7 +123,7 @@ void TEMPLATE(convertReadCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, u8* val
     MY_CTYPE_USER_DATA_MEMCPY(n, (u8*)(data + pos), value);
     (*ok) = CTYPE_TRUE;
 }
-void TEMPLATE(convertWriteCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertWriteCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok)
 {
     if((pos + n) > buffSize) {
         (*ok) = CTYPE_FALSE;
@@ -139,7 +140,7 @@ void TEMPLATE(convertWriteCheck_cpos_LSB, uni) (reg n, u8* data, reg pos, u8* va
  * ******************************************
  */
 
-void TEMPLATE(convertRead_MSB, uni)(reg n, u8* data, reg* pos, u8* value)
+void TEMPLATE(convertRead_MSB, uni)(reg n, u8* data, reg* pos, void* value)
 {
     reg posInternal = (*pos);
 
@@ -148,7 +149,7 @@ void TEMPLATE(convertRead_MSB, uni)(reg n, u8* data, reg* pos, u8* value)
     (*pos) = posInternal;
 }
 
-void TEMPLATE(convertWrite_MSB, uni)(reg n, u8* data, reg* pos, u8* value)
+void TEMPLATE(convertWrite_MSB, uni)(reg n, u8* data, reg* pos, void* value)
 {
     reg posInternal = (*pos);
 
@@ -158,7 +159,7 @@ void TEMPLATE(convertWrite_MSB, uni)(reg n, u8* data, reg* pos, u8* value)
 }
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_MSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertReadCheck_MSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok)
 {
     reg posInternal = (*pos);
 
@@ -172,7 +173,7 @@ void TEMPLATE(convertReadCheck_MSB, uni) (reg n, u8* data, reg* pos, u8* value, 
     (*ok) = CTYPE_TRUE;
     (*pos) = posInternal;
 }
-void TEMPLATE(convertWriteCheck_MSB, uni) (reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertWriteCheck_MSB, uni) (reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok)
 {
     reg posInternal = (*pos);
 
@@ -188,18 +189,18 @@ void TEMPLATE(convertWriteCheck_MSB, uni) (reg n, u8* data, reg* pos, u8* value,
 }
 
 // position not a pointer
-void TEMPLATE(convertRead_cpos_MSB, uni)(reg n, u8* data, reg pos, u8* value)
+void TEMPLATE(convertRead_cpos_MSB, uni)(reg n, u8* data, reg pos, void* value)
 {
     MY_CTYPE_USER_DATA_REVCPY(n, (u8*)(data + pos), value);
 }
 
-void TEMPLATE(convertWrite_cpos_MSB, uni)(reg n, u8* data, reg pos, u8* value)
+void TEMPLATE(convertWrite_cpos_MSB, uni)(reg n, u8* data, reg pos, void* value)
 {
     MY_CTYPE_USER_DATA_REVCPY(n, value, (u8*)(data + pos));
 }
 
 //with check buffer-----------------------------------------------------------------------------
-void TEMPLATE(convertReadCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertReadCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok)
 {
     if((pos + n) > buffSize) {
         (*ok) = CTYPE_FALSE;
@@ -209,7 +210,7 @@ void TEMPLATE(convertReadCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* val
     MY_CTYPE_USER_DATA_REVCPY(n, (u8*)(data + pos), value);
     (*ok) = CTYPE_TRUE;
 }
-void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok)
+void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, void* value, reg buffSize, b* ok)
 {
     if((pos + n) > buffSize) {
         (*ok) = CTYPE_FALSE;
@@ -235,7 +236,7 @@ void TEMPLATE(convertWriteCheck_cpos_MSB, uni) (reg n, u8* data, reg pos, u8* va
  * ******************************************
  */
 
-int TEMPLATE(convertTest_WRITE_READ, uni) (void (*read_ptr)(reg n, u8* data, reg* pos, u8* value), void (*write_ptr)(reg n, u8* data, reg* pos, u8* value), u64 value)
+int TEMPLATE(convertTest_WRITE_READ, uni) (void (*read_ptr)(reg n, u8* data, reg* pos, void* value), void (*write_ptr)(reg n, u8* data, reg* pos, void* value), u64 value)
 {
     u8 buff[sizeof(u64) * 2 + 2];
     reg pos = 0;
@@ -267,7 +268,7 @@ int TEMPLATE(convertTest_WRITE_READ, uni) (void (*read_ptr)(reg n, u8* data, reg
     return notValidcnt;
 }
 
-int TEMPLATE(convertTest_WRITE_READ_CPOS, uni) (void (*read_ptr)(reg n, u8* data, reg pos, u8* value), void (*write_ptr)(reg n, u8* data, reg pos, u8* value), u64 value)
+int TEMPLATE(convertTest_WRITE_READ_CPOS, uni) (void (*read_ptr)(reg n, u8* data, reg pos, void* value), void (*write_ptr)(reg n, u8* data, reg pos, void* value), u64 value)
 {
     u8 buff[sizeof(u64) * 2 + 2];
     reg pos = 0;
@@ -295,7 +296,7 @@ int TEMPLATE(convertTest_WRITE_READ_CPOS, uni) (void (*read_ptr)(reg n, u8* data
     return notValidcnt;
 }
 
-int TEMPLATE(convertTest_WRITE_READ_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok), void (*write_ptr)(reg n, u8* data, reg* pos, u8* value, reg buffSize, b* ok),  u64 value)
+int TEMPLATE(convertTest_WRITE_READ_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok), void (*write_ptr)(reg n, u8* data, reg* pos, void* value, reg buffSize, b* ok),  u64 value)
 {
     reg buffsize = sizeof(u64) * 2 + 2;
     u8 buff[sizeof(u64) * 2 + 2];
@@ -355,7 +356,7 @@ int TEMPLATE(convertTest_WRITE_READ_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8
     return notValidcnt;
 }
 
-int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok), void (*write_ptr)(reg n, u8* data, reg pos, u8* value, reg buffSize, b* ok),  u64 value)
+int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, uni) (void (*read_ptr)(reg n, u8* data, reg pos, void* value, reg buffSize, b* ok), void (*write_ptr)(reg n, u8* data, reg pos, void* value, reg buffSize, b* ok),  u64 value)
 {
     reg buffsize = sizeof(u64) * 2 + 2;
     u8 buff[sizeof(u64) * 2 + 2];
@@ -420,7 +421,7 @@ int TEMPLATE(convertTest_WRITE_READ_CPOS_BUFFER_CHK, uni) (void (*read_ptr)(reg 
 
 
 
-__attribute__((unused)) static int TEMPLATE(convertTest, uni) (int testN, int randomSeed)
+static int TEMPLATE(convertTest, uni) (int testN, int randomSeed)
 {
     srand(sizeof(reg) + randomSeed); // use type size as seed for random generator
 
@@ -557,6 +558,33 @@ int convertTest(int testCount, int randomSeed)
 
 
     printf("CONVERT TEST EXIT WITH ERROR: %d\n", convertTestcnt);
+
+    ///////////////////////////////////////////////////
+    printf("CONVERT SIMPLE: -------------------------\n");
+    u8 data[100];
+    reg pos = 0;
+
+    TEMPLATE(convertWrite_MSB, f32)(data, &pos, 123.456);
+    TEMPLATE(convertWrite_MSB, u16)(data, &pos, 853);
+    TEMPLATE(CAT_ENDIAN(convertWrite), u64)(data, &pos, 1122334455);
+
+    u64 tmpuni = 1234567890ULL;
+    TEMPLATE(CAT_ENDIAN(convertWrite), uni)(sizeof(u64), data, &pos, &tmpuni);
+
+
+    pos = 0;
+    f32 tmp = TEMPLATE(convertRead_MSB, f32)(data, &pos);
+    u16 tmp16 = TEMPLATE(convertRead_MSB, u16)(data, &pos);
+    u64 tmp64 = TEMPLATE(CAT_ENDIAN(convertRead), u64)(data, &pos);
+
+    u64 tmpunitest;
+    TEMPLATE(CAT_ENDIAN(convertRead), uni)(sizeof(u64), data, &pos, &tmpunitest);
+
+    printf("%f\n", tmp);
+    printf("%d\n", tmp16);
+    printf("%llu\n", tmp64);
+    printf("%llu\n", tmpunitest);
+    printf("%d\n", pos);
 
     fflush(stdout);
 

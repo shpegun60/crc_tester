@@ -42,7 +42,7 @@
 #   endif
 #else
 #   define forceinline INLINE
-#endif
+#endif /* forceinline switch macro */
 /*
  * external force inline linkage use==>
  * .h header file must be :
