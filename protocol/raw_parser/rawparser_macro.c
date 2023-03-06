@@ -12,20 +12,20 @@ void rawPTestWriteUni(u8* desc, reg totalLenInByte, reg typelenInByte, u8 *data)
     pos_i += totalLenInByte;
 
 
-#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+#if defined(__LITTLE_ENDIAN__)
     while(totalLenInByte--) {
         *to++ = *data++;
     }
 
     (void)typelenInByte;
-#else /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+#else /* defined(__BIG_ENDIAN__) */
     for(reg i = 0; i < totalLenInByte; i+= typelenInByte) {
         reg n = typelenInByte;
         while(n--) {
             *to++ = *(data + n + i);
         }
     }
-#endif /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+#endif /* ORDER SELECTION */
 
 }
 

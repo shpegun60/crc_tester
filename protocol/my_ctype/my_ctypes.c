@@ -7,7 +7,7 @@
  */
 
 const reg typeLengthMappingArray[TYPE_ARRAY_LENGTH] = {
-    0x00U,                  //VOID_TYPE           ( 0)
+    0x00U,                  //VOID_TYPE           (0)
     // unsigned type
     sizeof(u8),             //UINT8_TYPE          (1)
     sizeof(u16),            //UINT16_TYPE         (2)

@@ -605,7 +605,7 @@ void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByt
     M_Assert_Break((self->TX.data == NULL), M_EMPTY, return, "RawParser_dma_universalWrite: No valid TX buffer, call function before: -->  rawParser_dma_setUserBufferXX, XX = RX for rx buffer, XX = TX for tx buffer, XX = s for tx & rx buffers");
 #endif /* D_RAW_P_DISABLE_INTERNAL_TX_BUFFER */
 
-#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+#if defined(__LITTLE_ENDIAN__)
 
 #   ifdef D_RAW_P_REED_SOLOMON_ECC_CORR_ENA
     rscode_driver* const rs_ecc = &self->rs_ecc;
@@ -621,7 +621,7 @@ void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByt
 #   endif /* D_RAW_P_REED_SOLOMON_ECC_CORR_ENA */
 
     UNUSED(typelenInByte);
-#else /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+#else /* defined(__BIG_ENDIAN__) */
     rscode_driver* const rs_ecc = &self->rs_ecc;
     for(reg i = 0; i < totalLenInByte; i += typelenInByte) {
         reg n = typelenInByte;
@@ -634,7 +634,7 @@ void RawParser_dma_universalWrite(RawParser_dma_t* const self, reg totalLenInByt
 
         }
     }
-#endif /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+#endif /* ORDER SELECTION */
 
 }
 
@@ -656,7 +656,7 @@ void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte
 
     M_Assert_BreakSaveCheck(((uniRXPosition + totalLenInByte) > self->RX.size), M_EMPTY, return, "RawParser_dma_universalRead: no length for reading");
 
-#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+#if defined(__LITTLE_ENDIAN__)
 
     // do logic
     while(totalLenInByte--) {
@@ -666,7 +666,7 @@ void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte
     self->uniRXPosition = uniRXPosition;
 
     UNUSED(typelenInByte);
-#else /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+#else /* defined(__BIG_ENDIAN__) */
 
     // do logic
     for(reg i = 0; i < totalLenInByte; i+= typelenInByte) {
@@ -677,7 +677,7 @@ void RawParser_dma_universalRead(RawParser_dma_t* const self, reg totalLenInByte
         }
     }
     self->uniRXPosition = uniRXPosition;
-#endif /* MY_ENDIAN_ORDER == MY_BIG_ENDIAN */
+#endif /* ORDER SELECTION */
 
 }
 

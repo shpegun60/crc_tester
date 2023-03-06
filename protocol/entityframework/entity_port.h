@@ -24,6 +24,13 @@
 #   define C_ENTITY_FRAMEWORK_LIB_VERSION_INFO "Version: VVRRPP --> VV = Version, RR = Revision, PP = Patch"
 #endif /* C_ENTITY_FRAMEWORK_LIB_ENA */
 
+/* **********************************************************************************************************************************
+ * Entity test enable/disable
+ */
+#ifndef ENTITY_DESCRIPTION_SIZE
+//#   define ENTITY_TEST_DISABLE 	1
+#endif /* ENTITY_DESCRIPTION_SIZE */
+
 
 /* **********************************************************************************************************************************
  * Entity description size in bytes
@@ -185,17 +192,15 @@
  *  Macro for Defining Entity Copy function (Platform depent)
  * **********************************************************************************************************************************
  */
-#if MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN
+#if defined(__LITTLE_ENDIAN__)
 #   define ENTITY_BYTE_CPY(n, from, to) MY_CTYPE_USER_DATA_MEMCPY((n), (from), (to))
 #   define ENTITY_TYPE_CPY(type, from, to) cTypeMemcpy((type), (from), (to))
 #   define ENTITY_REG_CPY(from, to) MY_CTYPE_COPY_REGISTERS((from), (to))
-#elif MY_ENDIAN_ORDER == MY_BIG_ENDIAN
+#else /* defined(__BIG_ENDIAN__) */
 #   define ENTITY_BYTE_CPY(n, from, to) MY_CTYPE_USER_DATA_REVCPY((n), (from), (to))
 #   define ENTITY_TYPE_CPY(type, from, to) cTypeRevcpy((type), (from), (to))
 #   define ENTITY_REG_CPY(from, to) MY_CTYPE_REVCOPY_REGISTERS((from), (to))
-#else
-#   error unsupported endianness
-#endif /* MY_ENDIAN_ORDER == MY_LITTLE_ENDIAN */
+#endif /* ORDER SELECTION */
 
 
 /* **********************************************************************************************************************************
@@ -227,6 +232,9 @@
 
 // mail service for stream from device
 #define ENTITY_MAIL_SERVICE_PACK    0x33U
+
+// entity read type dimensions
+#define ENTITY_READ_DIMENSIONS      0x0AU
 
 
 

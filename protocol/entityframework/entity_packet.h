@@ -62,7 +62,7 @@ int proceedGluedValues(u8* const inputData, u8* const outputData, reg* const siz
  * Help functions for read and wrire entity if exists pointer to data, len and bit flags
  *
  */
-STATIC_FORCEINLINE void proceedReadEntity(const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, const void* const ptr, u8* const outputData, const reg typeLen)
+STATIC_FORCEINLINE void proceedReadEntity(const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* ptr, u8* outputData, const reg typeLen)
 {
 
 #ifdef USE_ENTITY_ATOMIC
@@ -111,7 +111,7 @@ STATIC_FORCEINLINE void proceedReadEntity(const TYPEOF_STRUCT(EntityField, bitFl
 #endif /* defined(USE_ENTITY_POINTER) */
 
                                     {
-                                        ENTITY_BYTE_CPY(typeLen, (u8*)ptr, outputData);
+                                        ENTITY_BYTE_CPY(typeLen, ptr, outputData);
                                     }
 
 #ifdef USE_ENTITY_ATOMIC
@@ -120,7 +120,7 @@ STATIC_FORCEINLINE void proceedReadEntity(const TYPEOF_STRUCT(EntityField, bitFl
 
 }
 
-STATIC_FORCEINLINE void proceedWriteEntity(const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* const ptr, u8* const inputData, const reg typeLen)
+STATIC_FORCEINLINE void proceedWriteEntity(const TYPEOF_STRUCT(EntityField, bitFlags) bitFlags, void* ptr, u8* const inputData, reg typeLen)
 {
 #ifdef USE_ENTITY_ATOMIC
     ATOMIC_BLOCK_RESTORATE_COND((entityInfo.entities[entityNumber]->fields[fieldNumber].bitFlags & ENTITY_ATOMIC_MSK), {

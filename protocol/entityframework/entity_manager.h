@@ -253,14 +253,20 @@ STATIC_FORCEINLINE int entityDescrNotCompleate(const c8* str1, const c8* str2)
 #if ENTITY_DESCRIPTION_SIZE == 0x01U
     return ((*str1) == (*str2)) ? 0 : 1;
 #elif ENTITY_DESCRIPTION_SIZE == 0x02U
-    return (( *UINT16_TYPE_DC(str1) ) == ( *UINT16_TYPE_DC(str2) )) ? 0 : 1;
+    const u16 val1 = *UINT16_TYPE_DC(str1);
+    const u16 val2 = *UINT16_TYPE_DC(str2);
+    return (val1 == val2) ? 0 : 1;
 #elif ENTITY_DESCRIPTION_SIZE == 0x04U
-    return (( *UINT32_TYPE_DC(str1) ) == ( *UINT32_TYPE_DC(str2) )) ? 0 : 1;
+    const u32 val1 = *UINT32_TYPE_DC(str1);
+    const u32 val2 = *UINT32_TYPE_DC(str2);
+    return (val1 == val2) ? 0 : 1;
 #elif ENTITY_DESCRIPTION_SIZE == 0x08U
-    return (( *UINT64_TYPE_DC(str1) ) == ( *UINT64_TYPE_DC(str2) )) ? 0 : 1;
+    const u64 val1 = *UINT64_TYPE_DC(str1);
+    const u64 val2 = *UINT64_TYPE_DC(str2);
+    return (val1 == val2) ? 0 : 1;
 #else
 
-    int n = ENTITY_DESCRIPTION_SIZE;
+    reg n = ENTITY_DESCRIPTION_SIZE;
     while(n--) {
         if(*str1++ != *str2++) {
             return 1;
