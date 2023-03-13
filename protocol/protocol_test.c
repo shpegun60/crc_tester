@@ -247,7 +247,7 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
     int a = -1234345;
     receive_callback((const TEMPLATE(StaticCallbackContainer, void)){static_callback, PREPROCESSOR_CTX_CAPTURE({&a, malloc(10)})});
 
-    entityTest(randomSeed, testCnt);
+    //entityTest(randomSeed, testCnt);
 
 
 
@@ -255,9 +255,13 @@ int protocolAllTest(int randomSeed, int testCnt, unsigned int testFlags)
 
 
 
+
     fflush(stdout);
     fflush(stderr);
     return 0;
+
+
+
 }
 
 

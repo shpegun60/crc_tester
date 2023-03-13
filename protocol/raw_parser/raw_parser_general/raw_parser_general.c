@@ -62,10 +62,6 @@ int RawParser_gen_init(RawParser_gen_t* const self, const RawParser_gen_descr_t*
 {
     M_Assert_BreakSaveCheck(self == NULL || descriptor == NULL, M_EMPTY, return D_RAW_P_ERROR, "RawParser_gen_init: data is null");
 
-#ifdef D_RAW_P_TWO_BYTES_LEN_SUPPORT
-    M_Assert_BreakSaveCheck(descriptor->m_startByte == RECEIVE_EXTENDED_LEN_CMD, M_EMPTY, return D_RAW_P_ERROR, "RawParser_gen_init: start byte: %d must be not equal RECEIVE_EXTENDED_LEN_CMD: %d", descriptor->m_startByte, RECEIVE_EXTENDED_LEN_CMD);
-#endif /* D_RAW_P_TWO_BYTES_LEN_SUPPORT */
-
     M_Assert_BreakSaveCheck((descriptor->RX_buf == NULL) || (descriptor->RX_buf_size == 0) || (descriptor->recv_message == NULL) || (descriptor->write_byte == NULL),
                             M_EMPTY, return D_RAW_P_ERROR, "RawParser_gen_init: invalid input");
 

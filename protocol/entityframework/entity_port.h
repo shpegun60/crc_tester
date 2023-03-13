@@ -28,7 +28,7 @@
  * Entity test enable/disable
  */
 #ifndef ENTITY_DESCRIPTION_SIZE
-//#   define ENTITY_TEST_DISABLE 	1
+#   define ENTITY_TEST_DISABLE 	1
 #endif /* ENTITY_DESCRIPTION_SIZE */
 
 

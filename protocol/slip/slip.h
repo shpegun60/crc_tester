@@ -6,6 +6,7 @@ Serial Line Internet Protocol
 #define SLIP_H
 
 #include "my_ctypes.h"
+#include "slip_port.h"
 
 typedef enum {
         SLIP_STATE_NORMAL = 0x00,

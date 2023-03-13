@@ -71,11 +71,11 @@
 
 #ifndef AUTO_VAL
 #   define AUTO_VAL(var, value) TYPEOF_DATA(value) var = (value)
-#endif /* TYPEOF_DATA */
+#endif /* AUTO_VAL */
 
 #ifndef AUTO_VAL_NO_INIT
 #   define AUTO_VAL_NO_INIT(var, value) TYPEOF_DATA(value) var
-#endif /* TYPEOF_DATA */
+#endif /* AUTO_VAL_NO_INIT */
 
 
 /************************************************************************************
@@ -152,8 +152,7 @@ STATIC_FORCEINLINE void MY_CTYPE_USER_DATA_REVCPY(reg n, void* from, void* to)
         break;}
     case sizeof(u8): {
         *(u8*)to = *(u8*)from;
-        break;
-    }
+        break;}
     default: {
         u8* from_ptr = (u8*)from + n - 1;
         u8* to_ptr   = (u8*)to;

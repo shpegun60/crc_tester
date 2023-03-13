@@ -34,8 +34,8 @@ void entityCMD(u8* const inputData, u8* const outputData, reg* const size, const
      *  READ MAIN TYPE DIMENSIONS
      */
     case ENTITY_READ_DIMENSIONS: {
-    readEntitiesSizes((outputData + Wpos), &entitySize, (maxOutBufferSize - Wpos));
-    break;}
+        readEntitiesSizes((outputData + Wpos), &entitySize, (maxOutBufferSize - Wpos));
+        break;}
 
     /* **********************************************************************************************************************************
      *  READ DESCRIPTIONS

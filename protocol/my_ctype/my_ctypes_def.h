@@ -34,6 +34,7 @@ typedef unsigned char   b;
 // bus types defining (platform depend) ----------------------------------------------
 typedef size_t      reg;    // platform depend type
 typedef ptrdiff_t   sreg;   // platform depend type
+
 //------------------------------------------------------------------------------------
 
 
